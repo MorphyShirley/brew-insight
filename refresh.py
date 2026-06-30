@@ -9,9 +9,12 @@ import json
 import time
 import html as html_module
 from datetime import datetime, timezone, timedelta
-from urllib.request import urlopen, Request
-from urllib.error import HTTPError, URLError
 import xml.etree.ElementTree as ET
+
+try:
+    import requests
+except ImportError:
+    requests = None
 
 # ── 品牌与搜索关键词 ──
 BRANDS = {
@@ -53,16 +56,27 @@ BRAND_ICONS = {
 def fetch_news(brand_name, keyword, max_results=5):
     """从 Google News RSS 获取品牌最新资讯"""
     results = []
-    query = keyword
+    from urllib.parse import quote
+    query = quote(keyword)
     url = f"https://news.google.com/rss/search?q={query}&hl=zh-CN&gl=CN"
     
     try:
-        req = Request(url, headers={
-            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
-                          'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-        })
-        resp = urlopen(req, timeout=15)
-        xml_data = resp.read()
+        if requests:
+            resp = requests.get(url, timeout=15, headers={
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+                              'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            }, verify=False)
+            xml_data = resp.content
+        else:
+            from urllib.request import urlopen, Request
+            import ssl
+            ctx = ssl._create_unverified_context()
+            req = Request(url, headers={
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
+                              'AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
+            })
+            resp = urlopen(req, timeout=15, context=ctx)
+            xml_data = resp.read()
         
         root = ET.fromstring(xml_data)
         channel = root.find('channel')
@@ -96,10 +110,8 @@ def fetch_news(brand_name, keyword, max_results=5):
             if len(results) >= max_results:
                 break
                 
-    except (HTTPError, URLError, ET.ParseError) as e:
-        print(f"  ⚠️  {brand_name}: 抓取失败 - {e}")
     except Exception as e:
-        print(f"  ⚠️  {brand_name}: 未知错误 - {e}")
+        print(f"  ⚠️  {brand_name}: 抓取失败 - {type(e).__name__}: {str(e)[:60]}")
     
     return results
 
