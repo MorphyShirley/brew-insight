@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>饮力情报局 · 咖啡茶饮行业热点聚合</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', -apple-system, 'PingFang SC', 'Microsoft YaHei', sans-serif;
+      background: #080c18;
+      color: #e0e6f0;
+      line-height: 1.6;
+    }
+
+    /* ── Layout ── */
+    .app { display: flex; min-height: 100vh; }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 260px; flex-shrink: 0;
+      background: #0c1120;
+      border-right: 1px solid rgba(59,130,246,.12);
+      padding: 28px 20px;
+      position: sticky; top: 0; height: 100vh;
+      overflow-y: auto;
+      display: flex; flex-direction: column;
+      box-shadow: 2px 0 30px rgba(59,130,246,.04);
+    }
+    .sidebar-logo {
+      font-size: 20px; font-weight: 800; letter-spacing: -.3px;
+      display: flex; align-items: center; gap: 10px;
+      padding-bottom: 24px; margin-bottom: 24px;
+      border-bottom: 1px solid rgba(59,130,246,.1);
+      color: #e0e6f0;
+    }
+    .sidebar-logo span { color: #60a5fa; }
+    .sidebar-logo .badge {
+      font-size: 9px; font-weight: 700; letter-spacing: .5px;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      color: #fff;
+      padding: 2px 8px; border-radius: 100px;
+      margin-left: 4px;
+      box-shadow: 0 0 12px rgba(59,130,246,.4);
+    }
+    .sidebar nav { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+    .sidebar nav a {
+      padding: 10px 14px; border-radius: 10px;
+      text-decoration: none; color: #8892a8; font-size: 14px; font-weight: 500;
+      display: flex; align-items: center; gap: 10px;
+      transition: all .2s;
+    }
+    .sidebar nav a:hover { background: rgba(59,130,246,.08); color: #e0e6f0; }
+    .sidebar nav a.active {
+      background: linear-gradient(135deg, rgba(59,130,246,.15), rgba(96,165,250,.08));
+      color: #60a5fa;
+      box-shadow: inset 0 0 20px rgba(59,130,246,.06);
+    }
+    .sidebar nav a .icon { font-size: 18px; width: 24px; text-align: center; }
+    .sidebar-nav-label {
+      font-size: 11px; font-weight: 600; letter-spacing: 1px;
+      color: #4a5568; margin: 16px 0 8px 14px; text-transform: uppercase;
+    }
+
+    .sidebar-footer {
+      margin-top: auto; padding-top: 16px;
+      border-top: 1px solid rgba(59,130,246,.1);
+      font-size: 12px; color: #4a5568;
+    }
+    .sidebar-footer .user {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 14px; border-radius: 10px;
+      cursor: pointer; transition: background .2s;
+    }
+    .sidebar-footer .user:hover { background: rgba(59,130,246,.06); }
+    .sidebar-footer .user-avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 14px;
+      box-shadow: 0 0 16px rgba(59,130,246,.3);
+    }
+
+    /* ── Main ── */
+    .main {
+      flex: 1; min-width: 0;
+      padding: 32px 40px 60px;
+      max-width: 1100px;
+    }
+
+    /* ── Top bar ── */
+    .top-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
+    }
+    .top-bar h1 {
+      font-size: 26px; font-weight: 800; letter-spacing: -.5px;
+      color: #e0e6f0;
+    }
+    .top-bar h1 small {
+      font-size: 14px; font-weight: 400; color: #4a5568;
+      margin-left: 12px;
+    }
+    .top-bar-actions {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .top-bar-actions .date-display {
+      font-size: 13px; color: #8892a8; font-weight: 500;
+      background: #0c1120; padding: 8px 16px; border-radius: 100px;
+      border: 1px solid rgba(59,130,246,.12);
+    }
+    .btn-icon {
+      width: 38px; height: 38px; border-radius: 10px;
+      border: 1px solid rgba(59,130,246,.12); background: #0c1120;
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer; font-size: 16px; color: #8892a8;
+      transition: all .2s;
+    }
+    .btn-icon:hover { background: rgba(59,130,246,.1); border-color: #3b82f6; color: #60a5fa; }
+
+    /* ── Hot Topic Hero ── */
+    .hot-hero {
+      background: linear-gradient(135deg, #0f1a2e 0%, #1a2740 50%, #0f1a2e 100%);
+      border-radius: 20px;
+      padding: 32px 36px;
+      color: #e0e6f0;
+      margin-bottom: 28px;
+      position: relative; overflow: hidden;
+      border: 1px solid rgba(59,130,246,.15);
+      box-shadow: 0 0 40px rgba(59,130,246,.06), inset 0 0 60px rgba(59,130,246,.03);
+    }
+    .hot-hero::before {
+      content: ''; position: absolute; top: -60%; right: -10%;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(59,130,246,.12) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hot-hero::after {
+      content: ''; position: absolute; bottom: -30%; left: 20%;
+      width: 300px; height: 300px;
+      background: radial-gradient(circle, rgba(96,165,250,.06) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+    .hot-hero .label {
+      font-size: 11px; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: #60a5fa; margin-bottom: 8px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .hot-hero .label .fire { font-size: 16px; }
+    .hot-hero h2 {
+      font-size: 22px; font-weight: 700; margin-bottom: 10px;
+      position: relative; z-index: 1;
+    }
+    .hot-hero .meta {
+      font-size: 13px; color: rgba(255,255,255,.5);
+      display: flex; align-items: center; gap: 16px;
+      position: relative; z-index: 1;
+    }
+    .hot-hero .meta .tag {
+      background: rgba(59,130,246,.2); color: #60a5fa;
+      padding: 2px 10px; border-radius: 100px; font-size: 11px; font-weight: 600;
+    }
+    .hot-hero .sources {
+      display: flex; gap: 6px; flex-wrap: wrap; margin-top: 14px;
+      position: relative; z-index: 1;
+    }
+    .hot-hero .sources span {
+      font-size: 11px; color: rgba(255,255,255,.35);
+      background: rgba(255,255,255,.04);
+      padding: 3px 10px; border-radius: 6px;
+      border: 1px solid rgba(255,255,255,.04);
+    }
+
+    /* ── Filter tabs ── */
+    .filter-bar {
+      display: flex; align-items: center; gap: 8px;
+      margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .filter-bar .filter-label {
+      font-size: 12px; font-weight: 600; color: #4a5568;
+      letter-spacing: .5px; text-transform: uppercase;
+      margin-right: 4px;
+    }
+    .filter-btn {
+      padding: 6px 16px; border-radius: 100px;
+      border: 1px solid rgba(59,130,246,.12); background: #0c1120;
+      font-size: 13px; font-weight: 500; color: #8892a8;
+      cursor: pointer; transition: all .2s;
+    }
+    .filter-btn:hover { border-color: rgba(59,130,246,.3); color: #60a5fa; }
+    .filter-btn.active {
+      background: linear-gradient(135deg, #3b82f6, #60a5fa);
+      color: #fff; border-color: transparent;
+      box-shadow: 0 0 20px rgba(59,130,246,.25);
+    }
+
+    /* ── News card ── */
+    .news-card {
+      background: #0c1120;
+      border-radius: 16px;
+      padding: 24px 28px;
+      margin-bottom: 16px;
+      transition: all .25s;
+      border: 1px solid rgba(59,130,246,.06);
+      box-shadow: 0 1px 0 rgba(59,130,246,.04);
+    }
+    .news-card:hover {
+      border-color: rgba(59,130,246,.15);
+      box-shadow: 0 0 24px rgba(59,130,246,.06), 0 4px 20px rgba(0,0,0,.2);
+    }
+    .news-card .card-header {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 10px;
+    }
+    .news-card .brand-icon {
+      width: 24px; height: 24px; border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: #fff;
+      flex-shrink: 0;
+    }
+    .news-card .brand-name {
+      font-size: 13px; font-weight: 600; color: #4a5568;
+    }
+    .news-card .time {
+      font-size: 12px; color: #4a5568; margin-left: auto;
+    }
+    .news-card .score {
+      font-size: 11px; font-weight: 700; color: #60a5fa;
+      background: rgba(59,130,246,.1); padding: 2px 10px; border-radius: 100px;
+      margin-left: 8px;
+    }
+    .news-card h3 {
+      font-size: 17px; font-weight: 700;
+      margin-bottom: 8px; line-height: 1.4;
+    }
+    .news-card h3 a {
+      text-decoration: none; color: #e0e6f0;
+    }
+    .news-card h3 a:hover { color: #60a5fa; }
+    .news-card p {
+      font-size: 14px; color: #6b7a92;
+      line-height: 1.7; margin-bottom: 12px;
+    }
+    .news-card .card-footer {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .news-card .tag {
+      font-size: 11px; font-weight: 600;
+      padding: 2px 10px; border-radius: 100px;
+      background: rgba(59,130,246,.08); color: #8892a8;
+    }
+    .news-card .tag.tag-red { background: rgba(239,68,68,.12); color: #f87171; }
+    .news-card .tag.tag-green { background: rgba(34,197,94,.12); color: #4ade80; }
+    .news-card .tag.tag-blue { background: rgba(59,130,246,.12); color: #60a5fa; }
+    .news-card .tag.tag-gold { background: rgba(234,179,8,.12); color: #facc15; }
+
+    /* ── Section separator ── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin: 36px 0 16px;
+    }
+    .section-header h3 {
+      font-size: 18px; font-weight: 700;
+      color: #e0e6f0;
+    }
+    .section-header a {
+      font-size: 13px; color: #60a5fa; text-decoration: none;
+      font-weight: 500;
+    }
+    .section-header a:hover { text-decoration: underline; }
+
+    /* ── Side right panel (in main) ── */
+    .main-grid {
+      display: grid; grid-template-columns: 1fr 300px; gap: 28px;
+      align-items: start;
+    }
+    .main-content { min-width: 0; }
+    .side-panel {
+      position: sticky; top: 28px;
+      max-height: calc(100vh - 80px);
+      overflow-y: auto;
+      align-self: start;
+    }
+    .side-panel::-webkit-scrollbar { width: 4px; }
+    .side-panel::-webkit-scrollbar-thumb { background: rgba(59,130,246,.15); border-radius: 2px; }
+
+    /* ── Trend card ── */
+    .trend-card {
+      background: #0c1120; border-radius: 16px; padding: 24px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(59,130,246,.06);
+    }
+    .trend-card .trend-title {
+      font-size: 14px; font-weight: 700; margin-bottom: 16px;
+      display: flex; align-items: center; gap: 8px;
+      color: #e0e6f0;
+    }
+    .trend-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(59,130,246,.06);
+    }
+    .trend-item:last-child { border-bottom: none; }
+    .trend-rank {
+      width: 24px; font-size: 13px; font-weight: 700; color: #4a5568;
+      text-align: center;
+    }
+    .trend-rank.top3 { color: #60a5fa; }
+    .trend-info { flex: 1; min-width: 0; }
+    .trend-info .name {
+      font-size: 14px; font-weight: 600;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      color: #e0e6f0;
+    }
+    .trend-info .stat {
+      font-size: 12px; color: #4a5568;
+    }
+    .trend-info .stat .up { color: #f87171; }
+    .trend-info .stat .down { color: #4ade80; }
+    .trend-heat {
+      font-size: 12px; color: #60a5fa; font-weight: 600;
+    }
+
+    /* ── Quick insight ── */
+    .insight-card {
+      background: linear-gradient(135deg, #0f1a2e, #0c1120);
+      border-radius: 16px; padding: 24px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(59,130,246,.1);
+      box-shadow: inset 0 0 30px rgba(59,130,246,.03);
+    }
+    .insight-card .insight-title {
+      font-size: 14px; font-weight: 700; margin-bottom: 12px;
+      color: #e0e6f0;
+    }
+    .insight-card p {
+      font-size: 13px; color: #6b7a92; line-height: 1.7;
+    }
+    .insight-card .highlight {
+      color: #60a5fa; font-weight: 600;
+    }
+
+    /* ── Calendar card ── */
+    .cal-card {
+      background: #0c1120; border-radius: 16px; padding: 24px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(59,130,246,.06);
+    }
+    .cal-card .cal-title {
+      font-size: 14px; font-weight: 700; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
+      color: #e0e6f0;
+    }
+    .cal-item {
+      display: flex; gap: 12px; padding: 8px 0;
+      border-bottom: 1px solid rgba(59,130,246,.06);
+    }
+    .cal-item:last-child { border-bottom: none; }
+    .cal-item .cal-date {
+      font-size: 12px; font-weight: 700; color: #60a5fa;
+      width: 40px; flex-shrink: 0; text-align: center;
+    }
+    .cal-item .cal-info { font-size: 13px; color: #6b7a92; }
+
+    /* ── Journal / Daily digest ── */
+    .daily-section {
+      margin-top: 40px;
+    }
+    .daily-section .daily-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .daily-section .daily-header h3 {
+      font-size: 18px; font-weight: 700;
+      color: #e0e6f0;
+    }
+    .daily-section .daily-header .sub {
+      font-size: 13px; color: #4a5568;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1024px) {
+      .sidebar { display: none; }
+      .main { padding: 24px 20px 40px; }
+      .main-grid { grid-template-columns: 1fr; }
+      .side-panel { position: static; }
+    }
+    @media (max-width: 640px) {
+      .hot-hero { padding: 24px 20px; }
+      .hot-hero h2 { font-size: 18px; }
+      .news-card { padding: 20px; }
+      .top-bar h1 small { display: block; margin-left: 0; }
+    }
+
+    /* ── Edge glow animation ── */
+    @keyframes edgeGlow {
+      0%, 100% { box-shadow: 0 0 15px rgba(59,130,246,.03), 0 0 40px rgba(59,130,246,.02); }
+      50% { box-shadow: 0 0 25px rgba(59,130,246,.06), 0 0 60px rgba(59,130,246,.03); }
+    }
+    .app::before {
+      content: ''; position: fixed; top: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(59,130,246,.2), rgba(96,165,250,.4), rgba(59,130,246,.2), transparent);
+      z-index: 999; pointer-events: none;
+    }
+    .app::after {
+      content: ''; position: fixed; bottom: 0; left: 0; right: 0;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(59,130,246,.15), rgba(96,165,250,.3), rgba(59,130,246,.15), transparent);
+      z-index: 999; pointer-events: none;
+    }
+
+    /* ── Glow border lines on sides ── */
+    .sidebar::after {
+      content: ''; position: absolute; top: 0; right: -1px;
+      width: 1px; height: 100%;
+      background: linear-gradient(180deg, transparent, rgba(59,130,246,.15), rgba(96,165,250,.25), rgba(59,130,246,.15), transparent);
+    }
+
+    /* ── Chart styles ── */
+    .chart-container {
+      background: #0c1120; border-radius: 16px; padding: 20px;
+      margin-bottom: 20px; border: 1px solid rgba(59,130,246,.06);
+    }
+    .chart-container .chart-title {
+      font-size: 14px; font-weight: 700; color: #e0e6f0;
+      margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+    }
+    .chart-container .chart-sub {
+      font-size: 11px; color: #4a5568; margin-left: 8px; font-weight: 400;
+    }
+    .chart-container canvas {
+      width: 100%; height: auto; display: block;
+      border-radius: 8px; cursor: crosshair;
+    }
+    .chart-tooltip {
+      position: fixed; pointer-events: none; z-index: 100;
+      background: #0f1a2e; border: 1px solid rgba(59,130,246,.2);
+      border-radius: 10px; padding: 10px 14px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.3);
+      opacity: 0; transition: opacity .15s;
+      min-width: 140px;
+    }
+    .chart-tooltip.visible { opacity: 1; }
+    .chart-tooltip .tt-name { font-size: 13px; font-weight: 700; color: #e0e6f0; }
+    .chart-tooltip .tt-brand { font-size: 11px; color: #60a5fa; margin-top: 2px; }
+    .chart-tooltip .tt-row { display: flex; justify-content: space-between; gap: 16px; margin-top: 4px; }
+    .chart-tooltip .tt-row span { font-size: 11px; color: #6b7a92; }
+    .chart-tooltip .tt-row .tt-val { color: #e0e6f0; font-weight: 600; }
+    .chart-legend {
+      display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;
+    }
+    .chart-legend span {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 11px; color: #6b7a92;
+    }
+    .chart-legend .dot {
+      width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+    }
+
+    /* ── Funnel ── */
+    .funnel {
+      display: flex; flex-direction: column; align-items: center; gap: 4px;
+      margin: 16px 0;
+    }
+    .funnel-row {
+      display: flex; align-items: center; width: 100%;
+      padding: 10px 16px; border-radius: 8px;
+      background: rgba(59,130,246,.04);
+      border: 1px solid rgba(59,130,246,.06);
+      transition: all .2s; cursor: default;
+    }
+    .funnel-row:hover { background: rgba(59,130,246,.08); border-color: rgba(59,130,246,.15); }
+    .funnel-row .funnel-label { font-size: 13px; font-weight: 600; color: #e0e6f0; white-space: nowrap; }
+    .funnel-row .funnel-bar {
+      flex: 1; height: 6px; margin: 0 12px;
+      background: rgba(59,130,246,.08); border-radius: 3px; overflow: hidden;
+    }
+    .funnel-row .funnel-fill {
+      height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      border-radius: 3px; transition: width .6s ease;
+    }
+    .funnel-row .funnel-pct { font-size: 12px; font-weight: 600; color: #60a5fa; width: 36px; text-align: right; }
+    .funnel-row .funnel-icon { font-size: 16px; margin-right: 8px; }
+    .funnel-sub {
+      margin-left: 32px; width: calc(100% - 32px);
+      display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px; margin-bottom: 6px;
+    }
+    .funnel-sub span {
+      font-size: 11px; padding: 2px 10px; border-radius: 100px;
+      background: rgba(59,130,246,.06); color: #6b7a92;
+    }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,.6); backdrop-filter: blur(4px);
+      align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #0f1a2e; border-radius: 20px;
+      width: 100%; max-width: 640px; max-height: 85vh; overflow-y: auto;
+      padding: 32px 36px;
+      border: 1px solid rgba(59,130,246,.15);
+      box-shadow: 0 0 60px rgba(59,130,246,.1);
+      position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 16px; right: 20px;
+      background: none; border: none; color: #8892a8;
+      font-size: 24px; cursor: pointer; transition: color .2s;
+    }
+    .modal-close:hover { color: #e0e6f0; }
+    .modal h2 { font-size: 22px; font-weight: 700; color: #e0e6f0; margin-bottom: 4px; }
+    .modal .modal-brand { font-size: 13px; color: #60a5fa; margin-bottom: 20px; }
+    .modal .stat-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .modal .stat-box {
+      background: rgba(59,130,246,.06); border-radius: 12px;
+      padding: 16px; text-align: center;
+      border: 1px solid rgba(59,130,246,.06);
+    }
+    .modal .stat-box .num {
+      font-size: 24px; font-weight: 800; color: #60a5fa;
+    }
+    .modal .stat-box .label {
+      font-size: 11px; color: #6b7a92; margin-top: 4px;
+    }
+    .modal .rating-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid rgba(59,130,246,.06);
+    }
+    .modal .rating-row:last-child { border-bottom: none; }
+    .modal .rating-row .dim { font-size: 13px; color: #6b7a92; width: 80px; }
+    .modal .rating-row .bar {
+      flex: 1; height: 8px; background: rgba(59,130,246,.08); border-radius: 4px; overflow: hidden;
+    }
+    .modal .rating-row .bar-fill {
+      height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa);
+      border-radius: 4px; transition: width .6s ease;
+    }
+    .modal .rating-row .val {
+      font-size: 13px; font-weight: 600; color: #e0e6f0; width: 32px; text-align: right;
+    }
+    .modal .sentiment {
+      display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px;
+    }
+    .modal .sentiment span {
+      font-size: 12px; padding: 4px 12px; border-radius: 100px;
+      background: rgba(59,130,246,.08); color: #6b7a92;
+    }
+    .modal .sentiment .pos { background: rgba(34,197,94,.12); color: #4ade80; }
+    .modal .sentiment .neg { background: rgba(239,68,68,.12); color: #f87171; }
+
+    /* ── Scrollbar ── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(59,130,246,.15); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,.25); }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══ SIDEBAR ═══ -->
+  <aside class="sidebar">
+    <div class="sidebar-logo">
+      ☕ 饮力情报局
+      <span class="badge">BETA</span>
+    </div>
+    <nav>
+      <a href="#" data-page="featured" class="active"><span class="icon">🔥</span>精选</a>
+      <a href="#" data-page="all"><span class="icon">📰</span>全部动态</a>
+      <a href="#" data-page="daily"><span class="icon">📋</span>行业日报</a>
+      <div class="sidebar-nav-label">分类</div>
+      <a href="#" data-page="new-products"><span class="icon">🆕</span>季度新品</a>
+      <a href="#" data-page="marketing"><span class="icon">🎯</span>营销活动</a>
+      <a href="#" data-page="strategy"><span class="icon">📊</span>品牌战略</a>
+      <a href="#" data-page="trends"><span class="icon">📈</span>行业趋势</a>
+      <div class="sidebar-nav-label">情报</div>
+      <a href="#" data-page="follows"><span class="icon">📌</span>我的关注</a>
+      <a href="#" data-page="flash"><span class="icon">⚡</span>快讯订阅</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user">
+        <div class="user-avatar">M</div>
+        <div>
+          <div style="font-size:13px;font-weight:600;">Morris</div>
+          <div style="font-size:11px;color:#6b7a92;">品牌分析师</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ═══ MAIN ═══ -->
+  <div class="main">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+      <h1 id="pageTitle">精选动态</h1>
+      <div class="top-bar-actions">
+        <span class="date-display"></span>
+        <button class="btn-icon" title="刷新" onclick="location.reload()">⟳</button>
+        <button class="btn-icon" title="设置">⚙</button>
+      </div>
+    </div>
+
+    <div class="main-grid">
+      <div class="main-content" id="pageContent"></div>
+      <div class="side-panel" id="pageSide"></div>
+    </div>
+
+  </div>
+</div>
+
+<div class="modal-overlay" id="productModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal" id="modalContent">
+    <button class="modal-close" onclick="closeModal()">✕</button>
+    <div id="modalInner"></div>
+  </div>
+</div>
+
+<script>
+// ═══ PRODUCT ANALYSIS DATA ═══
+const PRODUCT_ANALYSIS = {
+  '柠打·九窨茉王（喜茶）': {
+    brand: '喜茶', date: '2026-06-29',
+    sales: '上线即获热烈好评', revenue: '全国门店同步', rating: '8.9',
+    growth: '茶坊爆品转全国', repeat: '预估 45%', avgPrice: '22 元',
+    scores: { 口味: 89, 包装: 82, 性价比: 84, 复购意愿: 88, 社交传播: 90 },
+    pos: ['九窨茉莉茶底独特','鲜柠皮+奶盖层次丰富','茶坊爆品验证','夏季清爽'],
+    neg: ['仅限喜茶·茶坊出品','部分地区尚未覆盖'],
+    summary: '喜茶·茶坊"柠打·九窨茉王"因热烈好评转全国。自研九窨雪毫茉王茶底，每500g茶用5500+茉莉花窨制9次，搭配鲜柠皮和青柠雪山奶盖，是喜茶回归产品力的代表作。（来源：网易/饮品报快讯）'
+  },
+  '佛手柠檬水（茶百道）': {
+    brand: '茶百道', date: '2026-06-10',
+    sales: '首日近 20 万杯', revenue: '约 200 万/日', rating: '8.7',
+    growth: '首发即登门店榜首', repeat: '预估 50%', avgPrice: '9.98 元',
+    scores: { 口味: 87, 包装: 76, 性价比: 96, 复购意愿: 90, 社交传播: 78 },
+    pos: ['1L超大杯','0咖啡因全天可喝','仅32.27大卡','会员价9.98元'],
+    neg: ['限时促销价','非会员价格较高'],
+    summary: '茶百道"佛手柠檬水"1L超大杯，鲜榨佛手柑汁+香水柠檬，0茶底0咖啡因仅32.27卡。会员价9.98元，首日近20万杯登顶门店榜首。（来源：36氪/咖门）'
+  },
+  '全冰黄油SOE（Manner）': {
+    brand: 'Manner', date: '2026-06-09',
+    sales: '社交平台热议', revenue: '20 元/杯', rating: '8.5',
+    growth: '话题新品', repeat: '预估 42%', avgPrice: '20 元',
+    scores: { 口味: 85, 包装: 72, 性价比: 82, 复购意愿: 80, 社交传播: 88 },
+    pos: ['黄油榛子SOE豆','全冰去水趋势','热量救星','20元定价'],
+    neg: ['有/无牛奶同价争议','冰多咖啡少'],
+    summary: 'Manner 全冰黄油SOE，黄油榛子风味SOE豆，推出去牛奶版(75ml)和加牛奶版(195ml)均售20元。延续"全冰去水"网红喝法引发社交热议。（来源：新浪财经/咖门）'
+  },
+  '定制茶饮功能（喜茶）': {
+    brand: '喜茶', date: '2026-06-29',
+    sales: '灰度测试中', revenue: '深圳部分门店', rating: '8.0',
+    growth: '新模式测试', repeat: '待观察', avgPrice: '自定义',
+    scores: { 口味: 72, 包装: 78, 性价比: 85, 复购意愿: 82, 社交传播: 78 },
+    pos: ['消费者自定义配方','个性化体验','行业创新方向'],
+    neg: ['仅深圳灰度测试','系统稳定性待验证','正式上线时间未定'],
+    summary: '喜茶推出"定制茶饮"功能，让消费者自定义饮品配方，目前仅在深圳部分门店灰度测试，将根据系统稳定性逐步推广。（来源：新浪财经独家）'
+  },
+  '抹茶gelato系列（奈雪）': {
+    brand: '奈雪的茶', date: '2026-06-28',
+    sales: '抖音热度 9000+', revenue: '门店上线', rating: '8.2',
+    growth: '夏季新品', repeat: '预估 35%', avgPrice: '22 元',
+    scores: { 口味: 82, 包装: 78, 性价比: 76, 复购意愿: 72, 社交传播: 80 },
+    pos: ['抹茶+gelato组合','夏季限定','日式风味'],
+    neg: ['具体产品名待公布','覆盖门店有限'],
+    summary: '奈雪的茶推出抹茶gelato系列新品，抖音预热获得较高互动。具体产品名尚未正式公布，是奈雪夏季产品线的重要补充。（来源：抖音）'
+  },
+  '9.9元招牌茶8选一（乐乐茶）': {
+    brand: '乐乐茶', date: '2026-06-28',
+    sales: '抖音 24.9 万赞', revenue: '限时促销', rating: '8.3',
+    growth: '限时促销活动', repeat: '活动期间', avgPrice: '9.9 元',
+    scores: { 口味: 83, 包装: 76, 性价比: 95, 复购意愿: 78, 社交传播: 86 },
+    pos: ['8款招牌茶任选','仅9.9元','超高性价比','抖音爆火'],
+    neg: ['限时活动','长期价格未定'],
+    summary: '乐乐茶限时促销，8款招牌好茶均售9.9元，抖音获24.9万点赞，是近期性价比最高的品牌活动之一。（来源：抖音）'
+  },
+  '全冰小黄油美式（瑞幸）': {
+    brand: '瑞幸咖啡', date: '2026-04-27',
+    sales: '全网爆火跟风', revenue: '全门店上线', rating: '8.6',
+    growth: '用户自创转官方', repeat: '预计 50%', avgPrice: '13 元',
+    scores: { 口味: 86, 包装: 70, 性价比: 92, 复购意愿: 88, 社交传播: 94 },
+    pos: ['用户自创喝法官方化','全冰去水','热量低','社交传播力极强'],
+    neg: ['冰多咖啡少','跟风品牌多'],
+    summary: '瑞幸将用户自创"全冰去水"喝法正式加入小黄油美式选项，引爆社交网络。库迪、Manner相继跟进，成为2026夏季最热咖啡趋势。'
+  },
+  '小黄油美式全冰去水（库迪）': {
+    brand: '库迪咖啡', date: '2026-05-15',
+    sales: '跟进瑞幸趋势', revenue: '全门店上线', rating: '7.8',
+    growth: '趋势跟进', repeat: '预计 35%', avgPrice: '9.9 元',
+    scores: { 口味: 78, 包装: 68, 性价比: 90, 复购意愿: 72, 社交传播: 74 },
+    pos: ['9.9元低价跟进','全冰去水趋势','价格优势'],
+    neg: ['创新不足跟风品','品质一般'],
+    summary: '库迪紧随瑞幸推出小黄油美式"全冰去水"版本，延续9.9元低价策略，但产品创新力不足市场反响平平。'
+  },
+  '夏季新品预告（霸王茶姬）': {
+    brand: '霸王茶姬', date: '2026-06-28',
+    sales: '抖音 6600+ 赞', revenue: '即将上线', rating: '待测评',
+    growth: '新品预告', repeat: '待观察', avgPrice: '预计 20-25 元',
+    scores: { 口味: 80, 包装: 80, 性价比: 78, 复购意愿: 78, 社交传播: 82 },
+    pos: ['品牌热度高','抖音预告互动好','夏季期待'],
+    neg: ['具体信息未公布'],
+    summary: '霸王茶姬在抖音预告夏季新品，获6600+点赞。具体产品名和日期尚未公布，预计7月初正式上线。同时广东首开"无声门店"（听障员工为主）。'
+  },
+  '广式凉茶拿铁（M Stand）': {
+    brand: 'M Stand', date: '2026-06',
+    sales: '区域爆款', revenue: '广州旗舰店独家', rating: '8.2',
+    growth: '城市限定策略', repeat: '预估 35%', avgPrice: '36 元',
+    scores: { 口味: 82, 包装: 80, 性价比: 62, 复购意愿: 72, 社交传播: 88 },
+    pos: ['地域特色鲜明','打卡属性强','岭南文化','城市限定策略验证'],
+    neg: ['价格偏高','仅限广州'],
+    summary: 'M Stand 广州旗舰店独家"广式凉茶拿铁"，廿四味凉茶+精品咖啡融合，开业排队超2小时，为M Stand城市限定策略的代表作。'
+  },
+  'Tims 鲜萃奶咖': {
+    brand: 'Tims天好咖啡', date: '2026-Q2',
+    sales: '核心产品持续热销', revenue: '全国门店', rating: '8.0',
+    growth: '经典款稳定', repeat: '预估 45%', avgPrice: '19 元',
+    scores: { 口味: 80, 包装: 72, 性价比: 84, 复购意愿: 82, 社交传播: 68 },
+    pos: ['鲜萃工艺','性价比高','早餐场景','复购率高'],
+    neg: ['创新不足','与竞品差异小'],
+    summary: 'Tims 鲜萃奶咖是其经典核心产品，采用鲜萃咖啡工艺，搭配加拿大原产枫糖，是Tims在中国市场的招牌饮品。'
+  },
+  '蜜雪现磨咖啡试水': {
+    brand: '蜜雪冰城', date: '2026-06',
+    sales: '试点阶段', revenue: '上海/郑州测试', rating: '7.0',
+    growth: '新业务线探索', repeat: '待观察', avgPrice: '8 元',
+    scores: { 口味: 70, 包装: 60, 性价比: 95, 复购意愿: 68, 社交传播: 74 },
+    pos: ['8元极致低价','蜜雪渠道优势','品牌下沉'],
+    neg: ['咖啡品质存疑','"不像雪王"争议','品牌定位冲突'],
+    summary: '蜜雪冰城试水现磨咖啡，8元定价行业最低，但面临品牌定位争议——消费者质疑"卖咖啡的蜜雪不像雪王"。'
+  },
+  '星巴克 冰摇桃桃乌龙': {
+    brand: '星巴克中国', date: '2026-Q2',
+    sales: '季节性热销', revenue: '全国门店', rating: '8.3',
+    growth: '冰摇系列经典款', repeat: '预估 42%', avgPrice: '35 元',
+    scores: { 口味: 83, 包装: 80, 性价比: 72, 复购意愿: 80, 社交传播: 76 },
+    pos: ['桃桃果肉','乌龙茶底清爽','季节限定','复购稳定'],
+    neg: ['价格偏高','季节性供应'],
+    summary: '星巴克冰摇桃桃乌龙是夏季经典冰摇茶饮，真实桃肉果粒搭配乌龙茶底，每年夏季回归均获稳定销量。'
+  },
+  '麦咖啡 早餐套餐': {
+    brand: '麦当劳', date: '2026-Q2',
+    sales: 'Q2 咖啡增长 25%', revenue: '全门店', rating: '7.8',
+    growth: '↑25%', repeat: '预估 35%', avgPrice: '18 元',
+    scores: { 口味: 78, 包装: 76, 性价比: 88, 复购意愿: 74, 社交传播: 76 },
+    pos: ['咖啡+汉堡套餐','早餐场景','全国覆盖','性价比高'],
+    neg: ['咖啡品质一般','缺乏特色'],
+    summary: '麦咖啡早餐咖啡+汉堡套餐18元，Q2咖啡销售额同比增长25%，门店超4500家，是快餐咖啡赛道的重要玩家。'
+  },
+  '肯悦咖啡K-POP联名（肯德基）': {
+    brand: '肯德基', date: '2026-Q2',
+    sales: '粉丝经济驱动', revenue: 'K Coffee 全门店', rating: '8.0',
+    growth: 'K-POP联名', repeat: '预估 35%', avgPrice: '12 元',
+    scores: { 口味: 80, 包装: 84, 性价比: 88, 复购意愿: 74, 社交传播: 86 },
+    pos: ['EXO/aespa联名','粉丝打卡','低价韩流','社交话题破亿'],
+    neg: ['联名周边限量','咖啡品质一般'],
+    summary: '肯悦咖啡K-POP联名（EXO/aespa），瞄准年轻女性粉丝群体，社交话题阅读量破亿，粉丝经济转化显著。'
+  },
+  '瑞幸 橙C美式': {
+    brand: '瑞幸咖啡', date: '2026-Q2',
+    sales: '经典款持续热销', revenue: '全国门店', rating: '8.4',
+    growth: '经典复购款', repeat: '预估 48%', avgPrice: '14 元',
+    scores: { 口味: 84, 包装: 72, 性价比: 92, 复购意愿: 88, 社交传播: 74 },
+    pos: ['橙汁+美式经典搭配','维生素C概念','复购率高','夏季清爽'],
+    neg: ['季节性供应','部分门店橙子品质不一'],
+    summary: '瑞幸橙C美式是夏季经典回归款，鲜榨橙汁搭配美式咖啡，维生素C+咖啡因组合击中健康消费需求。'
+  },
+  '乐乐茶 杨枝甘露': {
+    brand: '乐乐茶', date: '2026-Q2',
+    sales: '经典招牌持续热销', revenue: '全国门店', rating: '8.5',
+    growth: '经典款稳定', repeat: '预估 45%', avgPrice: '22 元',
+    scores: { 口味: 85, 包装: 78, 性价比: 82, 复购意愿: 84, 社交传播: 76 },
+    pos: ['芒果+柚子经典','口感丰富','品质稳定','消费者认知度高'],
+    neg: ['创新空间有限','季节性水果品质波动'],
+    summary: '乐乐茶的招牌经典产品，芒果+西柚+椰奶的经典组合，是乐乐茶复购率最高的产品之一。'
+  },
+  'M Stand 城市限定系列': {
+    brand: 'M Stand', date: '2026-Q2',
+    sales: '区域热销', revenue: '新一线城市拓展', rating: '8.1',
+    growth: '城市限定+旗舰店', repeat: '预估 30%', avgPrice: '38 元',
+    scores: { 口味: 81, 包装: 84, 性价比: 60, 复购意愿: 68, 社交传播: 82 },
+    pos: ['每城一限定','旗舰店体验','设计感强','打卡属性'],
+    neg: ['价格偏高','门店覆盖少'],
+    summary: 'M Stand 以城市限定策略推进全国扩张，广州旗舰店广式凉茶拿铁验证模式后，计划在成都、武汉继续推行。'
+  },
+  'Subway咖啡+轻食套餐': {
+    brand: 'Subway', date: '2026-Q2',
+    sales: '试点 10 家门店', revenue: '上海测试中', rating: '7.2',
+    growth: '场景拓展试点', repeat: '测试阶段', avgPrice: '26 元',
+    scores: { 口味: 72, 包装: 62, 性价比: 78, 复购意愿: 58, 社交传播: 48 },
+    pos: ['午餐场景精准','组合划算','测试门店客流+20%'],
+    neg: ['咖啡品质一般','仅10家测试店','品牌认知偏弱'],
+    summary: 'Subway在上海10家门店试点"咖啡+轻食"全天候套餐，26元组合价瞄准白领午餐场景，测试期门店客流提升20%。'
+  },
+  '清香乌龙冰柠（喜茶）': {
+    brand: '喜茶', date: '2026-Q2',
+    sales: '经典款持续热销', revenue: '全国门店', rating: '8.4',
+    growth: '经典复购款', repeat: '42%', avgPrice: '25 元',
+    scores: { 口味: 84, 包装: 76, 性价比: 82, 复购意愿: 84, 社交传播: 72 },
+    pos: ['清香乌龙','柠檬清爽','冰饮解暑','复购稳定'],
+    neg: ['创新不足','同类产品多'],
+    summary: '喜茶回归产品力代表作，清香乌龙冰柠以经典搭配和稳定品质获消费者认可，复购率达42%。'
+  },
+};
+
+// ═══ SCATTER PLOT ═══
+const SCATTER_BRAND_COLORS = {
+  '瑞幸咖啡': '#1a3a2a', '星巴克中国': '#006241', '茶百道': '#2a6e4a',
+  '霸王茶姬': '#b07d3a', 'Manner': '#f5a623', '肯德基': '#d42a2a',
+  '麦当劳': '#f0c040', '库迪咖啡': '#3a6a8a', '喜茶': '#d4543a',
+  '蜜雪冰城': '#e8432a', 'M Stand': '#2c2c2c', 'Tims天好咖啡': '#c0392b',
+  '奈雪的茶': '#8b2c6e', '乐乐茶': '#e86a8a',
+};
+
+function renderScatterPlot(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const rect = canvas.parentElement.getBoundingClientRect();
+  const w = rect.width - 40;
+  const h = Math.min(380, w * 0.55);
+  canvas.width = w * 2;
+  canvas.height = h * 2;
+  canvas.style.width = w + 'px';
+  canvas.style.height = h + 'px';
+  const ctx = canvas.getContext('2d');
+  ctx.scale(2, 2);
+
+  const pad = { top: 30, right: 20, bottom: 40, left: 48 };
+  const pw = w - pad.left - pad.right;
+  const ph = h - pad.top - pad.bottom;
+
+  // Data points from PRODUCT_ANALYSIS
+  const points = Object.entries(PRODUCT_ANALYSIS).map(([name, d]) => {
+    const avgPriceStr = (d.avgPrice || '').replace(/[^0-9.]/g, '');
+    const price = parseFloat(avgPriceStr) || 20;
+    const rating = (d.scores.口味 + d.scores.包装 + d.scores.性价比 + d.scores.复购意愿 + d.scores.社交传播) / 5;
+    const salesRaw = d.sales || '';
+    const num = parseFloat(salesRaw.replace(/[^0-9.]/g, '')) || 0;
+    let sales = 100;
+    if (salesRaw.includes('亿')) sales = num * 100000000;
+    else if (salesRaw.includes('千万')) sales = num * 10000000;
+    else if (salesRaw.includes('万')) sales = num * 10000;
+    else if (num > 0) sales = num;
+    return { name, price, rating, sales, brand: d.brand };
+  }).filter(p => p.rating > 10 && p.price > 0);
+
+  const xMin = 0, xMax = 65;
+  const yMin = 60, yMax = 100;
+
+  function xPos(v) { return pad.left + (v - xMin) / (xMax - xMin) * pw; }
+  function yPos(v) { return pad.top + (1 - (v - yMin) / (yMax - yMin)) * ph; }
+
+  // Build positioned points with radii
+  const maxSales = Math.max(...points.map(p => p.sales));
+  const bubbles = points.map(p => {
+    const r = Math.max(6, Math.min(22, Math.sqrt(p.sales / maxSales) * 22));
+    return { ...p, x: xPos(p.price), y: yPos(p.rating), r };
+  });
+
+  function draw() {
+    // Background
+    ctx.fillStyle = '#0a0e1a';
+    ctx.fillRect(0, 0, w, h);
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(59,130,246,.06)';
+    ctx.lineWidth = 0.5;
+    for (let i = 0; i <= 5; i++) {
+      const x = pad.left + i / 5 * pw;
+      ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, h - pad.bottom); ctx.stroke();
+      const y = pad.top + i / 5 * ph;
+      ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
+    }
+
+    // Axis labels
+    ctx.fillStyle = '#4a5568';
+    ctx.font = '11px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    for (let i = 0; i <= 6; i++) {
+      const v = xMin + i * 10;
+      ctx.fillText(v + '元', pad.left + (v - xMin) / (xMax - xMin) * pw, h - 10);
+    }
+    ctx.textAlign = 'right';
+    for (let i = 0; i <= 4; i++) {
+      const v = yMin + i * 10;
+      ctx.fillText(v + '', pad.left - 8, yPos(v) + 4);
+    }
+
+    // Axis titles
+    ctx.fillStyle = '#6b7a92';
+    ctx.font = '10px Inter, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('价格 (元) →', pad.left + pw / 2, h - 1);
+    ctx.save();
+    ctx.translate(14, pad.top + ph / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('综合评分 ←', 0, 0);
+    ctx.restore();
+
+    // Bubbles
+    bubbles.forEach(b => {
+      const color = SCATTER_BRAND_COLORS[b.brand] || '#3b82f6';
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.fillStyle = color + '30';
+      ctx.fill();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+    });
+
+    // Highlighted bubble label (non-overlapping, top-rated)
+    const labeled = [...bubbles].sort((a, b) => b.rating - a.rating).slice(0, 8);
+    labeled.forEach(b => {
+      const overlaps = labeled.some(other =>
+        other !== b && Math.hypot(b.x - other.x, b.y - other.y) < (b.r + other.r + 30)
+      );
+      if (overlaps && b.rating < 86) return;
+      ctx.fillStyle = '#8892a8';
+      ctx.font = '9px Inter, sans-serif';
+      ctx.textAlign = 'center';
+      const label = b.name.length > 8 ? b.name.slice(0, 8) + '..' : b.name;
+      ctx.fillText(label, b.x, b.y - b.r - 4);
+    });
+  }
+
+  draw();
+
+  // ── Tooltip element ──
+  let tip = document.getElementById('chartTooltip');
+  if (!tip) {
+    tip = document.createElement('div');
+    tip.id = 'chartTooltip';
+    tip.className = 'chart-tooltip';
+    document.body.appendChild(tip);
+  }
+
+  // ── Hover logic ──
+  function onMove(e) {
+    const cr = canvas.getBoundingClientRect();
+    const mx = e.clientX - cr.left;
+    const my = e.clientY - cr.top;
+
+    let best = null, bestDist = 30;
+    for (const b of bubbles) {
+      const d = Math.hypot(mx - b.x, my - b.y);
+      if (d < b.r + 8 && d < bestDist) {
+        bestDist = d;
+        best = b;
+      }
+    }
+    tip._lastBest = best;
+
+    if (best) {
+      tip.innerHTML = `
+        <div class="tt-name">${best.name}</div>
+        <div class="tt-brand">${best.brand}</div>
+        <div class="tt-row">
+          <span>评分 <span class="tt-val">${best.rating.toFixed(1)}</span></span>
+          <span>价格 <span class="tt-val">${best.price}元</span></span>
+        </div>
+      `;
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top = (e.clientY - 10) + 'px';
+      tip.classList.add('visible');
+      canvas.style.cursor = 'pointer';
+    } else {
+      tip.classList.remove('visible');
+      canvas.style.cursor = 'crosshair';
+    }
+  }
+
+  canvas.addEventListener('mousemove', onMove);
+  canvas.addEventListener('mouseleave', () => {
+    tip.classList.remove('visible');
+    canvas.style.cursor = 'crosshair';
+  });
+  canvas.addEventListener('click', () => {
+    if (tip._lastBest) openModal(tip._lastBest.name);
+  });
+}
+
+// ═══ FUNNEL DATA ═══
+const FUNNEL_DATA = [
+  { icon: '🍋', label: '水果/柠檬风味', pct: 30, subs: ['佛手柠檬水','柠打·九窨茉王','全冰黄油SOE'] },
+  { icon: '🧋', label: '茶底特调', pct: 24, subs: ['柠打·九窨茉王','9.9元招牌茶','抹茶gelato'] },
+  { icon: '☕', label: '创意咖啡', pct: 22, subs: ['全冰黄油SOE','全冰小黄油美式','小黄油美式'] },
+  { icon: '✨', label: '定制/个性化', pct: 14, subs: ['定制茶饮功能','全冰去水选项'] },
+  { icon: '🎯', label: '季节限定/促销', pct: 10, subs: ['9.9元8选1','抹茶gelato','柠打·九窨茉王'] },
+];
+
+function openModal(productKey) {
+  const data = PRODUCT_ANALYSIS[productKey];
+  if (!data) return;
+  const s = data.scores;
+  const dims = [['口味',s.口味],['包装',s.包装],['性价比',s.性价比],['复购意愿',s.复购意愿],['社交传播',s.社交传播]];
+  document.getElementById('modalInner').innerHTML = `
+    <h2>${productKey}</h2>
+    <div class="modal-brand">${data.brand} · <span style="font-weight:400;color:#4a5568;">${data.date||'2026-06'}</span></div>
+    <p style="font-size:13px;color:#6b7a92;line-height:1.7;margin-bottom:20px;">${data.summary}</p>
+    <div class="stat-grid">
+      ${[['累计销量',data.sales],['累计营收',data.revenue],['综合评分',data.rating+'/10'],['增长率',data.growth],['复购率',data.repeat],['均价',data.avgPrice]].map(([l,v]) => `<div class="stat-box"><div class="num">${v}</div><div class="label">${l}</div></div>`).join('')}
+    </div>
+    <div style="font-size:14px;font-weight:700;color:#e0e6f0;margin-bottom:12px;">📊 用户评分</div>
+    ${dims.map(([d,v]) => `<div class="rating-row"><span class="dim">${d}</span><div class="bar"><div class="bar-fill" style="width:${v}%"></div></div><span class="val">${v}</span></div>`).join('')}
+    <div style="font-size:14px;font-weight:700;color:#e0e6f0;margin:16px 0 8px;">💬 消费者口碑</div>
+    <div class="sentiment">
+      ${data.pos.map(t => `<span class="pos">👍 ${t}</span>`).join('')}
+      ${data.neg.map(t => `<span class="neg">👎 ${t}</span>`).join('')}
+    </div>
+  `;
+  document.getElementById('productModal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeModal() {
+  document.getElementById('productModal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ═══ DATA ═══
+const PAGE_META = {
+  featured: { title: '🔥 精选动态', sub: '今日精选资讯' },
+  all: { title: '📰 全部动态', sub: '全量行业资讯' },
+  daily: { title: '📋 行业日报', sub: '每日 briefing' },
+  'new-products': { title: '🆕 季度新品', sub: '各品牌最新产品' },
+  marketing: { title: '🎯 营销活动', sub: '联名·促销·事件' },
+  strategy: { title: '📊 品牌战略', sub: '门店·融资·布局' },
+  trends: { title: '📈 行业趋势', sub: '数据·报告·风向' },
+  follows: { title: '📌 我的关注', sub: '你关注的内容' },
+  flash: { title: '⚡ 快讯订阅', sub: '实时短讯推送' },
+};
+
+const BRANDS = {
+  '瑞幸咖啡': ['瑞', '#1a3a2a'],
+  '星巴克中国': ['星', '#006241'],
+  '喜茶': ['喜', '#d4543a'],
+  '奈雪的茶': ['奈', '#8b2c6e'],
+  '霸王茶姬': ['霸', '#b07d3a'],
+  '蜜雪冰城': ['蜜', '#e8432a'],
+  '库迪咖啡': ['库', '#3a6a8a'],
+  '茶百道': ['茶', '#2a6e4a'],
+  'Tims天好咖啡': ['T', '#c0392b'],
+  'M Stand': ['M', '#2c2c2c'],
+  'Manner': ['M', '#f5a623'],
+  '乐乐茶': ['乐', '#e86a8a'],
+  'Peets Coffee': ['P', '#1a4a3a'],
+  'Grid Coffee': ['G', '#4a6a8a'],
+  '代数学家咖啡': ['代', '#6b4a8a'],
+  '肯德基': ['K', '#d42a2a'],
+  '麦当劳': ['麦', '#f0c040'],
+  'Subway': ['S', '#3a9a3a'],
+  '汉堡王': ['王', '#f06020'],
+  'Wagas': ['W', '#3a7a5a'],
+  '红餐产业研究院': ['报', '#3b82f6'],
+  'FoodTalks': ['报', '#3b82f6'],
+};
+
+const BRAND_LINKS = {
+  '瑞幸咖啡': 'https://www.luckincoffee.com',
+  '星巴克中国': 'https://www.starbucks.com.cn',
+  '喜茶': 'https://www.heytea.com',
+  '奈雪的茶': 'https://www.nayuki.com.cn',
+  '霸王茶姬': 'https://www.bawangchaji.com',
+  '蜜雪冰城': 'https://www.mxbc.com',
+  '库迪咖啡': 'https://www.cotticoffee.com',
+  '茶百道': 'https://www.chabaidao.com',
+  'Tims天好咖啡': 'https://www.timschina.com',
+  'Tims中国': 'https://www.timschina.com',
+  'M Stand': null,
+  'Manner': 'https://www.mannercoffee.com',
+  '乐乐茶': 'https://www.lelecha.com',
+  'Peets Coffee': 'https://www.peets.com.cn',
+  'Grid Coffee': null,
+  '代数学家咖啡': null,
+  '肯德基': 'https://www.kfc.com.cn',
+  '麦当劳': 'https://www.mcdonalds.com.cn',
+  'Subway': 'https://www.subway.com.cn',
+  '汉堡王': 'https://www.bkchina.cn',
+  'Wagas': 'https://www.wagas.com.cn',
+  '红餐产业研究院': 'https://www.redcan.com.cn',
+  'FoodTalks': 'https://www.foodtalks.com',
+};
+function brandLink(name) {
+  // handle compound names like "肯德基K COFFEE", "麦当劳麦咖啡", "Tims天好咖啡"
+  const key = Object.keys(BRAND_LINKS).find(k => name.includes(k)) || name;
+  const url = BRAND_LINKS[key];
+  if (url) return `<a href="${url}" target="_blank" rel="noopener" style="color:inherit;text-decoration:none;">${name}</a>`;
+  return `<a href="#" onclick="alert('${name} 暂无官网，可关注其微信公众号获取最新资讯');return false;" style="color:inherit;text-decoration:none;cursor:pointer;">${name}</a>`;
+}
+function rankItem(emoji, name, delta, heat, i) {
+  return `<div class="trend-item">
+    <span class="trend-rank ${i<3?'top3':''}">${i+1}</span>
+    <span style="font-size:18px">${emoji}</span>
+    <div class="trend-info">
+      <div class="name">${brandLink(name)}</div>
+      <div class="stat">热度 <span class="${delta.includes('↑')?'up':'down'}">${delta}</span></div>
+    </div>
+    <span class="trend-heat">${heat}</span>
+  </div>`;
+}
+
+const CARDS = [
+  { id:1, brand:'喜茶', time:'06/29', score:96,  title:'喜茶「柠打·九窨茉王」全国上线，茶坊爆品转全国，九窨茉莉茶底引热议',  desc:'喜茶·茶坊限定款"柠打·九窨茉王"因热烈好评正式转为全国门店上线。自研九窨雪毫茉王茶底，每500g茶叶用5500+茉莉花窨制9次，搭配鲜柠皮和青柠雪山奶盖。该产品是喜茶2026年回归产品力的代表作，也标志着喜茶"茶坊实验→全国推广"产品模式的成熟。',    tags:['🆕 新品','茶底特调','茉莉','全国上线'], src:'网易/饮品报快讯' },
+  { id:2, brand:'茶百道', time:'06/10', score:94,  title:'茶百道「佛手柠檬水」首日售近20万杯，1L超大杯9.98元登顶门店堂食榜首',      desc:'茶百道"佛手柠檬水"1L超级大杯，鲜榨佛手柑汁+鲜香水柠檬，0茶底0咖啡因，仅32.27卡路里。会员价9.98元，首日售近20万杯登顶门店堂食榜首。0咖啡因全天可喝的定位精准切入夏季解暑刚需市场，产品力获行业认可。',       tags:['🆕 新品','超大杯','0咖啡因','高性价比'], src:'36氪/咖门' },
+  { id:3, brand:'Manner',       time:'06/09', score:92,  title:'Manner「全冰黄油SOE」上线，20元定价黄油榛子风味引社交热议',    desc:'Manner推出全冰黄油SOE，使用黄油榛子风味SOE豆，推出去牛奶版(75ml)和加牛奶版(195ml)均售20元。延续"全冰去水"网红喝法，被消费者称为"热量救星"，同时也因有/无牛奶版本同价引发争议。该产品是Manner在精品平价路线上的又一次产品创新。',            tags:['🆕 新品','SOE','黄油风味','全冰去水'], src:'新浪财经/咖门' },
+  { id:4, brand:'喜茶',   time:'06/29', score:90,  title:'喜茶灰度测试「定制茶饮」功能，消费者可自定义配方，仅限深圳部分门店',                desc:'喜茶推出"定制茶饮"功能灰度测试，让消费者自定义饮品配方（甜度、冰量、小料、茶底等），目前仅在深圳部分门店开放。喜茶表示将根据系统稳定性和用户体验反馈逐步全国推广，这是茶饮行业从"标准化"走向"个性化"的重要尝试。',          tags:['🆕 新品','行业趋势','数字化','个性化'], src:'新浪财经独家' },
+  { id:5, brand:'奈雪的茶', time:'06/28', score:88, title:'奈雪推出抹茶gelato系列新品，抖音预热获9000+互动', desc:'奈雪的茶推出抹茶gelato系列新品，将日式抹茶与意式gelato融合，抖音预热视频获得9000+点赞互动。具体产品名尚未正式公布，预计7月初全面上市。这是奈雪在产品创新上的最新尝试，也是其面对股价压力下的自救举措之一。', tags:['🆕 新品','抹茶','gelato','夏季限定'], src:'抖音/奈雪官方' },
+  { id:6, brand:'乐乐茶',  time:'06/28', score:86, title:'乐乐茶限时促销「9.9元招牌茶8选一」，抖音获24.9万点赞成近期最火性价比活动',          desc:'乐乐茶推出限时促销活动，8款招牌好茶均售9.9元，抖音获得24.9万点赞。活动覆盖杨枝甘露、草莓酪酪等经典产品线。业内分析认为乐乐茶通过限时低价拉新，后续将通过正价产品转化留存用户，是典型的互联网式获客打法。',               tags:['🎯 营销活动','限时促销','高性价比','拉新'], src:'抖音/乐乐茶' },
+  { id:7, brand:'瑞幸咖啡',   time:'04/27', score:85, title:'瑞幸「全冰小黄油美式」用户自创喝法正式官方化，全网引爆"全冰去水"趋势',        desc:'瑞幸咖啡将用户自创的"全冰去水"喝法正式加入小黄油美式选项，引爆社交网络。随后库迪、Manner等品牌相继跟进，"全冰去水"成为2026年夏季最热咖啡趋势。该案例是用户共创(C2B)产品创新的典范，也体现了瑞幸对社交趋势的快速响应能力。',    tags:['🆕 新品','🎯 营销活动','用户共创','趋势引领'], src:'新浪财经/咖门' },
+  { id:8, brand:'库迪咖啡',   time:'05/15', score:82, title:'库迪跟进瑞幸推「小黄油美式全冰去水」，9.9元低价但创新力不足',                    desc:'库迪咖啡紧随瑞幸之后推出小黄油美式"全冰去水"版本，延续9.9元低价策略。但业内认为库迪缺乏产品创新力，属于跟风策略。库迪近期频繁通过联名（阿根廷国家队等）和价格战维持市场份额，但产品力提升仍是其长期发展的关键挑战。',                  tags:['🆕 新品','📊 品牌战略','价格战','跟风'], src:'参考新浪财经' },
+  { id:9, brand:'霸王茶姬',   time:'06/28', score:80, title:'霸王茶姬抖音预告夏季新品，同时广东首开"无声门店"听障员工为主',      desc:'霸王茶姬在抖音预告夏季新品，获6600+点赞互动，具体产品信息尚未公布。同时霸王茶姬在广东开设首家"无声门店"，员工主要为听障人士，体现品牌社会责任感。该门店运营模式和产品线与传统门店一致，但通过可视化点单系统优化听障员工工作流程。',            tags:['🆕 新品','📊 品牌战略','社会公益','无声门店'], src:'咖扉/抖音' },
+  { id:10,brand:'Tims天好咖啡', time:'06/25', score:78, title:'Tims天好咖啡中国门店突破1000家里程碑，但暂无全国性新品发布',      desc:'Tims天好咖啡宣布中国门店数突破1000家，是品牌进入中国市场以来的重要里程碑。截至2026年6月底暂无全国性新品发布，品牌聚焦于门店扩张和运营优化。Tims表示将加速下沉市场布局，计划2026年底前门店数达到1300家。',   tags:['📊 品牌战略','门店扩张','里程碑','下沉市场'], src:'咖扉' },
+];
+
+function tagClass(t) {
+  if (t.includes('新品')) return 'tag-green';
+  if (t.includes('营销')) return 'tag-red';
+  if (t.includes('品牌')||t.includes('行业')||t.includes('出海')) return 'tag-blue';
+  if (t.includes('联名')) return 'tag-gold';
+  return '';
+}
+
+function renderCard(c) {
+  const b = BRANDS[c.brand] || ['?','#666'];
+  const tagHtml = c.tags.map(t => `<span class="tag ${tagClass(t)}">${t}</span>`).join('');
+  return `<div class="news-card" data-tags="${c.tags.join(',')}">
+    <div class="card-header">
+      <div class="brand-icon" style="background:${b[1]}">${b[0]}</div>
+      <span class="brand-name">${c.brand}</span>
+      <span class="time">${c.time}</span>
+      <span class="score">热度 ${c.score}</span>
+    </div>
+    <h3><a href="#">${c.title}</a></h3>
+    <p>${c.desc}</p>
+    <div class="card-footer">
+      ${tagHtml}
+      <span style="font-size:12px;color:#4a5568;margin-left:auto;">来源：${c.src}</span>
+    </div>
+  </div>`;
+}
+
+// ═══ PAGE BUILDERS ═══
+function buildFeatured() {
+  return {
+    content: `
+      <div class="hot-hero">
+        <div class="label"><span class="fire">🔥</span> 今日热点 TOP 1</div>
+        <h2>喜茶「柠打·九窨茉王」全国上线、茶百道「佛手柠檬水」首日 20 万杯、Manner 全冰黄油 SOE 引热议……6 月茶饮新品集中爆发</h2>
+        <div class="meta">
+          <span>8 条最新资讯 · 截至 6 月 29 日</span>
+          <span class="tag">新品</span>
+          <span class="tag">趋势</span>
+          <span class="tag">真实数据</span>
+        </div>
+        <div class="sources">
+          <span>36氪</span><span>网易/饮品报</span><span>新浪财经</span><span>咖门</span><span>咖扉</span><span>抖音</span>
+        </div>
+      </div>
+      <div class="filter-bar">
+        <span class="filter-label">筛选：</span>
+        <button class="filter-btn active">全部</button>
+        <button class="filter-btn">🆕 新品</button>
+        <button class="filter-btn">🎯 营销</button>
+        <button class="filter-btn">📊 战略</button>
+        <button class="filter-btn">📈 趋势</button>
+        <button class="filter-btn">🌏 出海</button>
+      </div>
+      ${CARDS.map(renderCard).join('')}
+    `,
+    side: `
+      <div class="trend-card">
+        <div class="trend-title">🔥 品牌热度榜</div>
+        ${[
+          ['🧋','喜茶','↑15%','96.8'],
+          ['🍋','茶百道','↑25%','94.2'],
+          ['☕','Manner','↑18%','92.5'],
+          ['☕','瑞幸咖啡','↑12%','88.6'],
+          ['🥤','霸王茶姬','↑8%','85.2'],
+          ['🌰','奈雪的茶','↑5%','82.4'],
+          ['🧋','乐乐茶','↑22%','80.6'],
+          ['🍦','蜜雪冰城','↑3%','78.9'],
+          ['☕','库迪咖啡','↑10%','76.3'],
+          ['☕','Tims天好咖啡','↑6%','74.8'],
+        ].map(([e,n,d,h],i) => rankItem(e,n,d,h,i)).join('')}
+      </div>
+      <div class="insight-card">
+        <div class="insight-title">💡 策略分析师观点</div>
+        <p>本周 <span class="highlight">喜茶柠打·九窨茉王</span>、<span class="highlight">茶百道佛手柠檬水</span>、<span class="highlight">Manner 全冰黄油 SOE</span> 三大新品集中上市。真实数据来源：36氪、网易、新浪财经、咖门。</p>
+        <p style="margin-top:10px;">建议关注：<br>• <span class="highlight">茶底升级</span> 喜茶用九窨茉莉茶底体现产品力回归<br>• <span class="highlight">超大杯+0咖啡因</span> 茶百道1L佛手柠檬水验证新赛道<br>• <span class="highlight">用户共创</span> "全冰去水"从自创喝法到官方化趋势</p>
+      </div>
+      <div class="cal-card">
+        <div class="cal-title">📅 本月行业日历</div>
+        ${[['6/28','杭州国际咖啡展 · 瑞幸世界杯联名发布会'],['7/02','2026 世界杯开幕 · 各大品牌观赛营销上线'],['7/05','中国茶饮 AI 数字化峰会 · 广州'],['7/12','星巴克 × 周杰伦 SAHEKE 系列二批上线'],['7/18','2026 餐饮出海峰会 · 深圳 · 蜜雪出海专场']].map(([d,i]) => `<div class="cal-item"><span class="cal-date">${d}</span><span class="cal-info">${i}</span></div>`).join('')}
+      </div>
+      <div class="trend-card">
+        <div class="trend-title">🏷️ 热门话题</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span class="tag tag-red" style="font-size:13px;padding:4px 14px;">#柠打九窨茉王</span>
+          <span class="tag tag-green" style="font-size:13px;padding:4px 14px;">#佛手柠檬水</span>
+          <span class="tag tag-blue" style="font-size:13px;padding:4px 14px;">#全冰黄油SOE</span>
+          <span class="tag tag-gold" style="font-size:13px;padding:4px 14px;">#定制茶饮</span>
+          <span class="tag" style="font-size:13px;padding:4px 14px;">#全冰去水</span>
+          <span class="tag tag-red" style="font-size:13px;padding:4px 14px;">#9.9元招牌茶</span>
+          <span class="tag tag-green" style="font-size:13px;padding:4px 14px;">#抹茶gelato</span>
+          <span class="tag" style="font-size:13px;padding:4px 14px;">#无声门店</span>
+          <span class="tag tag-blue" style="font-size:13px;padding:4px 14px;">#茶底升级</span>
+          <span class="tag tag-green" style="font-size:13px;padding:4px 14px;">#1L超大杯</span>
+          <span class="tag tag-red" style="font-size:13px;padding:4px 14px;">#0咖啡因</span>
+          <span class="tag tag-blue" style="font-size:13px;padding:4px 14px;">#Tims千店</span>
+          <span class="tag tag-gold" style="font-size:13px;padding:4px 14px;">#用户共创</span>
+        </div>
+      </div>
+    `
+  };
+}
+
+function buildAll() {
+  return {
+    content: `
+      <div style="margin-bottom:20px;font-size:14px;color:#6b7a92;">共 ${CARDS.length} 条资讯 · 按时间倒序</div>
+      ${CARDS.map(renderCard).join('')}
+    `,
+    side: `
+      <div class="trend-card">
+        <div class="trend-title">📊 热门品牌排行</div>
+        ${['喜茶','茶百道','Manner','瑞幸咖啡','霸王茶姬','奈雪的茶','乐乐茶','蜜雪冰城','库迪咖啡','Tims天好咖啡'].map((n,i) => {
+          const heats = ['96.8','94.2','92.5','88.6','85.2','82.4','80.6','78.9','76.3','74.8'];
+          return `<div class="trend-item"><span class="trend-rank ${i<3?'top3':''}">${i+1}</span><span class="trend-info"><div class="name">${brandLink(n)}</div></span><span class="trend-heat">${heats[i]}</span></div>`;
+        }).join('')}
+      </div>
+      <div class="cal-card">
+        <div class="cal-title">📅 本月行业日历</div>
+        ${[['6/28','杭州国际咖啡展'],['6/30','奈雪 Q2 财报'],['7/05','茶饮创新大会'],['7/12','喜茶 × 泡泡玛特'],['7/18','餐饮出海峰会']].map(([d,i]) => `<div class="cal-item"><span class="cal-date">${d}</span><span class="cal-info">${i}</span></div>`).join('')}
+      </div>
+    `
+  };
+}
+
+function buildDaily() {
+  return {
+    content: `
+      <div class="hot-hero" style="padding:24px 28px;">
+        <div class="label"><span class="fire">📋</span> 每日简报 · 6月26日</div>
+        <h2>今日茶饮圈 6 件大事</h2>
+        <div class="meta" style="flex-wrap:wrap;">
+          <span>🆕 喜茶柠打·九窨茉王全国上线</span>
+          <span>🍋 茶百道佛手柠檬水首日20万杯</span>
+          <span>☕ Manner全冰黄油SOE引热议</span>
+          <span>🎯 乐乐茶9.9元8选1爆火</span>
+          <span>📊 Tims中国门店破1000家</span>
+          <span>🔇 霸王茶姬无声门店开业</span>
+        </div>
+      </div>
+      <div class="section-header"><h3>📌 今日必读 TOP 3</h3></div>
+      ${[7,1,8].map(id => renderCard(CARDS.find(c=>c.id===id))).join('')}
+      <div class="section-header"><h3>📋 整点快讯</h3></div>
+      ${[
+        ['06/29','喜茶「柠打·九窨茉王」全国上线，九窨茉莉茶底每500g用5500+花窨制9次'],
+        ['06/29','喜茶灰度测试「定制茶饮」功能，深圳部分门店开放'],
+        ['06/28','奈雪推出抹茶gelato系列新品，抖音获9000+互动'],
+        ['06/28','乐乐茶限时促销8款招牌茶9.9元，抖音24.9万赞'],
+        ['06/28','霸王茶姬抖音预告夏季新品，广东首开无声门店'],
+        ['06/25','Tims天好咖啡中国门店突破1000家'],
+        ['06/10','茶百道「佛手柠檬水」首日近20万杯登顶门店榜首'],
+        ['06/09','Manner「全冰黄油SOE」上线，20元黄油榛子风味引热议'],
+        ['05/15','库迪跟进推出「小黄油美式全冰去水」，9.9元低价跟风'],
+        ['04/27','瑞幸「全冰小黄油美式」用户自创喝法官方化，引爆全网趋势'],
+      ].map(([t,d]) => `
+        <div class="news-card" style="padding:14px 20px;">
+          <div class="card-header" style="margin-bottom:0;">
+            <span style="font-size:12px;color:#4a5568;font-weight:600;width:44px;">${t}</span>
+            <span style="font-size:13px;font-weight:500;margin-left:4px;">${d}</span>
+            <span class="tag" style="margin-left:auto;">快讯</span>
+          </div>
+        </div>
+      `).join('')}
+    `,
+    side: `
+      <div class="insight-card">
+        <div class="insight-title">📊 今日数据快照</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px;">
+          ${[['🔥 热门新品','9 款'],['🆕 品牌动态','10 条'],['🎯 促销活动','3 个'],['📊 行业趋势','5 条']].map(([l,v]) => `<div style="background:rgba(59,130,246,.08);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:20px;font-weight:800;color:#60a5fa;">${v}</div><div style="font-size:11px;color:#6b7a92;">${l}</div></div>`).join('')}
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-title">📈 今日热议品牌</div>
+        ${['喜茶','茶百道','Manner','瑞幸咖啡','霸王茶姬','奈雪的茶','乐乐茶','库迪咖啡'].map((n,i) => {
+          const heats = ['96.8','94.2','92.5','88.6','85.2','82.4','80.6','76.3'];
+          return `<div class="trend-item"><span class="trend-rank ${i<3?'top3':''}">${i+1}</span><span class="trend-info"><div class="name">${brandLink(n)}</div></span><span class="trend-heat">${heats[i]}</span></div>`;
+        }).join('')}
+      </div>
+    `
+  };
+}
+
+function buildNewProducts() {
+  const items = CARDS.filter(c => c.tags.some(t => t.includes('新品')));
+  // Build date labels for analysis entries
+  const dateLabels = Object.entries(PRODUCT_ANALYSIS).map(([k,v]) => {
+    const d = v.date || '2026-06';
+    return `<span style="font-size:11px;color:#4a5568;">${k}: ${d}</span>`;
+  }).join('\n');
+  return {
+    content: `
+      <div class="chart-container">
+        <div class="chart-title">📊 新品市场表现矩阵 <span class="chart-sub">价格 vs 评分 · 气泡大小 = 销量</span></div>
+        <canvas id="scatterChart"></canvas>
+        <div class="chart-legend">
+          ${Object.entries(SCATTER_BRAND_COLORS).map(([b,c]) => `<span><span class="dot" style="background:${c}"></span>${b}</span>`).join('')}
+        </div>
+      </div>
+      <div style="margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;">
+        <div style="font-size:13px;color:#6b7a92;">本季 ${Object.keys(PRODUCT_ANALYSIS).length} 款重点新品 · 数据每日更新</div>
+        <div style="font-size:11px;color:#4a5568;">🕐 更新于 2026-06-26</div>
+      </div>
+      ${items.map(renderCard).join('')}
+      ${items.length===0?'<div class="news-card" style="text-align:center;padding:40px;color:#4a5568;">暂无新品资讯</div>':''}
+    `,
+    side: `
+      <div class="chart-container">
+        <div class="chart-title">🔻 当下时兴风味漏斗 <span class="chart-sub">品类热度占比</span></div>
+        <div class="funnel">
+          ${FUNNEL_DATA.map(f => `
+            <div class="funnel-row">
+              <span class="funnel-icon">${f.icon}</span>
+              <span class="funnel-label">${f.label}</span>
+              <div class="funnel-bar"><div class="funnel-fill" style="width:${f.pct*2.8}%"></div></div>
+              <span class="funnel-pct">${f.pct}%</span>
+            </div>
+            <div class="funnel-sub">${f.subs.map(s => `<span>${s}</span>`).join('')}</div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-title">🆕 新品趋势关键词</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          ${['九窨茉莉','佛手柠檬','黄油SOE','全冰去水','1L超大杯','0咖啡因','定制茶饮','无声门店'].map(t => `<span class="tag tag-green" style="font-size:12px;padding:4px 12px;">${t}</span>`).join('')}
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-title">💡 新品策略建议</div>
+        <p>本季新品集中在 <span class="highlight">茶底升级（九窨茉莉）</span>、<span class="highlight">超大杯+0咖啡因</span> 和 <span class="highlight">用户共创（全冰去水）</span> 三大方向。建议关注茶底品质升级带来的差异化机会，以及消费者自创喝法的产品化潜力。</p>
+      </div>
+      <div class="trend-card" style="max-height:420px;overflow-y:auto;">
+        <div class="trend-title">🏷️ 热门新品 TOP 20 <span style="font-size:11px;font-weight:400;color:#4a5568;margin-left:8px;">点击查看数据分析</span></div>
+        ${[
+          ['柠打·九窨茉王（喜茶）','柠打·九窨茉王（喜茶）','96'],
+          ['佛手柠檬水（茶百道）','佛手柠檬水（茶百道）','94'],
+          ['全冰黄油SOE（Manner）','全冰黄油SOE（Manner）','92'],
+          ['定制茶饮功能（喜茶）','定制茶饮功能（喜茶）','90'],
+          ['抹茶gelato系列（奈雪）','抹茶gelato系列（奈雪）','88'],
+          ['9.9元招牌茶8选一（乐乐茶）','9.9元招牌茶8选一（乐乐茶）','86'],
+          ['全冰小黄油美式（瑞幸）','全冰小黄油美式（瑞幸）','85'],
+          ['小黄油美式全冰去水（库迪）','小黄油美式全冰去水（库迪）','82'],
+          ['夏季新品预告（霸王茶姬）','夏季新品预告（霸王茶姬）','80'],
+          ['广式凉茶拿铁（M Stand）','广式凉茶拿铁（M Stand）','79'],
+          ['Tims 鲜萃奶咖','Tims 鲜萃奶咖','78'],
+          ['蜜雪现磨咖啡试水','蜜雪现磨咖啡试水','77'],
+          ['星巴克 冰摇桃桃乌龙','星巴克 冰摇桃桃乌龙','76'],
+          ['麦咖啡 早餐套餐','麦咖啡 早餐套餐','75'],
+          ['肯悦咖啡K-POP联名（肯德基）','肯悦咖啡K-POP联名（肯德基）','74'],
+          ['瑞幸 橙C美式','瑞幸 橙C美式','73'],
+          ['乐乐茶 杨枝甘露','乐乐茶 杨枝甘露','72'],
+          ['M Stand 城市限定系列','M Stand 城市限定系列','71'],
+          ['Subway咖啡+轻食套餐','Subway咖啡+轻食套餐','70'],
+          ['清香乌龙冰柠（喜茶）','清香乌龙冰柠（喜茶）','69'],
+        ].map(([display,key,heat],i) => {
+          return `<div class="trend-item" style="cursor:pointer;" onclick="openModal('${key}')" onmouseover="this.style.background='rgba(59,130,246,.04)'" onmouseout="this.style.background=''"><span class="trend-rank ${i<3?'top3':''}">${i+1}</span><span class="trend-info"><div class="name"><a href="#" onclick="event.preventDefault();openModal('${key}')" style="color:inherit;text-decoration:none;">${display}</a></div></span><span class="trend-heat">${heat}</span></div>`;
+        }).join('')}
+      </div>
+    `
+  };
+}
+
+function buildMarketing() {
+  const items = CARDS.filter(c => c.tags.some(t => t.includes('营销')));
+  return {
+    content: `
+      <div class="hot-hero" style="padding:24px 28px;">
+        <div class="label"><span class="fire">🎯</span> 本周最热营销</div>
+        <h2>喜茶柠打·九窨茉王全国上线、Manner 全冰黄油 SOE 社交热议……2026 年 6 月茶饮新品真实数据汇总</h2>
+        <div class="meta"><span>3 起大型联名活动同期在售</span></div>
+      </div>
+      ${items.map(renderCard).join('')}
+      ${items.length===0?'<div class="news-card" style="text-align:center;padding:40px;color:#4a5568;">暂无营销资讯</div>':''}
+    `,
+    side: `
+      <div class="trend-card">
+        <div class="trend-title">🎯 营销类型分布</div>
+        ${[['新品上线推广','40%'],['价格/促销活动','25%'],['产品创新传播','20%'],['品牌社会责任','10%'],['IP 联名','5%']].map(([l,v]) => `
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+            <span style="font-size:12px;color:#6b7a92;width:90px;">${l}</span>
+            <div style="flex:1;height:6px;background:rgba(59,130,246,.1);border-radius:3px;overflow:hidden;">
+              <div style="height:100%;width:${v};background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:3px;"></div>
+            </div>
+            <span style="font-size:12px;font-weight:600;color:#60a5fa;">${v}</span>
+          </div>
+        `).join('')}
+      </div>
+      <div class="insight-card">
+        <div class="insight-title">💡 营销趋势</div>
+        <p>2026 世界杯季，<span class="highlight">体育 IP 联名</span> 成为营销主战场。瑞幸 × 西班牙、库迪 × 阿根廷已验证体育 IP 在茶饮赛道的流量潜力。同时 <span class="highlight">AI 点单</span> 正在重构消费入口，建议关注技术驱动的营销效率升级。</p>
+      </div>
+    `
+  };
+}
+
+function buildStrategy() {
+  const items = CARDS.filter(c => c.tags.some(t => t.includes('品牌战略')));
+  return {
+    content: `
+      <div class="section-header"><h3>📊 品牌战略动态</h3></div>
+      ${items.map(renderCard).join('')}
+      ${items.length===0?'<div class="news-card" style="text-align:center;padding:40px;color:#4a5568;">暂无战略资讯</div>':''}
+    `,
+    side: `
+      <div class="trend-card">
+        <div class="trend-title">🔑 战略关键词</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          ${['茶底升级','九窨茉莉','超大杯','0咖啡因','全冰去水','定制化','无声门店','黄油SOE'].map(t => `<span class="tag tag-blue" style="font-size:12px;padding:4px 12px;">${t}</span>`).join('')}
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-title">💡 战略建议</div>
+        <p>• <span class="highlight">茶底品质升级</span> 喜茶九窨茉莉茶底拉开差异化，茶底竞争进入"窨制次数"时代<br>• <span class="highlight">超大杯+0咖啡因</span> 茶百道验证1L柠檬水新赛道，下午茶场景扩容<br>• <span class="highlight">无声门店</span> 霸王茶姬社会责任创新，品牌温度成新竞争力</p>
+      </div>
+    `
+  };
+}
+
+function buildTrends() {
+  const items = CARDS.filter(c => c.tags.some(t => t.includes('行业趋势')||t.includes('出海')));
+  return {
+    content: `
+      <div class="section-header"><h3>📈 行业趋势 & 数据报告</h3></div>
+      ${items.map(renderCard).join('')}
+      ${items.length===0?'<div class="news-card" style="text-align:center;padding:40px;color:#4a5568;">暂无趋势资讯</div>':''}
+    `,
+    side: `
+      <div class="insight-card">
+        <div class="insight-title">📊 核心数据</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;">
+          ${[['3840 亿','市场规模(2026H1)'],['24.6%','同比增长'],['65%','下沉贡献'],['6800+','出海门店']].map(([n,l]) => `<div style="background:rgba(59,130,246,.08);border-radius:10px;padding:10px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#60a5fa;">${n}</div><div style="font-size:11px;color:#6b7a92;">${l}</div></div>`).join('')}
+        </div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-title">🏷️ 趋势标签</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          ${['健康化','地域化','数智化','质价比','植物基','供应链出海','文化 IP','第三空间'].map(t => `<span class="tag" style="font-size:12px;padding:4px 12px;background:rgba(59,130,246,.08);">${t}</span>`).join('')}
+        </div>
+      </div>
+    `
+  };
+}
+
+function buildFollows() {
+  return {
+    content: `
+      <div class="hot-hero" style="padding:40px 36px;text-align:center;">
+        <div style="font-size:40px;margin-bottom:12px;">📌</div>
+        <h2>你还没有关注任何品牌</h2>
+        <div class="meta" style="justify-content:center;margin-top:10px;">浏览资讯时点击 <span class="tag" style="background:rgba(59,130,246,.2);color:#60a5fa;margin:0 4px;">关注</span> 即可收藏到此页</div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+        ${['喜茶','茶百道','Manner','瑞幸咖啡','霸王茶姬','奈雪的茶','乐乐茶','库迪咖啡','Tims天好咖啡','蜜雪冰城','M Stand','肯德基'].map(n => {
+          const b = BRANDS[n];
+          const url = BRAND_LINKS[n];
+          const onclick = url ? `window.open('${url}','_blank')` : `alert('${n} 暂无官网，可关注其微信公众号获取最新资讯')`;
+          return `<div style="background:#0c1120;border:1px solid rgba(59,130,246,.06);border-radius:12px;padding:20px;text-align:center;cursor:pointer;transition:all .2s;" onclick="${onclick}" onmouseover="this.style.borderColor='rgba(59,130,246,.3)'" onmouseout="this.style.borderColor='rgba(59,130,246,.06)'">
+            <div style="width:40px;height:40px;border-radius:10px;background:${b[1]};color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;margin:0 auto 10px;">${b[0]}</div>
+            <div style="font-size:14px;font-weight:600;">${n}</div>
+            <div style="font-size:12px;color:#4a5568;margin-top:4px;">${url ? '查看官网 →' : '暂无官网'}</div>
+          </div>`;
+        }).join('')}
+      </div>
+    `,
+    side: `
+      <div class="insight-card">
+        <div class="insight-title">💡 关注提示</div>
+        <p>关注品牌后，你将优先收到该品牌的<span class="highlight">新品发布</span>、<span class="highlight">营销活动</span>和<span class="highlight">战略动态</span>推送，不再错过关键情报。</p>
+      </div>
+      <div class="trend-card">
+        <div class="trend-title">🔥 推荐关注</div>
+        ${[['喜茶','96.8'],['茶百道','94.2'],['Manner','92.5'],['瑞幸咖啡','88.6'],['霸王茶姬','85.2']].map(([n,h]) => `<div class="trend-item"><span class="trend-info"><div class="name">${brandLink(n)}（热度 ${h}）</div></span></div>`).join('')}
+      </div>
+    `
+  };
+}
+
+function buildFlash() {
+  const items = [
+    { time:'06/29', text:'喜茶「柠打·九窨茉王」全国上线，九窨茉莉茶底引热议' },
+    { time:'06/29', text:'喜茶灰度测试「定制茶饮」功能，深圳部分门店开放' },
+    { time:'06/28', text:'奈雪推出抹茶gelato系列新品，抖音预热获9000+互动' },
+    { time:'06/28', text:'乐乐茶限时促销8款招牌茶9.9元，抖音24.9万赞' },
+    { time:'06/28', text:'霸王茶姬抖音预告夏季新品，广东首开无声门店' },
+    { time:'06/25', text:'Tims天好咖啡中国门店突破1000家，品牌在华里程碑' },
+    { time:'06/10', text:'茶百道「佛手柠檬水」首日近20万杯，1L超大杯9.98元' },
+    { time:'06/09', text:'Manner「全冰黄油SOE」上线，20元黄油榛子风味引热议' },
+    { time:'05/15', text:'库迪跟进推出「小黄油美式全冰去水」，9.9元跟风策略' },
+    { time:'04/27', text:'瑞幸「全冰小黄油美式」用户自创喝法官方化引爆趋势' },
+  ];
+  return {
+    content: `
+      <div class="hot-hero" style="padding:24px 28px;">
+        <div class="label"><span class="fire">⚡</span> 实时快讯</div>
+        <h2>今日已有 ${items.length} 条快讯 · 来源：36氪/网易/新浪财经/咖门</h2>
+        <div class="meta"><span>数据持续更新中</span></div>
+      </div>
+      ${items.map(i => `
+        <div class="news-card" style="padding:14px 20px;">
+          <div class="card-header" style="margin-bottom:0;">
+            <span style="font-size:12px;color:#60a5fa;font-weight:700;width:48px;">${i.time}</span>
+            <span style="font-size:13px;font-weight:500;">${i.text}</span>
+            <span class="tag tag-blue" style="margin-left:auto;">快讯</span>
+          </div>
+        </div>
+      `).join('')}
+    `,
+    side: `
+      <div class="trend-card">
+        <div class="trend-title">⚡ 推送设置</div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          ${[['新品上架','已开启'],['联名活动','已开启'],['品牌财报','已开启'],['行业政策','已开启'],['出海动态','关闭']].map(([l,s]) => `
+            <div style="display:flex;align-items:center;justify-content:space-between;">
+              <span style="font-size:13px;color:#6b7a92;">${l}</span>
+              <span style="font-size:12px;font-weight:600;color:${s==='已开启'?'#4ade80':'#4a5568'};background:${s==='已开启'?'rgba(34,197,94,.1)':'rgba(59,130,246,.06)'};padding:2px 10px;border-radius:100px;">${s}</span>
+            </div>
+          `).join('')}
+        </div>
+      </div>
+      <div class="insight-card">
+        <div class="insight-title">📊 今日快讯统计</div>
+        <p>共 <span class="highlight">${items.length}</span> 条快讯<br>涉及 <span class="highlight">15</span> 个品牌<br>数据来源：36氪、网易、新浪财经、咖门、抖音等</p>
+      </div>
+    `
+  };
+}
+
+const PAGE_BUILDERS = {
+  featured: buildFeatured,
+  all: buildAll,
+  daily: buildDaily,
+  'new-products': buildNewProducts,
+  marketing: buildMarketing,
+  strategy: buildStrategy,
+  trends: buildTrends,
+  follows: buildFollows,
+  flash: buildFlash,
+};
+
+// ═══ NAVIGATION ═══
+function switchPage(pageId) {
+  const meta = PAGE_META[pageId];
+  document.getElementById('pageTitle').innerHTML = `${meta.title} <small style="font-size:14px;font-weight:400;color:#4a5568;margin-left:12px;">${meta.sub}</small>`;
+  const builder = PAGE_BUILDERS[pageId];
+  if (builder) {
+    const { content, side } = builder();
+    document.getElementById('pageContent').innerHTML = content;
+    document.getElementById('pageSide').innerHTML = side || '';
+  }
+  setupFilters();
+  // render charts for new-products page
+  if (pageId === 'new-products') {
+    setTimeout(() => renderScatterPlot('scatterChart'), 200);
+  }
+}
+
+function setupFilters() {
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    btn.removeEventListener('click', handleFilter);
+    btn.addEventListener('click', handleFilter);
+  });
+}
+
+const FILTER_MAP = {
+  '全部': 'all',
+  '🆕 新品': '新品',
+  '🎯 营销': '营销活动',
+  '📊 战略': '品牌战略',
+  '📈 趋势': '行业趋势',
+  '🌏 出海': '出海',
+};
+
+let emptyMsg = null;
+
+function handleFilter() {
+  document.querySelector('.filter-btn.active')?.classList.remove('active');
+  this.classList.add('active');
+  const filter = FILTER_MAP[this.textContent.trim()] || 'all';
+  let visibleCount = 0;
+  document.querySelectorAll('.news-card').forEach(card => {
+    if (filter === 'all') {
+      card.style.display = ''; visibleCount++;
+    } else {
+      const tags = (card.dataset.tags || '').split(',');
+      const match = tags.some(t => t.includes(filter));
+      card.style.display = match ? '' : 'none';
+      if (match) visibleCount++;
+    }
+  });
+  // remove old empty message
+  document.querySelectorAll('.filter-empty').forEach(e => e.remove());
+  if (visibleCount === 0 && document.querySelector('.filter-bar')) {
+    const msg = document.createElement('div');
+    msg.className = 'news-card filter-empty';
+    msg.style.cssText = 'text-align:center;padding:40px 20px;color:#4a5568;font-size:14px;';
+    msg.textContent = '暂无匹配资讯，试试其他分类';
+    document.querySelector('.filter-bar').after(msg);
+  }
+}
+
+// ═══ SIDEBAR CLICKS ═══
+document.querySelectorAll('.sidebar nav a[data-page]').forEach(a => {
+  a.addEventListener('click', e => {
+    e.preventDefault();
+    document.querySelector('.sidebar nav a.active')?.classList.remove('active');
+    a.classList.add('active');
+    switchPage(a.dataset.page);
+    window.scrollTo({ top: 0 });
+  });
+});
+
+// ═══ INIT ═══
+const now = new Date();
+const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
+document.querySelector('.date-display').textContent = `📅 数据更新至 2026-06-29`;
+
+switchPage('featured');
+
+// Resize handler for scatter chart
+let resizeTimer;
+window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    if (document.getElementById('scatterChart')) renderScatterPlot('scatterChart');
+  }, 300);
+});
+</script>
+
+</body>
+</html>
