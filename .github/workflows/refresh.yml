@@ -30,12 +30,25 @@ jobs:
       - name: 安装依赖
         run: pip install requests
 
-      - name: 刷新数据并准备部署
+      - name: 尝试刷新数据（失败则使用现有数据）
         run: |
-          python refresh.py || echo "⚠️ 刷新未完成，使用现有数据"
-          cp coffee.html index.html 2>/dev/null || cp index.html index.html 2>/dev/null || true
+          python refresh.py || echo "⚠️ 数据刷新跳过，使用现有内容"
+
+      - name: 提交并推送代码
+        run: |
+          git config user.name "brew-insight-bot"
+          git config user.email "bot@brew-insight.com"
+          git add coffee.html
+          git diff --quiet && git diff --staged --quiet && echo "无更新" || {
+            git commit -m "📊 数据自动刷新 $(date +'%Y-%m-%d %H:%M')"
+            git push
+          }
+
+      - name: 准备 Pages 部署文件
+        run: |
+          cp coffee.html index.html
           mkdir -p _site
-          cp index.html _site/ 2>/dev/null || echo "no index"
+          cp index.html _site/
 
       - name: 上传 Pages 工件
         uses: actions/upload-pages-artifact@v3
@@ -43,5 +56,4 @@ jobs:
           path: _site
 
       - name: 部署到 GitHub Pages
-        id: deployment
         uses: actions/deploy-pages@v4
