@@ -1507,7 +1507,7 @@ const CARDS = [
   { id:8, brand:'茉莉奶白', time:'07/04', score:85, title:'茉莉奶白×施华洛世奇联名预告8月7日上线，针王葡萄系列定价28元', desc:'茉莉奶白与施华洛世奇联名"针王葡萄"系列将于8月7日上线，定价28元。同时茉莉奶白宣布每月5日为"双杯约定"品牌日，买一送一。（来源：新浪财经头条）', tags:['🆕 新品','联名','品牌日'], src:'新浪财经头条' },
   { id:9, brand:'瑞幸咖啡', time:'06/30', score:95, title:'瑞幸×多邻国"结婚周年"联名：11款新品包括绿沙沙拿铁回归', desc:'瑞幸与多邻国联名一周年的"结婚纪念"活动正式上线。核心产品绿沙沙拿铁回归，同时推出屁屁杯等6款周边。活动延续了2025年"结婚"概念的社交话题性，上线即登热搜。（来源：17173/新浪网）', tags:['🆕 新品','🎯 营销活动','联名','热搜'], src:'17173/新浪网' },
   { id:10,brand:'茶百道', time:'06/30', score:82, title:'茶百道深圳门店冷凝水滴入原料事件引关注，品牌回应整改', desc:'消费者爆料深圳某茶百道门店空调冷凝水滴入原料，门店当日回应并整改。事件未造成大规模舆论发酵，但提醒了茶饮行业夏季门店运营的食品安全细节。（来源：百度百科）', tags:['📈 行业趋势','食品安全','门店运营'], src:'百度百科' },
-  { id:11,brand:'Manner', time:'07/05', score:80, title:'Manner参与上海咖啡文化节"豆仔"活动，联名信息待公布', desc:'Manner参与上海国际咖啡文化节"豆仔"主题活动，活动持续至8月19-23日。公众号联名活动信息或仅限于微信生态内发布，外部搜索暂未收录。（来源：新闻晨报/微信公众平台）', tags:['🎯 营销活动','咖啡文化节','品牌活动'], src:'新闻晨报' },
+  { id:11,brand:'Manner', time:'07/05', score:92, title:'Manner × Rest & Recreation 联名玻璃吸管杯上线，清凉随行', desc:'Manner Coffee 与 Rest & Recreation 联名推出玻璃吸管杯，限时限量放送。这是 Manner 2026 年夏季的首个联名活动，延续其"精品平价+生活方式"的品牌定位。杯身设计简约，主打随行清凉场景。（来源：Manner 微信公众号）', tags:['🆕 新品','🎯 营销活动','联名','限量周边'], src:'Manner微信公众号' },
   { id:12,brand:'库迪咖啡', time:'06/29', score:78, title:'库迪咖啡 × 《斩神》动漫联名上线', desc:'库迪咖啡与国产动漫《斩神》联名上线，推出限定杯套和周边。库迪持续通过IP联名维持品牌热度，但联名频率过高导致边际效应递减。（来源：B站/行业媒体）', tags:['🎯 营销活动','联名','动漫IP'], src:'B站' },
 ];
 
@@ -1576,7 +1576,7 @@ function buildFeatured() {
       ${generateAIBrief()}
       <div class="hot-hero" style="padding:20px 24px;">
         <div class="label"><span class="fire">🔥</span> 今日热点 TOP 1</div>
-        <h2 style="font-size:17px;">瑞幸×多邻国联名爆火、茶百道出海巴黎、茉莉奶白联名+商标案双线发酵</h2>
+        <h2 style="font-size:17px;">瑞幸×多邻国联名爆火、茶百道出海巴黎、Manner 联名玻璃吸管杯上线</h2>
         <div class="meta">
           <span>${CARDS.length} 条最新资讯 · 截至 7 月 5 日</span>
           <span class="tag">联名</span>
@@ -1692,7 +1692,7 @@ function buildStrategy() {
   const stratData = [
     { date:'07/05', brand:'瑞幸咖啡', action:'× 多邻国联名"11个孩子"上线，屁屁杯2小时售罄', cat:'联名营销', catClass:'product', color:'#003366' },
     { date:'07/05', brand:'瑞幸咖啡', action:'橙C美式升级+缤纷C美式上市', cat:'产品升级', catClass:'product', color:'#003366' },
-    { date:'07/05', brand:'Manner', action:'参与上海咖啡文化节"豆仔"活动', cat:'品牌活动', catClass:'social', color:'#f57c00' },
+    { date:'07/05', brand:'Manner', action:'× Rest & Recreation 联名玻璃吸管杯上线', cat:'联名营销', catClass:'product', color:'#f57c00' },
     { date:'07/04', brand:'喜茶', action:'7月推买一送一活动，覆盖全国门店', cat:'促销活动', catClass:'finance', color:'#d32f2f' },
     { date:'07/03', brand:'茉莉奶白', action:'× 汪苏泷联名套餐爆单，门店排队100+杯', cat:'联名营销', catClass:'product', color:'#8e6e3a' },
     { date:'07/03', brand:'茶百道', action:'海外签约门店近百家，即将入驻巴黎卢浮宫', cat:'出海扩张', catClass:'expansion', color:'#2e7d32' },
@@ -1763,7 +1763,7 @@ function buildFlash() {
   const items = [
     { time:'07/05', text:'瑞幸 × 多邻国联名"11个孩子"上线，屁屁杯2小时售罄' },
     { time:'07/05', text:'瑞幸橙C美式鲜活升级+缤纷C美式上市' },
-    { time:'07/05', text:'Manner参与上海咖啡文化节"豆仔"活动' },
+    { time:'07/05', text:'Manner × Rest & Recreation 联名玻璃吸管杯上线' },
     { time:'07/04', text:'喜茶7月推买一送一活动，全国门店覆盖' },
     { time:'07/03', text:'茉莉奶白 × 汪苏泷联名套餐爆单，排队100+' },
     { time:'07/03', text:'茶百道海外签约门店近百家，将入驻巴黎卢浮宫' },
