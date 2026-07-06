@@ -2,17 +2,22 @@ name: 每日数据刷新
 
 on:
   schedule:
-    # 每天 UTC 2:00 和 8:00（北京时间 10:00 和 16:00）各执行一次
     - cron: '0 2,8 * * *'
-  workflow_dispatch:  # 支持手动触发
+  workflow_dispatch:
   push:
     branches: [main]
 
 permissions:
   contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
 
 jobs:
-  refresh:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -23,30 +28,32 @@ jobs:
           python-version: '3.11'
 
       - name: 安装依赖
+        run: pip install requests
+
+      - name: 尝试刷新数据（失败则使用现有数据）
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          python refresh.py || echo "⚠️ 数据刷新跳过，使用现有内容"
 
-      - name: 刷新数据
-        run: python refresh.py
-
-      - name: 提交更新
+      - name: 提交并推送代码
         run: |
           git config user.name "brew-insight-bot"
-          git config user.email "bot@brew-insight.surge.sh"
+          git config user.email "bot@brew-insight.com"
           git add coffee.html
-          git diff --quiet && git diff --staged --quiet || \
-            git commit -m "📊 每日数据自动刷新 $(date +'%Y-%m-%d %H:%M')"
+          git diff --quiet && git diff --staged --quiet && echo "无更新" || {
+            git commit -m "📊 数据自动刷新 $(date +'%Y-%m-%d %H:%M')"
+            git push
+          }
 
-      - name: 推送到 GitHub
-        uses: ad-m/github-push-action@v0.8.0
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
-
-      - name: 部署到 Surge.sh
+      - name: 准备 Pages 部署文件
         run: |
-          npm install -g surge
           cp coffee.html index.html
-          surge ./ brew-insight.surge.sh \
-            --token ${{ secrets.SURGE_TOKEN }}
+          mkdir -p _site
+          cp index.html _site/
+
+      - name: 上传 Pages 工件
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: 部署到 GitHub Pages
+        uses: actions/deploy-pages@v4
