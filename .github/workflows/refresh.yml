@@ -9,15 +9,9 @@ on:
 
 permissions:
   contents: write
-  pages: write
-  id-token: write
-
-concurrency:
-  group: pages
-  cancel-in-progress: false
 
 jobs:
-  deploy:
+  refresh:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,30 +24,17 @@ jobs:
       - name: 安装依赖
         run: pip install requests
 
-      - name: 尝试刷新数据（失败则使用现有数据）
+      - name: 尝试刷新数据（失败则跳过）
         run: |
-          python refresh.py || echo "⚠️ 数据刷新跳过，使用现有内容"
+          python refresh.py || echo "⚠️ 数据刷新跳过"
 
-      - name: 提交并推送代码
+      - name: 生成并提交 index.html
         run: |
+          cp coffee.html index.html
           git config user.name "brew-insight-bot"
           git config user.email "bot@brew-insight.com"
-          git add coffee.html
+          git add coffee.html index.html
           git diff --quiet && git diff --staged --quiet && echo "无更新" || {
             git commit -m "📊 数据自动刷新 $(date +'%Y-%m-%d %H:%M')"
             git push
           }
-
-      - name: 准备 Pages 部署文件
-        run: |
-          cp coffee.html index.html
-          mkdir -p _site
-          cp index.html _site/
-
-      - name: 上传 Pages 工件
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
-      - name: 部署到 GitHub Pages
-        uses: actions/deploy-pages@v4
