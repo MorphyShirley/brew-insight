@@ -1,40 +1,23 @@
-name: 每日数据刷新
+name: 部署到 GitHub Pages
 
 on:
-  schedule:
-    - cron: '0 2,8 * * *'
   workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  refresh:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
-      - name: 设置 Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-
-      - name: 安装依赖
-        run: pip install requests
-
-      - name: 尝试刷新数据（失败则保留原有数据）
-        run: |
-          cp coffee.html coffee.html.bak
-          python refresh.py && echo "✅ 刷新成功" || { cp coffee.html.bak coffee.html; echo "⚠️ 刷新失败，已恢复原有数据"; }
-          rm -f coffee.html.bak
-
-      - name: 提交并推送
+      - name: 同步 index.html
         run: |
           cp coffee.html index.html
           git config user.name "brew-insight-bot"
           git config user.email "bot@brew-insight.com"
-          git add coffee.html index.html
-          git diff --quiet && git diff --staged --quiet && echo "无更新" || {
-            git commit -m "📊 数据自动刷新 $(date +'%Y-%m-%d %H:%M')"
+          git add index.html
+          git diff --quiet || {
+            git commit -m "📊 同步 index.html $(date +'%Y-%m-%d')"
             git push
           }
