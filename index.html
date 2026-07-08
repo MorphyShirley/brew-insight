@@ -1772,39 +1772,55 @@ function renderBrandUniverse(canvasId) {
     const angle = (i / UNIVERSE_BRANDS.length) * Math.PI * 2 - Math.PI / 2;
     const px = cx + orbitR * Math.cos(angle);
     const py = cy + orbitR * Math.sin(angle);
-    const planetR = 6 + ((b.heat - minHeat) / (maxHeat - minHeat)) * 12;
+    const baseR = 6 + ((b.heat - minHeat) / (maxHeat - minHeat)) * 12;
     const isActive = _activeBrand === b.name;
-    const glowR = isActive ? planetR + 8 : planetR + 3;
+    const hasFilter = _activeBrand !== null;
+    
+    // Active planet is larger, others shrink when filter is active
+    const planetR = isActive ? baseR * 1.5 : (hasFilter ? baseR * 0.7 : baseR);
+    const alpha = hasFilter ? (isActive ? 1 : 0.2) : 0.8;
+    const glowR = isActive ? planetR + 14 : planetR + 3;
 
-    // Glow
-    const g = ctx.createRadialGradient(px, py, planetR * 0.3, px, py, glowR);
-    g.addColorStop(0, isActive ? `${b.color}60` : `${b.color}25`);
-    g.addColorStop(1, 'transparent');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px, py, glowR, 0, Math.PI*2); ctx.fill();
+    // Glow (active planet gets bigger glow)
+    if (isActive || !hasFilter) {
+      const g = ctx.createRadialGradient(px, py, planetR * 0.3, px, py, glowR);
+      g.addColorStop(0, isActive ? `${b.color}80` : `${b.color}20`);
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px, py, glowR, 0, Math.PI*2); ctx.fill();
+    }
 
     // Planet body
-    const g2 = ctx.createRadialGradient(px - planetR*0.3, py - planetR*0.3, 0, px, py, planetR);
-    g2.addColorStop(0, '#fff');
-    g2.addColorStop(0.3, b.color);
-    g2.addColorStop(1, b.color + 'cc');
-    ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(px, py, planetR, 0, Math.PI*2); ctx.fill();
+    if (alpha > 0.1) {
+      const g2 = ctx.createRadialGradient(px - planetR*0.3, py - planetR*0.3, 0, px, py, planetR);
+      g2.addColorStop(0, '#fff');
+      g2.addColorStop(0.3, b.color);
+      g2.addColorStop(1, b.color + 'cc');
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = g2; ctx.beginPath(); ctx.arc(px, py, planetR, 0, Math.PI*2); ctx.fill();
+      ctx.globalAlpha = 1;
+    }
 
-    // Active ring
+    // Active ring with dash animation effect
     if (isActive) {
-      ctx.strokeStyle = b.color; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(px, py, planetR + 4, 0, Math.PI*2); ctx.stroke();
-      ctx.setLineDash([3, 3]); ctx.strokeStyle = b.color + '60'; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(px, py, planetR + 8, 0, Math.PI*2); ctx.stroke();
+      ctx.strokeStyle = b.color + '80'; ctx.lineWidth = 2.5; ctx.beginPath(); ctx.arc(px, py, planetR + 5, 0, Math.PI*2); ctx.stroke();
+      ctx.setLineDash([4, 6]); ctx.strokeStyle = b.color + '40'; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(px, py, planetR + 10, 0, Math.PI*2); ctx.stroke();
       ctx.setLineDash([]);
+      // Inner brightness dot
+      ctx.beginPath(); ctx.arc(px, py, planetR * 0.3, 0, Math.PI*2);
+      ctx.fillStyle = '#ffffff60'; ctx.fill();
     }
 
     // Label
-    ctx.fillStyle = isActive ? b.color : '#8892a8';
+    ctx.fillStyle = isActive ? b.color : (hasFilter ? '#3a4a5a' : '#8892a8');
     ctx.font = isActive ? 'bold 10px Inter,sans-serif' : '9px Inter,sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`${b.emoji} ${b.name}`, px, py + planetR + 14);
-    ctx.fillStyle = '#4a5568'; ctx.font = '8px Inter,sans-serif';
-    ctx.fillText(b.heat.toFixed(1), px, py + planetR + 26);
+    if (isActive) {
+      ctx.fillStyle = b.color + '90'; ctx.font = '8px Inter,sans-serif';
+      ctx.fillText(`热度 ${b.heat.toFixed(1)}`, px, py + planetR + 26);
+    }
 
-    planets.push({ name: b.name, x: px, y: py, r: planetR + 4 });
+    planets.push({ name: b.name, x: px, y: py, r: Math.max(planetR, 8) });
   });
 
   // Click handler
