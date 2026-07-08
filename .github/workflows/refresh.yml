@@ -4,8 +4,6 @@ on:
   schedule:
     - cron: '0 2,8 * * *'
   workflow_dispatch:
-  push:
-    branches: [main]
 
 permissions:
   contents: write
@@ -24,11 +22,13 @@ jobs:
       - name: 安装依赖
         run: pip install requests
 
-      - name: 尝试刷新数据（失败则跳过）
+      - name: 尝试刷新数据（失败则保留原有数据）
         run: |
-          python refresh.py || echo "⚠️ 数据刷新跳过"
+          cp coffee.html coffee.html.bak
+          python refresh.py && echo "✅ 刷新成功" || { cp coffee.html.bak coffee.html; echo "⚠️ 刷新失败，已恢复原有数据"; }
+          rm -f coffee.html.bak
 
-      - name: 生成并提交 index.html
+      - name: 提交并推送
         run: |
           cp coffee.html index.html
           git config user.name "brew-insight-bot"
