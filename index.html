@@ -625,7 +625,7 @@
     .universe-wrap { background: #0c1120; border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid rgba(59,130,246,.06); position: relative; overflow: hidden; }
     .universe-wrap .uv-title { font-size: 12px; font-weight: 700; color: #e0e6f0; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
     .universe-wrap .uv-title .uv-tip { font-size: 10px; font-weight: 400; color: #4a5568; }
-    .universe-wrap canvas { width: 100%; height: auto; display: block; border-radius: 8px; cursor: pointer; touch-action: manipulation; }
+    .universe-wrap canvas { width: 100%; display: block; border-radius: 8px; cursor: pointer; touch-action: manipulation; }
     .uv-legend { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; justify-content: center; }
     .uv-legend span { font-size: 9px; padding: 2px 8px; border-radius: 100px; background: rgba(59,130,246,.06); color: #6b7a92; cursor: pointer; transition: all .15s; }
     .uv-legend span:hover { background: rgba(59,130,246,.15); color: #e0e6f0; }
@@ -1777,8 +1777,8 @@ function renderBrandUniverse(canvasId) {
     const hasFilter = _activeBrand !== null;
     
     // Active planet is larger, others shrink when filter is active
-    const planetR = isActive ? baseR * 1.5 : (hasFilter ? baseR * 0.7 : baseR);
-    const alpha = hasFilter ? (isActive ? 1 : 0.2) : 0.8;
+    const planetR = isActive ? baseR * 1.5 : (hasFilter ? baseR * 0.5 : baseR);
+    const alpha = hasFilter ? (isActive ? 1 : 0.08) : 0.85;
     const glowR = isActive ? planetR + 14 : planetR + 3;
 
     // Glow (active planet gets bigger glow)
@@ -1811,10 +1811,16 @@ function renderBrandUniverse(canvasId) {
     }
 
     // Label
-    ctx.fillStyle = isActive ? b.color : (hasFilter ? '#3a4a5a' : '#8892a8');
+    if (hasFilter && !isActive) {
+      ctx.globalAlpha = 0.3;
+    }
+    ctx.fillStyle = isActive ? b.color : (hasFilter ? '#2a3a4a' : '#8892a8');
     ctx.font = isActive ? 'bold 10px Inter,sans-serif' : '9px Inter,sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText(`${b.emoji} ${b.name}`, px, py + planetR + 14);
+    if (hasFilter && !isActive) {
+      ctx.globalAlpha = 1;
+    }
     if (isActive) {
       ctx.fillStyle = b.color + '90'; ctx.font = '8px Inter,sans-serif';
       ctx.fillText(`热度 ${b.heat.toFixed(1)}`, px, py + planetR + 26);
@@ -1832,8 +1838,8 @@ function renderBrandUniverse(canvasId) {
     for (const p of planets) {
       if (Math.hypot(mx - p.x, my - p.y) <= p.r + 4) { clicked = p.name; break; }
     }
+    // Toggle: click same planet to deselect
     _activeBrand = _activeBrand === clicked ? null : clicked;
-    // Re-render universe and refresh featured page
     renderBrandUniverse('brandUniverse');
     buildFeaturedAndRender();
   };
@@ -1884,7 +1890,7 @@ function buildFeatured() {
     `,
     side: `
       <div class="universe-wrap">
-        <div class="uv-title">🌌 品牌宇宙 <span class="uv-tip">${_activeBrand ? '再次点击星球取消筛选' : '点击星球查看品牌动态'}</span></div>
+        <div class="uv-title">🌌 品牌宇宙 <span class="uv-tip">${_activeBrand ? '再次点击星球取消筛选' : '点击星球查看该品牌动态'}</span></div>
         <canvas id="brandUniverse"></canvas>
         <div class="uv-legend">${UNIVERSE_BRANDS.map(b => `<span class="${_activeBrand === b.name ? 'active' : ''}" onclick="_activeBrand='${b.name}';buildFeaturedAndRender()">${b.emoji} ${b.name}</span>`).join('')}</div>
       </div>
