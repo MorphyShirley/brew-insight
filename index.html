@@ -1704,18 +1704,24 @@ function sideTags(title, tags) {
 
 // ═══ BRAND UNIVERSE ═══
 let _activeBrand = null;
-const UNIVERSE_BRANDS = [
-  { name:'喜茶', heat:96.8, emoji:'🧋', color:'#d32f2f' },
-  { name:'茶百道', heat:94.2, emoji:'🍋', color:'#2e7d32' },
-  { name:'Manner', heat:92.5, emoji:'☕', color:'#f57c00' },
-  { name:'瑞幸咖啡', heat:88.6, emoji:'☕', color:'#003366' },
-  { name:'霸王茶姬', heat:85.2, emoji:'🥤', color:'#8d6e2e' },
-  { name:'奈雪的茶', heat:82.4, emoji:'🌰', color:'#7b1fa2' },
-  { name:'乐乐茶', heat:80.6, emoji:'🧋', color:'#e91e63' },
-  { name:'蜜雪冰城', heat:78.9, emoji:'🍦', color:'#e53935' },
-  { name:'库迪咖啡', heat:76.3, emoji:'☕', color:'#1565c0' },
-  { name:'M Stand', heat:74.8, emoji:'☕', color:'#37474f' },
-];
+const UNIVERSE_BRANDS = (() => {
+  // Dynamically build from CARDS and PRODUCT_ANALYSIS
+  const brandSet = new Set();
+  CARDS.forEach(c => brandSet.add(c.brand));
+  Object.keys(PRODUCT_ANALYSIS).forEach(k => {
+    const b = PRODUCT_ANALYSIS[k].brand;
+    if (b) brandSet.add(b);
+  });
+  const heatData = {'喜茶':96.8,'茶百道':94.2,'Manner':92.5,'瑞幸咖啡':88.6,'霸王茶姬':85.2,'奈雪的茶':82.4,'乐乐茶':80.6,'蜜雪冰城':78.9,'库迪咖啡':76.3,'M Stand':74.8,'Tims天好咖啡':73.5,'肯德基':72.1,'麦当劳':71.8,'星巴克中国':70.5,'茉莉奶白':90.1};
+  const emojiData = {'喜茶':'🧋','茶百道':'🍋','Manner':'☕','瑞幸咖啡':'☕','霸王茶姬':'🥤','奈雪的茶':'🌰','乐乐茶':'🧋','蜜雪冰城':'🍦','库迪咖啡':'☕','M Stand':'☕','Tims天好咖啡':'☕','肯德基':'K','麦当劳':'麦','星巴克中国':'⭐','茉莉奶白':'💐'};
+  const colorData = {'喜茶':'#d32f2f','茶百道':'#2e7d32','Manner':'#f57c00','瑞幸咖啡':'#003366','霸王茶姬':'#8d6e2e','奈雪的茶':'#7b1fa2','乐乐茶':'#e91e63','蜜雪冰城':'#e53935','库迪咖啡':'#1565c0','M Stand':'#37474f','Tims天好咖啡':'#b71c1c','肯德基':'#c62828','麦当劳':'#daa520','星巴克中国':'#006241','茉莉奶白':'#8e6e3a'};
+  return [...brandSet].filter(b => heatData[b]).map(b => ({
+    name: b,
+    heat: heatData[b] || 70,
+    emoji: emojiData[b] || '🏷️',
+    color: colorData[b] || '#3b82f6'
+  })).sort((a, b) => b.heat - a.heat);
+})();
 
 function renderBrandUniverse(canvasId) {
   const canvas = document.getElementById(canvasId);
@@ -1831,9 +1837,9 @@ function buildFeaturedAndRender() {
 function buildFeatured() {
   const allItems = [...CARDS];
   const filteredItems = _activeBrand ? allItems.filter(c => c.brand === _activeBrand) : allItems;
-  const hotItems = filteredItems.slice(0, 8);
-  const rankMap = {'喜茶':1,'茶道':2,'Manner':3,'瑞幸咖啡':4,'霸王茶姬':5};
-  const rankColors = ['#f87171','#fb923c','#facc15','#4ade80','#60a5fa'];
+  const hotItems = filteredItems.slice(0, 10);
+  const rankMap = {'喜茶':1,'茶百道':2,'Manner':3,'瑞幸咖啡':4,'霸王茶姬':5,'奈雪的茶':6,'乐乐茶':7,'蜜雪冰城':8,'库迪咖啡':9,'M Stand':10,'Tims天好咖啡':11,'肯德基':12,'麦当劳':13,'茉莉奶白':14};
+  const rankColors = ['#f87171','#fb923c','#facc15','#4ade80','#60a5fa','#818cf8','#a78bfa','#c084fc','#e879f9','#f472b6','#34d399','#f59e0b','#ec4899','#8b5cf6'];
   return {
     content: `
       ${statusBar()}
@@ -1844,33 +1850,34 @@ function buildFeatured() {
         <div class="label"><span class="fire">🔥</span> ${_activeBrand ? `${_activeBrand} 相关动态` : '今日热点 TOP 1'}</div>
         <h2 style="font-size:17px;">${_activeBrand ? `${_activeBrand} 共有 ${filteredItems.length} 条相关资讯` : '瑞幸×多邻国联名爆火、茶百道出海巴黎、Manner 联名玻璃吸管杯上线'}</h2>
         <div class="meta">
-          <span>${filteredItems.length} 条资讯 · 截至 7 月 5 日</span>
+          <span>${_activeBrand ? `${filteredItems.length} 条筛选结果` : `${CARDS.length} 条最新资讯 · 截至 7 月 5 日`}</span>
           <span class="tag">${_activeBrand || '联名'}</span>
           <span class="tag">趋势</span>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
-        ${hotItems.length > 0 ? hotItems.map(c => {
-          const rank = rankMap[c.brand];
-          const rankBadge = rank ? `<span style="width:18px;height:18px;border-radius:50%;background:${rankColors[rank-1]}20;color:${rankColors[rank-1]};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;border:1.5px solid ${rankColors[rank-1]};">${rank}</span>` : '';
-          return `<div style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:#0c1120;border-radius:10px;border:1px solid rgba(59,130,246,.06);font-size:13px;${_activeBrand ? 'border-color:rgba(59,130,246,.2);box-shadow:0 0 12px rgba(59,130,246,.08);' : ''}">
-            ${rankBadge}
+        ${hotItems.length > 0 ? hotItems.map(c => `
+          <div style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:#0c1120;border-radius:10px;border:1px solid rgba(59,130,246,.06);font-size:13px;${_activeBrand ? 'border-color:rgba(59,130,246,.2);box-shadow:0 0 12px rgba(59,130,246,.08);' : ''}">
             ${brandIcon(c.brand, 22)}
             <span style="color:#e0e6f0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.title}</span>
             <span style="color:#4a5568;font-size:11px;flex-shrink:0;">${c.time}</span>
             <span style="font-size:10px;padding:2px 8px;border-radius:100px;background:rgba(59,130,246,.1);color:#6b7a92;flex-shrink:0;">热度 ${c.score}</span>
-          </div>`;
-        }).join('') : '<div class="news-card" style="text-align:center;padding:30px;color:#4a5568;">该品牌暂无相关资讯</div>'}
+          </div>`).join('') : '<div class="news-card" style="text-align:center;padding:30px;color:#4a5568;">暂无相关资讯</div>'}
       </div>
-      ${_activeBrand ? '' : '<div style="text-align:center;"><a href="#" style="color:#60a5fa;font-size:12px;text-decoration:none;" onclick="event.preventDefault();document.querySelector(\'[data-page=all]\').click()">查看全部 ' + CARDS.length + ' 条动态 →</a></div>'}
+      ${_activeBrand ? `<div style="text-align:center;margin-bottom:12px;"><a href="#" style="color:#60a5fa;font-size:12px;" onclick="event.preventDefault();_activeBrand=null;buildFeaturedAndRender()">🌌 查看全部品牌 →</a></div>` : '<div style="text-align:center;"><a href="#" style="color:#60a5fa;font-size:12px;text-decoration:none;" onclick="event.preventDefault();document.querySelector(\'[data-page=all]\').click()">查看全部 ' + CARDS.length + ' 条动态 →</a></div>'}
     `,
     side: `
       <div class="universe-wrap">
-        <div class="uv-title">🌌 品牌宇宙 <span class="uv-tip">点击星球查看品牌动态</span></div>
+        <div class="uv-title">🌌 品牌宇宙 <span class="uv-tip">${_activeBrand ? '再次点击星球取消筛选' : '点击星球查看品牌动态'}</span></div>
         <canvas id="brandUniverse"></canvas>
         <div class="uv-legend">${UNIVERSE_BRANDS.map(b => `<span class="${_activeBrand === b.name ? 'active' : ''}" onclick="_activeBrand='${b.name}';buildFeaturedAndRender()">${b.emoji} ${b.name}</span>`).join('')}</div>
       </div>
-      ${sideInsight('💡 策略观点','点击上方星球查看对应品牌的最新动态。<br>' + (_activeBrand ? `${UNIVERSE_BRANDS.find(b=>b.name===_activeBrand)?.emoji} <span class="highlight">${_activeBrand}</span> 当前热度 ${UNIVERSE_BRANDS.find(b=>b.name===_activeBrand)?.heat}` : '星球越大表示品牌热度越高。'))}
+      <div class="insight-card">
+        <div class="insight-title">💡 ${_activeBrand ? `当前筛选: ${_activeBrand}` : '品牌宇宙'}</div>
+        <p>${_activeBrand 
+          ? `${UNIVERSE_BRANDS.find(b=>b.name===_activeBrand)?.emoji} <span class="highlight">${_activeBrand}</span> 热度 ${UNIVERSE_BRANDS.find(b=>b.name===_activeBrand)?.heat}，共 ${filteredItems.length} 条资讯。`
+          : '点击上方星球查看对应品牌的最新动态。<br><span class="highlight">星球越大</span> 表示品牌热度越高，当前展示 <span class="highlight">全品牌</span> 资讯。'}</p>
+      </div>
     `
   };
 }
