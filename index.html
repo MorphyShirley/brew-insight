@@ -1734,9 +1734,9 @@ const UNIVERSE_BRANDS = (() => {
     const b = PRODUCT_ANALYSIS[k].brand;
     if (b) brandSet.add(b);
   });
-  const heatData = {'喜茶':96.8,'茶百道':94.2,'Manner':92.5,'瑞幸咖啡':88.6,'霸王茶姬':85.2,'奈雪的茶':82.4,'乐乐茶':80.6,'蜜雪冰城':78.9,'库迪咖啡':76.3,'M Stand':74.8,'Tims天好咖啡':73.5,'肯德基':72.1,'麦当劳':71.8,'星巴克中国':70.5,'茉莉奶白':90.1};
-  const emojiData = {'喜茶':'🧋','茶百道':'🍋','Manner':'☕','瑞幸咖啡':'☕','霸王茶姬':'🥤','奈雪的茶':'🌰','乐乐茶':'🧋','蜜雪冰城':'🍦','库迪咖啡':'☕','M Stand':'☕','Tims天好咖啡':'☕','肯德基':'K','麦当劳':'麦','星巴克中国':'⭐','茉莉奶白':'💐'};
-  const colorData = {'喜茶':'#d32f2f','茶百道':'#2e7d32','Manner':'#f57c00','瑞幸咖啡':'#003366','霸王茶姬':'#8d6e2e','奈雪的茶':'#7b1fa2','乐乐茶':'#e91e63','蜜雪冰城':'#e53935','库迪咖啡':'#1565c0','M Stand':'#37474f','Tims天好咖啡':'#b71c1c','肯德基':'#c62828','麦当劳':'#daa520','星巴克中国':'#006241','茉莉奶白':'#8e6e3a'};
+  const heatData = {'喜茶':96.8,'茶百道':94.2,'Manner':92.5,'瑞幸咖啡':88.6,'霸王茶姬':85.2,'奈雪的茶':82.4,'乐乐茶':80.6,'蜜雪冰城':78.9,'库迪咖啡':76.3,'M Stand':74.8,'Tims天好咖啡':73.5,'肯德基':72.1,'麦当劳':71.8,'星巴克中国':70.5,'茉莉奶白':90.1,'沪上阿姨':75.3,'古茗':79.5,'书亦烧仙草':70.2,'CoCo都可':68.5,'一点点':67.8};
+  const emojiData = {'喜茶':'🧋','茶百道':'🍋','Manner':'☕','瑞幸咖啡':'☕','霸王茶姬':'🥤','奈雪的茶':'🌰','乐乐茶':'🧋','蜜雪冰城':'🍦','库迪咖啡':'☕','M Stand':'☕','Tims天好咖啡':'☕','肯德基':'K','麦当劳':'麦','星巴克中国':'⭐','茉莉奶白':'💐','沪上阿姨':'🧑','古茗':'🍵','书亦烧仙草':'🌿','CoCo都可':'🥥','一点点':'🫘'};
+  const colorData = {'喜茶':'#d32f2f','茶百道':'#2e7d32','Manner':'#f57c00','瑞幸咖啡':'#003366','霸王茶姬':'#8d6e2e','奈雪的茶':'#7b1fa2','乐乐茶':'#e91e63','蜜雪冰城':'#e53935','库迪咖啡':'#1565c0','M Stand':'#37474f','Tims天好咖啡':'#b71c1c','肯德基':'#c62828','麦当劳':'#daa520','星巴克中国':'#006241','茉莉奶白':'#8e6e3a','沪上阿姨':'#ff6b6b','古茗':'#4caf50','书亦烧仙草':'#3e2723','CoCo都可':'#ff9800','一点点':'#7c4dff'};
   return [...brandSet].filter(b => heatData[b]).map(b => ({
     name: b,
     heat: heatData[b] || 70,
@@ -2172,6 +2172,7 @@ const PAGE_BUILDERS = {
   flash: buildFlash,
   matrix: buildMatrix,
   'brand-overview': buildBrandOverview,
+  'brand-deep': buildBrandDeep,
 };
 
 // ═══ BRAND PROFILES ═══
@@ -2191,6 +2192,11 @@ const BRAND_PROFILES = {
   '肯德基': { value:'百胜中国(500亿+)', position:'快餐咖啡 · K COFFEE 平价战略', category:'快餐咖啡', slogan:'生活如此多娇', since:'1952(全球)', stores:'10000+(中国)', tags:['K COFFEE','早餐场景','K-POP联名','9.9元'] },
   '麦当劳': { value:'2000亿+ (NYSE)', position:'快餐咖啡 · 麦咖啡便捷选择', category:'快餐咖啡', slogan:'我就喜欢', since:'1955(全球)', stores:'5500+(中国咖啡)', tags:['麦咖啡','早餐套餐','果咖系列','甜品+咖啡'] },
   '茉莉奶白': { value:'未上市', position:'茉莉茶饮 · 花香细分赛道', category:'新茶饮', slogan:'茉莉香，中国茶', since:'2021', stores:'800+', tags:['茉莉花香','IP联名','快速增长','商标争议'] },
+  '沪上阿姨': { value:'50亿+ (估值)', position:'五谷茶饮 · 下沉市场', category:'新茶饮', slogan:'健康五谷茶', since:'2013', stores:'6000+', tags:['五谷茶','下沉市场','加盟模式','性价比'] },
+  '古茗': { value:'200亿+ (估值)', position:'鲜果茶饮 · 区域深耕', category:'新茶饮', slogan:'每天一杯喝不腻', since:'2010', stores:'9000+', tags:['鲜果茶','区域密集开店','加盟','供应链'] },
+  '书亦烧仙草': { value:'100亿+ (估值)', position:'烧仙草 · 健康茶饮', category:'新茶饮', slogan:'半杯都是料', since:'2007', stores:'7000+', tags:['烧仙草','半杯料','加盟','高性价比'] },
+  'CoCo都可': { value:'未上市', position:'经典台式奶茶 · 全球布局', category:'新茶饮', slogan:'都可茶饮', since:'1997', stores:'5000+', tags:['台式奶茶','全球','经典','长青品牌'] },
+  '一点点': { value:'未上市', position:'台式奶茶 · 经典配方', category:'新茶饮', slogan:'好茶·好奶·好料', since:'2010', stores:'3000+', tags:['台式奶茶','经典','波霸','长生命周期'] },
 };
 
 function buildBrandOverview() {
@@ -2479,6 +2485,7 @@ function buildBrand() {
         <div class="tc-title">📈 ${brand} 12个月趋势 <span style="font-size:11px;font-weight:400;color:#4a5568;">资讯活跃度 & 平均热度</span></div>
         <canvas id="brandTrendChart" data-brand="${brand}"></canvas>
       </div>
+      <div style="text-align:center;margin:-12px 0 16px;"><a href="#" style="color:#60a5fa;font-size:12px;" onclick="event.preventDefault();goToBrandDeep('${brand}')">🔍 查看深度分析 →</a></div>
       <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px;">
         ${[
           ['📰 资讯', cards.length + ' 条'],
@@ -2522,6 +2529,131 @@ function buildBrand() {
   };
 }
 
+// ═══ BRAND DEEP ANALYSIS ═══
+function goToBrandDeep(brand) {
+  _currentBrand = brand;
+  switchPage('brand-deep');
+}
+
+function buildBrandDeep() {
+  const brand = _currentBrand || '';
+  const cards = CARDS.filter(c => c.brand === brand);
+  const products = Object.entries(PRODUCT_ANALYSIS).filter(([,v]) => v.brand === brand);
+  const profile = BRAND_PROFILES[brand];
+  const univ = UNIVERSE_BRANDS.find(u => u.name === brand);
+  // Compute avg scores
+  const avgScores = { 口味:0,包装:0,性价比:0,复购:0,社交:0 };
+  if (products.length) {
+    ['口味','包装','性价比','复购','社交'].forEach((k,i) => {
+      avgScores[k] = (products.reduce((s,[,v]) => s + [v.scores.口味,v.scores.包装,v.scores.性价比,v.scores.复购意愿,v.scores.社交传播][i], 0) / products.length).toFixed(1);
+    });
+  }
+  // Compare with industry avg
+  const allProducts = Object.values(PRODUCT_ANALYSIS);
+  const indAvg = {};
+  ['口味','包装','性价比','复购','社交'].forEach((k,i) => {
+    const vals = allProducts.map(v => [v.scores.口味,v.scores.包装,v.scores.性价比,v.scores.复购意愿,v.scores.社交传播][i]).filter(v => v > 0);
+    indAvg[k] = vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(1) : '0';
+  });
+
+  return {
+    content: `
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;padding:16px;background:#0c1120;border-radius:12px;border:1px solid rgba(59,130,246,.06);cursor:pointer;" onclick="goToBrandDeep('${brand}')">
+        <span style="font-size:28px;">${univ?.emoji||'🏷️'}</span>
+        <div><div style="font-size:20px;font-weight:800;color:#e0e6f0;">${brand}</div>
+        <div style="font-size:11px;color:#4a5568;">品牌深度分析 · 点击刷新</div></div>
+      </div>
+
+      <!-- 评分雷达对比 industry -->
+      <div class="trend-chart-wrap">
+        <div class="tc-title">📊 ${brand} 评分 vs 行业均值</div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+          ${[['口味',avgScores.口味,indAvg.口味],['包装',avgScores.包装,indAvg.包装],['性价比',avgScores.性价比,indAvg.性价比],['复购意愿',avgScores.复购,indAvg.复购],['社交传播',avgScores.社交,indAvg.社交]].map(([dim,val,ind]) => {
+            const dv = parseFloat(val)||0, iv = parseFloat(ind)||0;
+            const pct = Math.min(dv/100*100, 100);
+            const ipct = Math.min(iv/100*100, 100);
+            return `<div style="text-align:center;">
+              <div style="font-size:10px;color:#4a5568;margin-bottom:4px;">${dim}</div>
+              <div style="position:relative;height:80px;display:flex;align-items:flex-end;justify-content:center;gap:8px;">
+                <div style="width:20px;background:${dv>=iv?'#60a5fa':'#4a5568'};height:${pct*0.7}px;border-radius:3px 3px 0 0;position:relative;">
+                  <div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:9px;color:#60a5fa;font-weight:600;">${val}</div>
+                </div>
+                <div style="width:20px;background:#4a5568;height:${ipct*0.7}px;border-radius:3px 3px 0 0;opacity:.5;position:relative;">
+                  <div style="position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:8px;color:#4a5568;">${ind}</div>
+                </div>
+              </div>
+              <div style="display:flex;justify-content:center;gap:8px;font-size:8px;color:#4a5568;margin-top:4px;">
+                <span>${brand}</span><span>行业</span>
+              </div>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+
+      <!-- 关键指标 -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:20px;">
+        ${[
+          ['📊 产品数',products.length+' 款'],
+          ['📰 资讯数',cards.length+' 条'],
+          ['🔥 品牌热度',univ?.heat.toFixed(1)||'-'],
+          ['💎 估值',profile?.value||'-'],
+          ['🏪 门店',profile?.stores||'-'],
+          ['📅 品类',profile?.category||'-'],
+        ].map(([l,v]) => `<div style="background:#0c1120;border:1px solid rgba(59,130,246,.06);border-radius:10px;padding:12px;text-align:center;"><div style="font-size:16px;font-weight:800;color:#60a5fa;">${v}</div><div style="font-size:10px;color:#4a5568;">${l}</div></div>`).join('')}
+      </div>
+
+      <!-- SWOT -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px;">
+        ${[['💪 优势',['品牌认知度高','产品创新能力强','供应链成熟']],['🛡️ 劣势',['价格带竞争激烈','同质化严重','成本压力']],['🚀 机会',['下沉市场扩容','出海窗口期','健康化趋势']],['⚠️ 威胁',['新品牌涌入','价格战加剧','政策变化']]].map(([title,items]) => `
+          <div style="background:#0c1120;border:1px solid rgba(59,130,246,.06);border-radius:10px;padding:14px;">
+            <div style="font-size:12px;font-weight:700;color:#e0e6f0;margin-bottom:8px;">${title}</div>
+            ${items.map(t => `<div style="font-size:11px;color:#6b7a92;padding:3px 0;border-bottom:1px solid rgba(59,130,246,.04);">• ${t}</div>`).join('')}
+          </div>
+        `).join('')}
+      </div>
+
+      <!-- 竞品对比 -->
+      <div class="section-header"><h3>⚔️ 同赛道竞品对比</h3></div>
+      <div style="overflow-x:auto;margin-bottom:20px;">
+      <table class="cmp-table">
+        <thead><tr><th>品牌</th><th>定位</th><th>价格带</th><th>门店</th><th>品类</th></tr></thead>
+        <tbody>
+          ${Object.entries(BRAND_PROFILES).filter(([n]) => n !== brand).filter(([,p]) => p.category === (profile?.category||'')).slice(0,5).map(([n,p]) => {
+            const b = BRANDS[n] || ['?','#666'];
+            return `<tr><td><div class="cmp-brand"><span style="width:14px;height:14px;border-radius:4px;background:${b[1]};color:#fff;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;">${b[0]}</span>${n}</div></td><td style="font-size:11px;color:#6b7a92;">${p.position.slice(0,20)}</td><td>${p.category.includes('咖啡')?'10-35元':'10-25元'}</td><td>${p.stores}</td><td>${p.category}</td></tr>`;
+          }).join('')}
+        </tbody>
+      </table></div>
+
+      <!-- 产品列表 -->
+      ${products.length > 0 ? `
+      <div class="section-header"><h3>📦 全部产品 (${products.length})</h3></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:10px;">
+        ${products.map(([k,v]) => `<div style="background:#0c1120;border:1px solid rgba(59,130,246,.06);border-radius:10px;padding:12px;cursor:pointer;" onclick="openModal('${k}')">
+          <div style="font-size:12px;font-weight:600;color:#e0e6f0;">${k}</div>
+          <div style="font-size:10px;color:#4a5568;margin:4px 0;">${v.date}</div>
+          <div style="display:flex;gap:6px;">${[['口味',v.scores.口味],['包装',v.scores.包装],['性价比',v.scores.性价比],['复购',v.scores.复购意愿],['社交',v.scores.社交传播]].filter(([,s]) => s > 0).map(([l,s]) => `<span style="font-size:9px;padding:1px 6px;border-radius:100px;background:rgba(59,130,246,.08);color:#6b7a92;">${l} ${s}</span>`).join('')}</div>
+        </div>`).join('')}
+      </div>` : ''}
+    `,
+    side: `
+      ${sideInsight('💡 深度分析', `${brand} 当前有 <span class="highlight">${products.length}</span> 款产品、<span class="highlight">${cards.length}</span> 条资讯。<br>${profile ? '定位：' + profile.position + '<br>品类：' + profile.category : ''}`)}
+      <div class="trend-chart-wrap">
+        <div class="tc-title">📈 12月趋势</div>
+        <canvas id="brandTrendChart" data-brand="${brand}"></canvas>
+      </div>
+      ${products.length > 0 ? `<div class="trend-card"><div class="trend-title">📊 评分排行</div>${products.sort(([,a],[,b]) => {
+        const avgA = (a.scores.口味+a.scores.包装+a.scores.性价比+a.scores.复购意愿+a.scores.社交传播)/5;
+        const avgB = (b.scores.口味+b.scores.包装+b.scores.性价比+b.scores.复购意愿+b.scores.社交传播)/5;
+        return avgB - avgA;
+      }).slice(0,5).map(([k,v],i) => {
+        const avg = ((v.scores.口味+v.scores.包装+v.scores.性价比+v.scores.复购意愿+v.scores.社交传播)/5).toFixed(1);
+        return `<div class="trend-item"><span class="trend-rank ${i<3?'top3':''}">${i+1}</span><span class="trend-info"><div class="name">${k.length>14?k.slice(0,14)+'..':k}</div></span><span class="trend-heat">${avg}</span></div>`;
+      }).join('')}</div>` : ''}
+    `
+  };
+}
+
 // ═══ NAVIGATION ═══
 let _pageHistory = [];
 function setupFilters() {} // 旧筛选栏已移除，保留空函数避免报错
@@ -2533,7 +2665,7 @@ function switchPage(pageId) {
   }
   // Show/hide back button
   const backBtn = document.getElementById('backBtn');
-  if (backBtn) backBtn.classList.toggle('visible', pageId === 'brand' || pageId === 'brand-overview');
+  if (backBtn) backBtn.classList.toggle('visible', pageId === 'brand' || pageId === 'brand-overview' || pageId === 'brand-deep');
   if (meta) {
     document.getElementById('pageTitle').innerHTML = `${meta.title} <small style="font-size:14px;font-weight:400;color:#4a5568;margin-left:12px;">${meta.sub}</small>`;
   }
@@ -2550,7 +2682,7 @@ function switchPage(pageId) {
   if (pageId === 'strategy') {
     setTimeout(() => renderTrendChart('trendChart'), 200);
   }
-  if (pageId === 'brand') {
+  if (pageId === 'brand' || pageId === 'brand-deep') {
     setTimeout(() => renderBrandTrend('brandTrendChart'), 200);
   }
   refreshSearchSource();
