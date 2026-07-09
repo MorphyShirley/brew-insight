@@ -622,10 +622,17 @@
     .status-bar .sb-action { margin-left: auto; cursor: pointer; color: #60a5fa; font-size: 11px; }
 
     /* ── Brand Universe ── */
-    .universe-wrap { background: #0c1120; border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid rgba(59,130,246,.06); position: relative; overflow: hidden; }
+    .universe-wrap { background: #0c1120; border-radius: 16px; padding: 16px; margin-bottom: 16px; border: 1px solid rgba(59,130,246,.06); position: relative; overflow: hidden; transition: all .25s ease; }
+    .universe-wrap:hover { transform: scale(1.02); border-color: rgba(59,130,246,.15); box-shadow: 0 4px 24px rgba(59,130,246,.08); }
     .universe-wrap .uv-title { font-size: 12px; font-weight: 700; color: #e0e6f0; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
     .universe-wrap .uv-title .uv-tip { font-size: 10px; font-weight: 400; color: #4a5568; }
     .universe-wrap canvas { width: 100%; display: block; border-radius: 8px; cursor: pointer; touch-action: manipulation; }
+    .uv-hover-info { min-height: 0; max-height: 0; overflow: hidden; transition: all .3s ease; margin-top: 0; }
+    .uv-hover-info.open { min-height: 40px; max-height: 200px; margin-top: 10px; }
+    .uv-hover-info .uvh-brand { font-size: 13px; font-weight: 700; margin-bottom: 4px; }
+    .uv-hover-info .uvh-item { font-size: 11px; color: #6b7a92; padding: 3px 0; border-bottom: 1px solid rgba(59,130,246,.04); display: flex; align-items: center; gap: 6px; }
+    .uv-hover-info .uvh-item:last-child { border-bottom: none; }
+    .uv-hover-info .uvh-dot { width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; }
     .uv-legend { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 8px; justify-content: center; }
     .uv-legend span { font-size: 9px; padding: 2px 8px; border-radius: 100px; background: rgba(59,130,246,.06); color: #6b7a92; cursor: pointer; transition: all .15s; }
     .uv-legend span:hover { background: rgba(59,130,246,.15); color: #e0e6f0; }
@@ -1829,9 +1836,30 @@ function renderBrandUniverse(canvasId) {
     if (found !== _hoveredBrand) {
       _hoveredBrand = found;
       renderBrandUniverse(canvasId);
-      // Update cursor
       canvas.style.cursor = found ? 'pointer' : 'default';
+      // Update hover info panel
+      const info = document.getElementById('uvHoverInfo');
+      if (info) {
+        if (found) {
+          const brand = UNIVERSE_BRANDS.find(b => b.name === found);
+          const cards = CARDS.filter(c => c.brand === found).slice(0, 3);
+          const products = Object.entries(PRODUCT_ANALYSIS).filter(([,v]) => v.brand === found).slice(0, 2);
+          info.className = 'uv-hover-info open';
+          info.innerHTML = `<div class="uvh-brand">${brand?.emoji||''} ${found}</div>
+            ${cards.map(c => `<div class="uvh-item"><span class="uvh-dot" style="background:${brand?.color||'#60a5fa'}"></span>${c.title.slice(0,45)}${c.title.length>45?'…':''}</div>`).join('')}
+            ${products.map(([k]) => `<div class="uvh-item"><span class="uvh-dot" style="background:${brand?.color||'#60a5fa'}"></span>📊 ${k}</div>`).join('')}`;
+        } else {
+          info.className = 'uv-hover-info';
+          info.innerHTML = '';
+        }
+      }
     }
+  };
+  
+  canvas.onmouseleave = () => {
+    if (_hoveredBrand) { _hoveredBrand = null; renderBrandUniverse(canvasId); canvas.style.cursor = 'default'; }
+    const info = document.getElementById('uvHoverInfo');
+    if (info) { info.className = 'uv-hover-info'; info.innerHTML = ''; }
   };
   
   canvas.onmouseleave = () => {
@@ -1900,6 +1928,7 @@ function buildFeatured() {
       <div class="universe-wrap">
         <div class="uv-title">🌌 品牌宇宙 <span class="uv-tip">${_activeBrand ? '再次点击星球取消筛选' : '点击星球查看该品牌动态'}</span></div>
         <canvas id="brandUniverse"></canvas>
+        <div class="uv-hover-info" id="uvHoverInfo"></div>
         <div class="uv-legend">${UNIVERSE_BRANDS.map(b => `<span class="${_activeBrand === b.name ? 'active' : ''}" onclick="_activeBrand='${b.name}';buildFeaturedAndRender()">${b.emoji} ${b.name}</span>`).join('')}</div>
       </div>
       <div class="insight-card">
