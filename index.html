@@ -932,6 +932,7 @@
       <a href="#" data-page="follows"><span class="icon">📌</span>我的关注</a>
       <div class="sidebar-nav-label">分析</div>
       <a href="#" data-page="matrix"><span class="icon">📊</span>竞品矩阵</a>
+      <a href="#" data-page="brand-overview"><span class="icon">🏢</span>品牌概况</a>
       <a href="#" data-page="brand" id="brandNavLink" style="display:none;"><span class="icon">🏷️</span><span id="brandNavName">品牌详情</span></a>
       <a href="#" data-page="flash"><span class="icon">⚡</span>快讯订阅</a>
     </nav>
@@ -957,6 +958,7 @@
       <a href="#" data-page="strategy"><span class="mn-icon">📊</span>战略</a>
       <a href="#" data-page="trends"><span class="mn-icon">📈</span>趋势</a>
       <a href="#" data-page="matrix"><span class="mn-icon">📊</span>矩阵</a>
+      <a href="#" data-page="brand-overview"><span class="mn-icon">🏢</span>概况</a>
       <a href="#" data-page="flash"><span class="mn-icon">⚡</span>快讯</a>
       <a href="#" data-page="follows"><span class="mn-icon">📌</span>关注</a>
     </div>
@@ -1536,6 +1538,7 @@ const PAGE_META = {
   follows: { title: '📌 我的关注', sub: '你关注的内容' },
   flash: { title: '⚡ 快讯订阅', sub: '实时短讯推送' },
   matrix: { title: '📊 竞品矩阵', sub: '品牌核心指标一览' },
+  'brand-overview': { title: '🏢 品牌概况', sub: '品牌定位·价值·品类' },
 };
 
 const BRAND_LOGO = {
@@ -2157,7 +2160,55 @@ const PAGE_BUILDERS = {
   follows: buildFollows,
   flash: buildFlash,
   matrix: buildMatrix,
+  'brand-overview': buildBrandOverview,
 };
+
+// ═══ BRAND PROFILES ═══
+const BRAND_PROFILES = {
+  '瑞幸咖啡': { value:'300亿+ (NYSE)', position:'平价精品咖啡 · 数字化驱动', category:'现磨咖啡', slogan:'专业咖啡新鲜每杯', since:'2017', stores:'18000+', tags:['数字化','高频上新','联名营销','私域运营'] },
+  '星巴克中国': { value:'1500亿+ (NASDAQ)', position:'高端第三空间 · 品质咖啡文化', category:'现磨咖啡', slogan:'每一杯用心呈现', since:'1999', stores:'8000+', tags:['第三空间','会员体系','季节限定','臻选店'] },
+  '喜茶': { value:'600亿 (估值)', position:'新茶饮开创者 · 灵感之茶', category:'新茶饮', slogan:'灵感之茶', since:'2012', stores:'3000+', tags:['产品创新','联名营销','LAB概念店','定制化'] },
+  '奈雪的茶': { value:'10亿+ (港股)', position:'茶饮+烘焙 · 高端现制茶饮', category:'新茶饮', slogan:'一杯好茶，一口软欧包', since:'2015', stores:'1500+', tags:['茶饮+烘焙','第三空间','IP联名','困境反转'] },
+  '霸王茶姬': { value:'300亿 (估值)', position:'国风茶饮 · 原叶鲜奶茶', category:'新茶饮', slogan:'以东方茶，会世界友', since:'2017', stores:'5000+', tags:['国风','原叶茶','出海','文化IP'] },
+  '蜜雪冰城': { value:'300亿+ (港股)', position:'极致性价比 · 下沉市场之王', category:'冰淇淋与茶', slogan:'让每个人享受高质平价的美味', since:'1997', stores:'36000+', tags:['极致性价比','下沉市场','加盟模式','供应链'] },
+  '库迪咖啡': { value:'未上市', position:'低价咖啡 · 快速扩张挑战者', category:'现磨咖啡', slogan:'喝库迪，更年轻', since:'2022', stores:'7000+', tags:['价格战','快速扩张','联名跟风','全冰去水'] },
+  '茶百道': { value:'300亿+ (港股)', position:'鲜果茶饮 · 年轻化品牌', category:'新茶饮', slogan:'好茶为底，新鲜为核', since:'2008', stores:'10000+', tags:['鲜果茶','出海','咖啡业务','IP联名'] },
+  'Tims天好咖啡': { value:'10亿+ (NASDAQ)', position:'加拿大国民咖啡 · 暖食咖啡', category:'现磨咖啡', slogan:'温暖每一天', since:'2019(中国)', stores:'1000+', tags:['暖食咖啡','枫糖','加盟扩张','下沉市场'] },
+  'Manner': { value:'120亿+ (估值)', position:'精品平价 · 打工人咖啡', category:'现磨咖啡', slogan:'让咖啡成为日常', since:'2015', stores:'1200+', tags:['精品平价','自带杯减5元','SOE','超大冰杯'] },
+  'M Stand': { value:'40亿+ (估值)', position:'设计师咖啡 · 极简工业风', category:'现磨咖啡', slogan:'Not Standard', since:'2017', stores:'500+', tags:['设计师品牌','城市限定','旗舰店','打卡属性'] },
+  '乐乐茶': { value:'50亿 (估值)', position:'快乐茶饮 · 鲜果制茶', category:'新茶饮', slogan:'让喝茶变得快乐', since:'2016', stores:'500+', tags:['鲜果茶','限时促销','9.9元','区域性品牌'] },
+  '肯德基': { value:'百胜中国(500亿+)', position:'快餐咖啡 · K COFFEE 平价战略', category:'快餐咖啡', slogan:'生活如此多娇', since:'1952(全球)', stores:'10000+(中国)', tags:['K COFFEE','早餐场景','K-POP联名','9.9元'] },
+  '麦当劳': { value:'2000亿+ (NYSE)', position:'快餐咖啡 · 麦咖啡便捷选择', category:'快餐咖啡', slogan:'我就喜欢', since:'1955(全球)', stores:'5500+(中国咖啡)', tags:['麦咖啡','早餐套餐','果咖系列','甜品+咖啡'] },
+  '茉莉奶白': { value:'未上市', position:'茉莉茶饮 · 花香细分赛道', category:'新茶饮', slogan:'茉莉香，中国茶', since:'2021', stores:'800+', tags:['茉莉花香','IP联名','快速增长','商标争议'] },
+};
+
+function buildBrandOverview() {
+  const sorted = Object.entries(BRAND_PROFILES).sort();
+  return {
+    content: `
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;">
+        ${sorted.map(([name, p]) => {
+          const b = BRANDS[name] || ['?','#666'];
+          const logoUrl = BRAND_LOGO[name];
+          const cards = CARDS.filter(c => c.brand === name);
+          return `<div style="background:#0c1120;border:1px solid rgba(59,130,246,.06);border-radius:12px;padding:16px;cursor:pointer;transition:all .2s;" onclick="goToBrand('${name}')" onmouseover="this.style.borderColor='rgba(59,130,246,.2)'" onmouseout="this.style.borderColor='rgba(59,130,246,.06)'">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+              ${logoUrl ? `<img src="${logoUrl}" width="32" height="32" style="border-radius:6px;object-fit:contain;background:#fff;" alt="${name}">` : `<span style="width:32px;height:32px;border-radius:6px;background:${b[1]};color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;">${b[0]}</span>`}
+              <div><div style="font-size:15px;font-weight:700;color:#e0e6f0;">${name}</div><div style="font-size:10px;color:#4a5568;">${p.since} · ${p.stores}</div></div>
+            </div>
+            <div style="font-size:11px;color:#6b7a92;line-height:1.5;margin-bottom:6px;"><span style="color:#60a5fa;font-weight:600;">定位</span> ${p.position}</div>
+            <div style="font-size:11px;color:#6b7a92;margin-bottom:6px;"><span style="color:#60a5fa;font-weight:600;">品类</span> ${p.category} · <span style="color:#60a5fa;font-weight:600;">估值</span> ${p.value}</div>
+            <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:6px;">${p.tags.map(t => `<span style="font-size:9px;padding:2px 8px;border-radius:100px;background:rgba(59,130,246,.08);color:#6b7a92;">${t}</span>`).join('')}</div>
+            <div style="font-size:10px;color:#4a5568;margin-top:6px;">📰 ${cards.length} 条相关资讯 · 点击查看 →</div>
+          </div>`;
+        }).join('')}
+      </div>
+    `,
+    side: `
+      ${sideInsight('🏢 品牌概况','当前收录 <span class="highlight">' + Object.keys(BRAND_PROFILES).length + '</span> 个品牌的完整档案。<br>包含品牌定位、市场价值、核心品类、门店规模等关键信息。<br>点击任意品牌卡片跳转至品牌详情页。')}
+    `
+  };
+}
 
 // ═══ WEEK REPORT ═══
 function generateWeekReport() {
@@ -2558,13 +2609,13 @@ function getBookmarks() { return JSON.parse(localStorage.getItem('brew_bookmarks
 function generateAIBrief() {
   const entries = Object.entries(PRODUCT_ANALYSIS);
   if (entries.length === 0) return '';
-  const brands = [...new Set(entries.map(([,v]) => v.brand))];
+  const brandSet = [...new Set(entries.map(([,v]) => v.brand))];
   const avgScore = (entries.reduce((s,[,v]) => {
     const sc = v.scores;
     return s + (sc.口味 + sc.包装 + sc.性价比 + sc.复购意愿 + sc.社交传播) / 5;
   }, 0) / entries.length).toFixed(1);
   const latestDate = entries.sort((a,b) => b[1].date.localeCompare(a[1].date))[0][1].date;
-  const topBrand = [...brands].map(b => {
+  const topBrand = [...brandSet].map(b => {
     const p = entries.filter(([,v]) => v.brand === b);
     return { brand: b, count: p.length, avg: p.reduce((s,[,v]) => s + ((v.scores.口味+v.scores.包装+v.scores.性价比+v.scores.复购意愿+v.scores.社交传播)/5),0) / p.length };
   }).sort((a,b) => b.avg - a.avg)[0];
@@ -2572,13 +2623,13 @@ function generateAIBrief() {
     <div class="ai-brief">
       <div class="ab-label">🤖 AI 简报</div>
       <div class="ab-main">
-        <span class="ab-stat">${brands.length}<small>品牌</small></span>
+        <span class="ab-stat"><a href="#" onclick="event.preventDefault();activatePage('brand-overview')" style="color:inherit;text-decoration:none;">${brandSet.length}<small>品牌</small></a></span>
         <span class="ab-divider"></span>
         <span class="ab-stat">${entries.length}<small>产品</small></span>
         <span class="ab-divider"></span>
         <span class="ab-stat">${avgScore}<small>均分</small></span>
         <span class="ab-divider"></span>
-        <span class="ab-tag">🔥 ${topBrand.brand}</span>
+        <span class="ab-tag" style="cursor:pointer;" onclick="event.preventDefault();goToBrand('${topBrand.brand}')">🔥 ${topBrand.brand}</span>
         <span style="font-size:11px;color:#4a5568;">${latestDate} 更新</span>
       </div>
     </div>
