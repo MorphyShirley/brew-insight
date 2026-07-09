@@ -2363,6 +2363,91 @@ function statusBar() {
   return `<div class="status-bar"><span class="sb-dot green"></span>数据更新至 ${now.toISOString().slice(0,10)} · 共 ${CARDS.length} 条资讯<span class="sb-action" onclick="location.reload()">⟳ 刷新</span></div>`;
 }
 
+// ═══ BRAND TREND CHART (12-month) ═══
+function renderBrandTrend(canvasId) {
+  const canvas = document.getElementById(canvasId);
+  if (!canvas) return;
+  const brand = canvas.dataset.brand;
+  const cards = CARDS.filter(c => c.brand === brand);
+  const w = Math.max(300, canvas.parentElement.getBoundingClientRect().width - 40);
+  const h = 200;
+  canvas.width = w * 2; canvas.height = h * 2;
+  canvas.style.width = w + 'px'; canvas.style.height = h + 'px';
+  const ctx = canvas.getContext('2d'); ctx.scale(2, 2);
+
+  // Build 12 months of data
+  const months = [];
+  for (let m = 0; m < 12; m++) {
+    const d = new Date(2025, 6 + m, 1);
+    const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const monthCards = cards.filter(c => c.time && c.time.startsWith(ym.slice(2)));
+    months.push({
+      label: `${d.getMonth()+1}月`,
+      count: monthCards.length,
+      avgScore: monthCards.length ? Math.round(monthCards.reduce((s,c)=>s+c.score,0)/monthCards.length) : null,
+    });
+  }
+
+  const pad = { top: 20, right: 16, bottom: 28, left: 36 };
+  const pw = w - pad.left - pad.right, ph = h - pad.top - pad.bottom;
+  const maxVal = Math.max(...months.map(m => m.count), 1);
+
+  ctx.fillStyle = '#0a0e1a'; ctx.fillRect(0, 0, w, h);
+
+  // Grid
+  ctx.strokeStyle = 'rgba(59,130,246,.05)'; ctx.lineWidth = .5;
+  for (let i = 0; i <= 4; i++) {
+    const y = pad.top + i / 4 * ph;
+    ctx.beginPath(); ctx.moveTo(pad.left, y); ctx.lineTo(w - pad.right, y); ctx.stroke();
+    ctx.fillStyle = '#3a4a5a'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText(Math.round(maxVal - i/4*maxVal) + '', pad.left - 6, y + 3);
+  }
+
+  // Bars + line
+  const barW = pw / months.length * 0.5;
+  let lastValid = -1;
+
+  months.forEach((m, i) => {
+    const x = pad.left + i * (pw / months.length) + pw / months.length / 2;
+    
+    // Bar
+    if (m.count > 0) {
+      const bh = (m.count / maxVal) * ph;
+      ctx.fillStyle = 'rgba(59,130,246,.2)';
+      ctx.beginPath(); ctx.roundRect(x - barW/2, pad.top + ph - bh, barW, bh, 2); ctx.fill();
+    }
+
+    // Line connection (only if both current and last have data)
+    if (m.avgScore !== null && lastValid >= 0 && months[lastValid].avgScore !== null) {
+      const lx = pad.left + lastValid * (pw / months.length) + pw / months.length / 2;
+      const ly = pad.top + (1 - months[lastValid].avgScore / 100) * ph;
+      const cx = x, cy = pad.top + (1 - m.avgScore / 100) * ph;
+      ctx.strokeStyle = '#60a5fa'; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(lx, ly); ctx.lineTo(cx, cy); ctx.stroke();
+      // Dot
+      ctx.beginPath(); ctx.arc(lx, ly, 3, 0, Math.PI*2); ctx.fillStyle = '#60a5fa'; ctx.fill();
+    }
+    if (m.avgScore !== null) {
+      const cy = pad.top + (1 - m.avgScore / 100) * ph;
+      ctx.beginPath(); ctx.arc(x, cy, 3, 0, Math.PI*2); ctx.fillStyle = '#60a5fa'; ctx.fill();
+      ctx.fillStyle = '#60a5fa'; ctx.font = '8px Inter,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(m.avgScore, x, cy - 8);
+    }
+
+    // Bottom label
+    ctx.fillStyle = '#4a5568'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText(m.label, x, h - 4);
+
+    if (m.count > 0 || m.avgScore !== null) lastValid = i;
+  });
+
+  // Dual legend
+  ctx.fillStyle = 'rgba(59,130,246,.3)'; ctx.fillRect(w - pad.right - 90, pad.top + 4, 10, 10);
+  ctx.fillStyle = '#60a5fa'; ctx.fillRect(w - pad.right - 90, pad.top + 18, 10, 3);
+  ctx.fillStyle = '#8892a8'; ctx.font = '9px Inter,sans-serif'; ctx.textAlign = 'left';
+  ctx.fillText('资讯量', w - pad.right - 76, pad.top + 12);
+  ctx.fillText('热度均分', w - pad.right - 76, pad.top + 26);
+}
+
 // ═══ BRAND PAGE ═══
 let _currentBrand = null;
 function goToBrand(brand) {
@@ -2379,27 +2464,59 @@ function buildBrand() {
   const products = Object.entries(PRODUCT_ANALYSIS).filter(([,v]) => v.brand === brand);
   const b = BRANDS[brand] || ['?','#666'];
   const logoUrl = BRAND_LOGO[brand];
+  const profile = BRAND_PROFILES[brand];
+  // Monthly distribution for 12-month trend
+  const months = [];
+  for (let m = 0; m < 12; m++) {
+    const d = new Date(2025, 6 + m, 1);
+    const ym = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const monthCards = cards.filter(c => c.time && c.time.startsWith(ym.slice(2)));
+    months.push({ label: `${d.getMonth()+1}月`, cards: monthCards.length, avgScore: monthCards.length ? Math.round(monthCards.reduce((s,c)=>s+c.score,0)/monthCards.length) : null });
+  }
   return {
     content: `
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
-        ${logoUrl ? `<img src="${logoUrl}" width="40" height="40" style="border-radius:8px;object-fit:contain;background:#fff;" alt="${brand}">` : `<span style="width:40px;height:40px;border-radius:8px;background:${b[1]};color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;">${b[0]}</span>`}
-        <div>
-          <div style="font-size:20px;font-weight:800;color:#e0e6f0;">${brand}</div>
-          <div style="font-size:12px;color:#4a5568;">${cards.length} 条资讯 · ${products.length} 款产品分析</div>
-        </div>
+      <div class="trend-chart-wrap">
+        <div class="tc-title">📈 ${brand} 12个月趋势 <span style="font-size:11px;font-weight:400;color:#4a5568;">资讯活跃度 & 平均热度</span></div>
+        <canvas id="brandTrendChart" data-brand="${brand}"></canvas>
       </div>
-      ${products.length > 0 ? `
-        <div class="section-header"><h3>📊 产品分析</h3></div>
-        ${products.slice(0,4).map(([k]) => `<div class="news-card" style="cursor:pointer;" onclick="openModal('${k}')"><h3 style="font-size:15px;">${k}</h3><div style="font-size:12px;color:#4a5568;margin-top:4px;">点击查看详情</div></div>`).join('')}
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-bottom:20px;">
+        ${[
+          ['📰 资讯', cards.length + ' 条'],
+          ['📊 产品', products.length + ' 款'],
+          ['🏷️ 定位', profile ? profile.category : '-'],
+          ['💎 估值', profile ? profile.value : '-'],
+          ['🏪 规模', profile ? profile.stores : '-'],
+          ['🔥 热度', brand ? (UNIVERSE_BRANDS.find(u=>u.name===brand)?.heat.toFixed(1)||'-') : '-'],
+        ].map(([l,v]) => `<div style="background:#0c1120;border:1px solid rgba(59,130,246,.06);border-radius:10px;padding:14px;text-align:center;"><div style="font-size:18px;font-weight:800;color:#60a5fa;">${v}</div><div style="font-size:10px;color:#4a5568;margin-top:2px;">${l}</div></div>`).join('')}
+      </div>
+      ${profile ? `
+      <div class="news-card"><div style="display:flex;flex-wrap:wrap;gap:16px;">
+        <div><span style="font-size:11px;color:#4a5568;">定位</span><div style="font-size:13px;color:#e0e6f0;font-weight:600;">${profile.position}</div></div>
+        <div><span style="font-size:11px;color:#4a5568;">口号</span><div style="font-size:13px;color:#e0e6f0;">${profile.slogan}</div></div>
+        <div><span style="font-size:11px;color:#4a5568;">品类</span><div style="font-size:13px;color:#e0e6f0;">${profile.category}</div></div>
+        <div><span style="font-size:11px;color:#4a5568;">成立</span><div style="font-size:13px;color:#e0e6f0;">${profile.since}</div></div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:10px;">${profile.tags.map(t => `<span style="font-size:10px;padding:2px 10px;border-radius:100px;background:rgba(59,130,246,.08);color:#6b7a92;">${t}</span>`).join('')}</div></div>
       ` : ''}
-      <div class="section-header"><h3>📰 资讯动态</h3></div>
+      ${products.length > 0 ? `
+      <div class="section-header"><h3>📊 产品分析 (${products.length})</h3></div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:10px;">
+        ${products.map(([k,v]) => `<div style="background:#0c1120;border:1px solid rgba(59,130,246,.06);border-radius:10px;padding:14px;cursor:pointer;" onclick="openModal('${k}')">
+          <div style="font-size:13px;font-weight:600;color:#e0e6f0;margin-bottom:4px;">${k}</div>
+          <div style="font-size:10px;color:#4a5568;">${v.date} · 评分 ${((v.scores.口味+v.scores.包装+v.scores.性价比+v.scores.复购意愿+v.scores.社交传播)/5).toFixed(1)}</div>
+          <div style="display:flex;gap:6px;margin-top:6px;">
+            ${[['口味',v.scores.口味],['包装',v.scores.包装],['性价比',v.scores.性价比],['复购',v.scores.复购意愿],['社交',v.scores.社交传播]].map(([l,s]) => s > 0 ? `<span style="font-size:9px;color:#6b7a92;">${l} ${s}</span>` : '').join('')}
+          </div>
+        </div>`).join('')}
+      </div>` : ''}
+      <div class="section-header"><h3>📰 资讯动态 (${cards.length})</h3></div>
       ${cards.length > 0 ? cards.map(renderCard).join('') : '<div class="news-card" style="text-align:center;padding:30px;color:#4a5568;">暂无资讯</div>'}
     `,
     side: `
-      ${sideInsight('💡 品牌概览', brand ? `${brand} 当前有 <span class="highlight">${cards.length}</span> 条相关资讯和 <span class="highlight">${products.length}</span> 款产品分析数据。` : '请选择一个品牌查看详情。')}
-      ${products.length > 0 ? `<div class="trend-card"><div class="trend-title">📈 产品评分</div>${products.slice(0,5).map(([k,v]) => {
+      ${sideInsight('💡 品牌概览', `${brand} ${profile ? '· ' + profile.position : ''}<br>共有 <span class="highlight">${cards.length}</span> 条资讯、<span class="highlight">${products.length}</span> 款产品分析。`)}
+      ${products.length > 0 ? `<div class="trend-card"><div class="trend-title">📈 产品评分</div>${products.slice(0,6).map(([k,v]) => {
         const avg = ((v.scores.口味+v.scores.包装+v.scores.性价比+v.scores.复购意愿+v.scores.社交传播)/5).toFixed(1);
-        return `<div class="trend-item"><span class="trend-info"><div class="name">${k.length>12?k.slice(0,12)+'..':k}</div></span><span class="trend-heat">${avg}</span></div>`;
+        return `<div class="trend-item"><span class="trend-info"><div class="name">${k.length>14?k.slice(0,14)+'..':k}</div></span><span class="trend-heat">${avg}</span></div>`;
       }).join('')}</div>` : ''}
     `
   };
@@ -2432,6 +2549,9 @@ function switchPage(pageId) {
   }
   if (pageId === 'strategy') {
     setTimeout(() => renderTrendChart('trendChart'), 200);
+  }
+  if (pageId === 'brand') {
+    setTimeout(() => renderBrandTrend('brandTrendChart'), 200);
   }
   refreshSearchSource();
   if (pageId === 'featured') {
@@ -2523,6 +2643,7 @@ window.addEventListener('resize', () => {
     if (document.getElementById('scatterChart')) renderScatterPlot('scatterChart');
     if (document.getElementById('trendChart')) renderTrendChart('trendChart');
     if (document.getElementById('priceChart')) renderPriceChart('priceChart');
+    if (document.getElementById('brandTrendChart')) renderBrandTrend('brandTrendChart');
   }, 300);
 });
 
