@@ -2327,6 +2327,9 @@ function switchPage(pageId) {
     setTimeout(() => renderTrendChart('trendChart'), 200);
   }
   refreshSearchSource();
+  if (pageId === 'featured') {
+    setTimeout(() => renderBrandUniverse('brandUniverse'), 100);
+  }
 }
 
 
@@ -2394,6 +2397,7 @@ Object.entries(PRODUCT_ANALYSIS).forEach(([k,v]) => searchItems.push({type:'prod
 CARDS.forEach(c => searchItems.push({type:'news',label:c.title, brand:c.brand, time:c.time, key:c.id, tags:c.tags}));
 
 switchPage('featured');
+setTimeout(() => renderBrandUniverse('brandUniverse'), 300);
 
 // Resize handler for scatter chart
 let resizeTimer;
