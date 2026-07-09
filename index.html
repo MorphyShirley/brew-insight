@@ -97,9 +97,17 @@
       display: flex; align-items: center; justify-content: space-between;
       margin-bottom: 28px; flex-wrap: wrap; gap: 12px;
     }
+    .top-bar .tb-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .top-bar .tb-left .back-btn {
+      display: none; font-size: 13px; color: #60a5fa; cursor: pointer;
+      padding: 4px 10px; border-radius: 8px; flex-shrink: 0; text-decoration: none;
+      background: rgba(59,130,246,.08); white-space: nowrap;
+    }
+    .top-bar .tb-left .back-btn:hover { background: rgba(59,130,246,.15); }
+    .top-bar .tb-left .back-btn.visible { display: inline-block; }
     .top-bar h1 {
       font-size: 26px; font-weight: 800; letter-spacing: -.5px;
-      color: #e0e6f0;
+      color: #e0e6f0; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
     .top-bar h1 small {
       font-size: 14px; font-weight: 400; color: #4a5568;
@@ -968,8 +976,11 @@
   <div class="main">
 
     <!-- Top bar -->
-    <div class="top-bar">
-      <h1 id="pageTitle">精选动态</h1>
+     <div class="top-bar">
+      <div class="tb-left">
+        <a href="#" class="back-btn" id="backBtn" onclick="event.preventDefault();goBack()">← 返回</a>
+        <h1 id="pageTitle">精选动态</h1>
+      </div>
       <div class="top-bar-actions">
         <span class="date-display"></span>
         <button class="btn-icon search-trigger" title="搜索" onclick="openSearch()">🔍</button>
@@ -2395,9 +2406,17 @@ function buildBrand() {
 }
 
 // ═══ NAVIGATION ═══
+let _pageHistory = [];
 function setupFilters() {} // 旧筛选栏已移除，保留空函数避免报错
 function switchPage(pageId) {
   const meta = PAGE_META[pageId];
+  const prevPage = _pageHistory.length > 0 ? _pageHistory[_pageHistory.length - 1] : null;
+  if (!pageId.startsWith('brand') || prevPage !== pageId) {
+    _pageHistory.push(pageId);
+  }
+  // Show/hide back button
+  const backBtn = document.getElementById('backBtn');
+  if (backBtn) backBtn.classList.toggle('visible', pageId === 'brand' || pageId === 'brand-overview');
   if (meta) {
     document.getElementById('pageTitle').innerHTML = `${meta.title} <small style="font-size:14px;font-weight:400;color:#4a5568;margin-left:12px;">${meta.sub}</small>`;
   }
@@ -2467,6 +2486,15 @@ function activatePage(pageId) {
   switchPage(pageId);
   window.scrollTo({ top: 0 });
 }
+
+// ═══ BACK NAVIGATION ═══
+function goBack() {
+  if (_pageHistory.length < 2) { switchPage('featured'); return; }
+  _pageHistory.pop(); // remove current
+  const prev = _pageHistory.pop() || 'featured';
+  activatePage(prev);
+}
+
 document.querySelectorAll('.sidebar nav a[data-page]').forEach(a => {
   a.addEventListener('click', e => { e.preventDefault(); activatePage(a.dataset.page); });
 });
