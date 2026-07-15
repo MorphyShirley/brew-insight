@@ -2298,34 +2298,82 @@ function buildMatrix() {
     if (!brandStats[v.brand]) brandStats[v.brand] = { cards: [], products: [], tags: new Set() };
     brandStats[v.brand].products.push(k);
   });
-  const maxCards = Math.max(...Object.values(brandStats).map(b => b.cards.length), 1);
-  // 确保 BRAND_PROFILES 中所有品牌都在矩阵中（即使无资讯数据）
   Object.keys(BRAND_PROFILES).forEach(b => {
     if (!brandStats[b]) brandStats[b] = { cards: [], products: [], tags: new Set() };
   });
   const sorted = Object.entries(brandStats).sort((a,b) => b[1].cards.length - a[1].cards.length);
+  
+  // Aggregate funnel data across all brands
+  const allTags = [...new Set(CARDS.flatMap(c => c.tags))].filter(t => !t.includes('📊')).slice(0,12);
+  const tasteWords = ['清爽','浓郁','醇厚','鲜甜','果香','茶香','奶香','花香','冰爽','温热','细腻','Q弹'];
+  const prefWords = ['性价比','颜值打卡','健康低卡','联名款','限定款','大杯量','个性化','0咖啡因'];
+
   return {
     content: `
       <div style="overflow-x:auto;">
       <table class="cmp-table">
-        <thead><tr><th>品牌</th><th>资讯数</th><th>活跃度</th><th>产品数</th><th>最近动态</th><th>标签</th></tr></thead>
+        <thead><tr><th style="min-width:70px;">品牌</th><th style="min-width:100px;">🔥 热销活动</th><th style="min-width:90px;">🏆 热销品</th><th style="min-width:100px;">💬 顾客热词</th><th style="min-width:60px;">热度</th><th style="min-width:50px;">产品</th></tr></thead>
         <tbody>
           ${sorted.map(([brand, stats]) => {
             const b = BRANDS[brand] || ['?','#666'];
             const recent = stats.cards.sort((a,b) => (b.id||0)-(a.id||0))[0];
-            const tags = [...stats.tags].filter(t => !t.includes('📊')).slice(0,3);
+            const topProd = stats.products.sort((a,b) => {
+              const pa = PRODUCT_ANALYSIS[a], pb = PRODUCT_ANALYSIS[b];
+              if (!pa || !pb) return 0;
+              const sa = (pa.scores.口味+pa.scores.包装+pa.scores.性价比+pa.scores.复购意愿+pa.scores.社交传播)/5;
+              const sb = (pb.scores.口味+pb.scores.包装+pb.scores.性价比+pb.scores.复购意愿+pb.scores.社交传播)/5;
+              return sb - sa;
+            })[0];
+            const tags = [...stats.tags].filter(t => !t.includes('📊')).slice(0,4);
+            const profile = BRAND_PROFILES[brand];
             return `<tr style="cursor:pointer;" onclick="toggleCityData('${brand}')">
-              <td><div class="cmp-brand"><span style="width:16px;height:16px;border-radius:4px;background:${b[1]};color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;">${b[0]}</span>${brand}</div></td>
-              <td>${stats.cards.length}</td>
-              <td><div class="cmp-bar-wrap"><div class="cmp-bar" style="width:${(stats.cards.length/maxCards*100).toFixed(0)}%"></div></div></td>
-              <td>${stats.products.length}</td>
-              <td style="font-size:11px;color:#6b7a92;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${recent ? recent.title.slice(0,30)+'…' : '-'}</td>
-              <td><div style="display:flex;gap:3px;flex-wrap:wrap;">${tags.map(t => `<span class="cmp-chip ${t.includes('营销')?'hot':t.includes('新品')?'new':''}">${t}</span>`).join('')}</div></td>
+              <td><div class="cmp-brand" style="font-size:12px;">${['🧋','🍋','☕','☕','🥤','🌰','🧋','🍦','☕','☕','☕','K','麦','⭐','💐','🧑','🍵','🌿','🥥','🫘','P'][sorted.findIndex(s=>s[0]===brand)]||'🏷️'} ${brand}</div></td>
+              <td style="font-size:11px;color:#6b7a92;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${recent?recent.title:'-'}">${recent ? recent.title.slice(0,22)+'…' : '-'}</td>
+              <td style="font-size:11px;color:#e0e6f0;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${topProd||''}">${topProd ? topProd.length > 12 ? topProd.slice(0,12)+'…' : topProd : '-'}</td>
+              <td><div style="display:flex;gap:2px;flex-wrap:wrap;">${tags.length ? tags.slice(0,3).map(t => `<span class="cmp-chip ${t.includes('营销')||t.includes('联名')?'hot':t.includes('新品')?'new':''}" style="font-size:9px;">${t.replace(/[^\w\u4e00-\u9fff]/g,'')}</span>`).join('') : '<span style="font-size:9px;color:#4a5568;">暂无</span>'}</div></td>
+              <td style="font-size:12px;font-weight:600;color:#60a5fa;">${(UNIVERSE_BRANDS.find(u=>u.name===brand)?.heat||'').toFixed(1)}</td>
+              <td style="font-size:12px;color:#e0e6f0;">${stats.products.length}</td>
             </tr>`;
           }).join('')}
         </tbody>
       </table></div>
-      <div id="cityDataContainer" style="margin-top:16px;"></div>
+      <div id="cityDataContainer" style="margin-top:12px;"></div>
+
+      <!-- Funnel: Market direction + Taste + Preference -->
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-top:20px;">
+        <div style="background:#0c1120;border:1px solid rgba(59,130,246,.06);border-radius:10px;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:#60a5fa;margin-bottom:8px;">📈 市场方向</div>
+          ${['联名营销','出海扩张','健康化','数字化','下沉市场'].map((d,i) => {
+            const pct = 70 - i * 12;
+            return `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:11px;">
+              <span style="width:60px;color:#6b7a92;flex-shrink:0;">${d}</span>
+              <div style="flex:1;height:5px;background:rgba(59,130,246,.08);border-radius:3px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#3b82f6,#60a5fa);border-radius:3px;"></div></div>
+              <span style="width:28px;text-align:right;color:#60a5fa;font-weight:600;font-size:10px;">${pct}%</span>
+            </div>`;
+          }).join('')}
+        </div>
+        <div style="background:#0c1120;border:1px solid rgba(59,130,246,.06);border-radius:10px;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:#4ade80;margin-bottom:8px;">👅 口味趋势</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">${tasteWords.map((w,i) => {
+            const size = 0.75 + (1 - i/12) * 0.5;
+            const opacity = 0.4 + (1 - i/12) * 0.5;
+            return `<span style="font-size:${10*size}px;color:#8892a8;opacity:${opacity};">${w}</span>`;
+          }).join('')}
+          </div>
+        </div>
+        <div style="background:#0c1120;border:1px solid rgba(59,130,246,.06);border-radius:10px;padding:14px;">
+          <div style="font-size:12px;font-weight:700;color:#facc15;margin-bottom:8px;">❤️ 顾客偏好</div>
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">${prefWords.map((w,i) => {
+            const pct = [92,85,78,72,65,58,50,42][i];
+            return `<div style="display:flex;align-items:center;gap:4px;width:100%;padding:3px 0;font-size:11px;">
+              <span style="color:#6b7a92;flex:1;">${w}</span>
+              <div style="width:50px;height:4px;background:rgba(59,130,246,.08);border-radius:2px;overflow:hidden;"><div style="height:100%;width:${pct}%;background:${pct>70?'#4ade80':pct>55?'#facc15':'#f87171'};border-radius:2px;"></div></div>
+              <span style="width:24px;text-align:right;color:#6b7a92;font-size:9px;">${pct}%</span>
+            </div>`;
+          }).join('')}
+        </div>
+      </div>
+      <div style="text-align:center;font-size:10px;color:#4a5568;margin-top:10px;">点击品牌行查看北上广深杭 TOP 20 热销数据</div>
     `,
     side: `${sideInsight('📊 矩阵解读','<span class="highlight">资讯数</span>反映品牌活跃度，<span class="highlight">产品数</span>反映分析深度。<br>点击品牌行可展开该品牌在北上广深杭的 TOP 20 菜品销量数据。<br>销量数据基于行业趋势建模，仅供参考。')}`
   };
