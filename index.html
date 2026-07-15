@@ -2299,6 +2299,10 @@ function buildMatrix() {
     brandStats[v.brand].products.push(k);
   });
   const maxCards = Math.max(...Object.values(brandStats).map(b => b.cards.length), 1);
+  // 确保 BRAND_PROFILES 中所有品牌都在矩阵中（即使无资讯数据）
+  Object.keys(BRAND_PROFILES).forEach(b => {
+    if (!brandStats[b]) brandStats[b] = { cards: [], products: [], tags: new Set() };
+  });
   const sorted = Object.entries(brandStats).sort((a,b) => b[1].cards.length - a[1].cards.length);
   return {
     content: `
