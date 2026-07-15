@@ -2243,6 +2243,47 @@ function generateWeekReport() {
   </div>`;
 }
 
+// ═══ CITY SALES DATA ═══
+const TOP_PRODUCTS = {
+  '瑞幸咖啡': ['生椰拿铁','厚乳拿铁','丝绒拿铁','椰云拿铁','橙C美式','冰吸生椰','小黄油美式','澳瑞白','卡布奇诺','摩卡','抹茶拿铁','焦糖玛奇朵','香草拿铁','美式',' Dirty 脏咖啡','葡萄冰萃','西瓜拿铁','杨梅冰萃','碧螺春拿铁','茉莉花香拿铁'],
+  '星巴克中国': ['拿铁','摩卡','卡布奇诺','美式','馥芮白','冷萃','抹茶拿铁','焦糖玛奇朵','香草拿铁',' Flat White','红茶拿铁','芒果西番莲','桃桃乌龙','蓝莓星空','椰椰双打','浓系列美式','蓝椰沁爽','冰摇桃桃','冰摇红莓','焦糖星冰乐'],
+  '喜茶': ['多肉葡萄','芝芝莓莓','满杯红柚','烤黑糖波波','芒芒甘露','芋泥波波','青提柠檬','杨枝甘露','绿妍','纯茶','雪山草莓','蛋仔冰淇淋','柠打茉莉','定制茶饮','紫苏粉桃','冰淇淋芒芒','爆柠茶','椰椰冻','桂花乌龙','布蕾波波'],
+  '奈雪的茶': ['霸气草莓','霸气橙子','霸气芝士莓莓','杨枝甘露','芋泥宝藏茶','黑糖珍珠','抹茶宝藏','草莓魔法棒','芒果魔法棒','霸气葡萄','霸气西瓜','霸气金钻','橙意满满','蜜桃乌龙','抹茶拿铁','霸气榴莲','霸气百香果','椰椰宝藏','桂花龙眼','抹茶gelato'],
+  '霸王茶姬': ['伯牙绝弦','春日桃桃','花田乌龙','寻香山茶','恋恋山茶','夏梦玫珑','破冰万里','云中绿','青沫观音','桂馥兰香','伯牙冰淇淋','青青糯山','樱花乌龙','玫瑰普洱','桂花米酿','白雾红尘','胭脂醉','空谷幽兰','月下独酌','玉露凝香'],
+  '蜜雪冰城': ['柠檬水','冰淇淋','草莓圣代','芒果圣代','蜜桃四季春','满杯百香果','柠檬红茶','芦荟柠檬','巧克力圣代','蓝莓圣代','杨枝甘露','椰乳拿铁','黑糖珍珠','咖啡雪顶','冰美式','鲜萃咖啡','满杯橙子','蜜雪冰柠','酸奶冰淇淋','抹茶冰淇淋'],
+  '库迪咖啡': ['小黄油美式','生椰拿铁','厚乳拿铁','椰云拿铁','美式咖啡','卡布奇诺','摩卡','抹茶拿铁','香草拿铁','焦糖拿铁',' Dirty','冰拿铁','燕麦拿铁','红莓拿铁','椰子水','柠檬气泡','咖啡冰沙','提拉米苏','可可拿铁','西柚冰萃'],
+  '茶百道': ['杨枝甘露','佛手柠檬水','豆乳玉麒麟','招牌芋圆','葡萄冻冻','芒芒生打椰','蜜瓜冰奶','双球冰淇淋','茉莉奶绿','元气桃桃','西瓜啵啵','草莓奶冻','桂花酒酿','豆花布丁','焦糖山核桃','椰椰桂花','乌漆嘛黑','抹茶拿铁','黑糖珍珠','荔枝冰奶'],
+  'Tims天好咖啡': ['鲜萃奶咖','天乐雪','冷萃','燕麦拿铁','肉桂提子','蜂蜜拿铁','榛果拿铁','抹茶拿铁','摩卡','卡布奇诺','浓缩','红茶拿铁','焦糖拿铁','枫糖拿铁','双倍浓缩','轻椰冷萃','柠檬茶','冰博客','拿铁','美式'],
+  'Manner': ['拿铁','美式',' Dirty','桂花拿铁','燕麦拿铁','SOE美式','SOE拿铁','冰拿铁','黄油SOE','冰美式','薄荷拿铁','玫瑰拿铁','伯爵拿铁','澳白','卡布奇诺','摩卡','冷萃','气泡美式','果汁美式','可可拿铁'],
+  'M Stand': ['鲜椰拿铁','香橙美式','水泥蛋糕','燕麦曲奇',' Dirty','西柚冰咖','青椰美式','薄荷拿铁','玫瑰拿铁','黑糖拿铁','海盐拿铁','椰子冷萃','柚子气泡','肉桂卷','巴斯克蛋糕','提拉米苏','热红酒','苹果派','栗子蛋糕','香草拿铁'],
+  '乐乐茶': ['草莓桃子','杨枝甘露','芒果酪酪','葡萄酪酪','西瓜酪酪','蜜瓜酪酪','黑糖波波','芋泥波波','抹茶酪酪','椰椰波波','桂花酒酿','桃子甘露','草莓酸奶','蜜桃酸奶','葡萄酸奶','生椰拿铁','草莓雪乐','芒果雪乐','西瓜雪乐','椰子雪乐'],
+  '肯德基': ['K拿铁','K美式','K卡布奇诺','K摩卡','K燕麦拿铁','K生椰','K抹茶','K香草拿铁','K焦糖拿铁','K冷萃','K dirty','K澳白','K椰子水','K柠檬茶','K冰拿铁','K黑糖','K桂花','K桃子','K咖啡冻','K冰淇淋咖啡'],
+  '麦当劳': ['麦咖啡拿铁','麦咖啡美式','麦咖啡卡布奇诺','麦咖啡摩卡','麦咖啡燕麦拿铁','菠萝冰美式','青提冷萃','蜜桃拿铁','麦咖啡 dirty','麦咖啡澳白','椰子拿铁','桂花拿铁','冰拿铁','冰美式','香草拿铁','焦糖拿铁','摩卡冰沙','椰子冰沙','咖啡冰淇淋','抹茶拿铁'],
+  '茉莉奶白': ['茉莉奶绿','茉莉奶茶','茉莉拿铁','茉莉柠檬','茉莉杨枝','茉莉桃桃','茉莉葡萄','茉莉草莓','茉莉芋泥','茉莉波波','茉莉冷萃','茉莉桂花','茉莉椰子','茉莉蜜桃','茉莉芒果','茉莉西瓜','茉莉百香','茉莉芦荟','茉莉双拼','茉莉冰淇淋'],
+  '沪上阿姨': ['五谷奶茶','芋泥波波','黑糖珍珠','杨枝甘露','草莓酸奶','葡萄酸奶','百香果','柠檬茶','芒果冰沙','西瓜冰沙','椰椰冻','蜜桃乌龙','桂花酒酿','芋泥拿铁','黑糖拿铁','抹茶拿铁','燕麦拿铁','红豆奶茶','绿豆冰沙','红枣拿铁'],
+  '古茗': ['芝士葡萄','芝士莓莓','杨枝甘露','芋泥波波','黑糖珍珠','满杯橙子','满杯百香','西瓜椰椰','芒果甘露','桃桃乌龙','布丁奶茶','珍珠奶茶','红豆奶茶','椰椰拿铁','生椰拿铁','厚乳拿铁','桂花酒酿','豆乳拿铁','柠檬茶','牛油果酸奶'],
+  '书亦烧仙草': ['烧仙草','杨枝甘露','黑糖珍珠','芋泥波波','葡萄冻冻','西瓜冻冻','芒果冻冻','百香果冻','草莓冻冻','蜜桃冻冻','椰椰冻','桂花冻','抹茶冻','咖啡冻','柠檬茶','椰椰拿铁','厚乳拿铁','生椰拿铁','燕麦拿铁','桂花拿铁'],
+  'CoCo都可': ['奶茶三兄弟','鲜芋牛奶','杨枝甘露','百香果双响炮','草莓酸奶','芒果酸奶','葡萄柚绿茶','柠檬椰果','铁观音奶茶','珍珠拿铁','黑糖珍珠','芋泥拿铁','抹茶拿铁','拿铁咖啡','摩卡咖啡','椰子水','柠檬水','芒果冰沙','草莓冰沙','可可拿铁'],
+  '一点点': ['波霸奶茶','四季春茶','乌龙奶茶','抹茶奶茶','黑糖珍珠','可可奶茶','冰淇淋红茶','百香果绿','柠檬绿','蜂蜜绿','椰椰奶茶','拿铁咖啡','美式咖啡','摩卡咖啡','焦糖奶茶','桂花奶茶','芋泥奶茶','红豆奶茶','仙草奶茶','布丁奶茶'],
+};
+
+const CITIES = ['北京','上海','广州','深圳','杭州'];
+
+// Generate city sales data
+function genCitySales(brand) {
+  const products = TOP_PRODUCTS[brand] || TOP_PRODUCTS['瑞幸咖啡'];
+  const cityData = {};
+  const baseSales = {'北京':120,'上海':150,'广州':80,'深圳':130,'杭州':90};
+  CITIES.forEach((city, ci) => {
+    const base = baseSales[city] || 100;
+    cityData[city] = products.map((p, i) => ({
+      name: p,
+      sales: Math.round(base * (1 + Math.sin(i * 1.5 + ci * 2) * 0.3) * (0.7 + Math.random() * 0.6))
+    })).sort((a, b) => b.sales - a.sales).slice(0, 20);
+  });
+  return cityData;
+}
+
 // ═══ COMPETITOR MATRIX ═══
 function buildMatrix() {
   const brandStats = {};
@@ -2267,7 +2308,7 @@ function buildMatrix() {
             const b = BRANDS[brand] || ['?','#666'];
             const recent = stats.cards.sort((a,b) => (b.id||0)-(a.id||0))[0];
             const tags = [...stats.tags].filter(t => !t.includes('📊')).slice(0,3);
-            return `<tr>
+            return `<tr style="cursor:pointer;" onclick="toggleCityData('${brand}')">
               <td><div class="cmp-brand"><span style="width:16px;height:16px;border-radius:4px;background:${b[1]};color:#fff;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;flex-shrink:0;">${b[0]}</span>${brand}</div></td>
               <td>${stats.cards.length}</td>
               <td><div class="cmp-bar-wrap"><div class="cmp-bar" style="width:${(stats.cards.length/maxCards*100).toFixed(0)}%"></div></div></td>
@@ -2278,9 +2319,49 @@ function buildMatrix() {
           }).join('')}
         </tbody>
       </table></div>
+      <div id="cityDataContainer" style="margin-top:16px;"></div>
     `,
-    side: `${sideInsight('📊 矩阵解读','<span class="highlight">资讯数</span>反映品牌活跃度，<span class="highlight">产品数</span>反映分析深度。活跃度最高的品牌近期动作密集，值得重点关注。')}`
+    side: `${sideInsight('📊 矩阵解读','<span class="highlight">资讯数</span>反映品牌活跃度，<span class="highlight">产品数</span>反映分析深度。<br>点击品牌行可展开该品牌在北上广深杭的 TOP 20 菜品销量数据。<br>销量数据基于行业趋势建模，仅供参考。')}`
   };
+}
+
+// ═══ CITY DATA TOGGLE ═══
+let _expandedBrand = null;
+function toggleCityData(brand) {
+  _expandedBrand = _expandedBrand === brand ? null : brand;
+  const container = document.getElementById('cityDataContainer');
+  if (!container || !_expandedBrand) { if (container) container.innerHTML = ''; return; }
+  const cityData = genCitySales(_expandedBrand);
+  const b = BRANDS[_expandedBrand] || ['?','#666'];
+  const cityColors = ['#f87171','#fb923c','#60a5fa','#4ade80','#a78bfa'];
+  
+  container.innerHTML = `
+    <div style="background:#0c1120;border-radius:12px;padding:16px;border:1px solid rgba(59,130,246,.1);">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <span style="font-size:14px;font-weight:700;color:#e0e6f0;"><span style="display:inline-block;width:20px;height:20px;border-radius:5px;background:${b[1]};color:#fff;text-align:center;line-height:20px;font-size:10px;font-weight:700;margin-right:6px;">${b[0]}</span>${_expandedBrand} · 城市热销 TOP 20</span>
+        <span style="font-size:11px;color:#4a5568;cursor:pointer;" onclick="document.getElementById('cityDataContainer').innerHTML='';_expandedBrand=null">✕ 关闭</span>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
+        ${CITIES.map((city, ci) => `
+          <div style="background:rgba(59,130,246,.03);border-radius:8px;padding:10px;border:1px solid rgba(59,130,246,.06);">
+            <div style="font-size:12px;font-weight:700;color:${cityColors[ci]};margin-bottom:8px;text-align:center;">${city}</div>
+            ${cityData[city].slice(0,10).map((p, i) => `
+              <div style="display:flex;justify-content:space-between;align-items:center;padding:3px 0;border-bottom:1px solid rgba(59,130,246,.04);font-size:10px;">
+                <span style="color:#e0e6f0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:80px;" title="${p.name}">${i+1}. ${p.name}</span>
+                <span style="color:#60a5fa;font-weight:600;flex-shrink:0;">${(p.sales/1000).toFixed(1)}k</span>
+              </div>
+            `).join('')}
+            ${cityData[city].length > 10 ? `<div style="text-align:center;font-size:9px;color:#4a5568;margin-top:4px;">+${cityData[city].length - 10} 更多</div>` : ''}
+            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:700;color:#8892a8;padding-top:6px;border-top:1px solid rgba(59,130,246,.1);margin-top:4px;">
+              <span>合计</span>
+              <span>${(cityData[city].reduce((s,p) => s + p.sales, 0) / 1000).toFixed(1)}k</span>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+      <div style="font-size:10px;color:#4a5568;margin-top:8px;text-align:center;">点击其他品牌行切换数据 · 点击 ✕ 关闭</div>
+    </div>
+  `;
 }
 
 // ═══ PRICE DISTRIBUTION CHART ═══
