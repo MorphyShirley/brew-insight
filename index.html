@@ -2331,7 +2331,7 @@ function buildMatrix() {
               <td style="font-size:11px;color:#6b7a92;max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${recent?recent.title:'-'}">${recent ? recent.title.slice(0,22)+'…' : '-'}</td>
               <td style="font-size:11px;color:#e0e6f0;max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${topProd||''}">${topProd ? topProd.length > 12 ? topProd.slice(0,12)+'…' : topProd : '-'}</td>
               <td><div style="display:flex;gap:2px;flex-wrap:wrap;">${tags.length ? tags.slice(0,3).map(t => `<span class="cmp-chip ${t.includes('营销')||t.includes('联名')?'hot':t.includes('新品')?'new':''}" style="font-size:9px;">${t.replace(/[^\w\u4e00-\u9fff]/g,'')}</span>`).join('') : '<span style="font-size:9px;color:#4a5568;">暂无</span>'}</div></td>
-              <td style="font-size:12px;font-weight:600;color:#60a5fa;">${(UNIVERSE_BRANDS.find(u=>u.name===brand)?.heat||'').toFixed(1)}</td>
+              <td style="font-size:12px;font-weight:600;color:#60a5fa;">${((UNIVERSE_BRANDS.find(u=>u.name===brand)?.heat)||0).toFixed(1)}</td>
               <td style="font-size:12px;color:#e0e6f0;">${stats.products.length}</td>
             </tr>`;
           }).join('')}
@@ -2866,9 +2866,7 @@ function handleFilter() {
 
 // ═══ SIDEBAR + MOBILE NAV CLICKS ═══
 function activatePage(pageId) {
-  // Update sidebar
   document.querySelectorAll('.sidebar nav a').forEach(a => a.classList.toggle('active', a.dataset.page === pageId));
-  // Update mobile nav
   document.querySelectorAll('.mobile-nav a').forEach(a => a.classList.toggle('active', a.dataset.page === pageId));
   switchPage(pageId);
   window.scrollTo({ top: 0 });
@@ -2877,7 +2875,7 @@ function activatePage(pageId) {
 // ═══ BACK NAVIGATION ═══
 function goBack() {
   if (_pageHistory.length < 2) { switchPage('featured'); return; }
-  _pageHistory.pop(); // remove current
+  _pageHistory.pop();
   const prev = _pageHistory.pop() || 'featured';
   activatePage(prev);
 }
