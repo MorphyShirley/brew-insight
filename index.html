@@ -2404,15 +2404,28 @@ function buildMatrixAndRender() {
   const m = buildMatrix();
   content.innerHTML = m.content;
   if (side) side.innerHTML = m.side;
-  document.getElementById('cityDataContainer') && (document.getElementById('cityDataContainer').innerHTML = '');
+  // Auto-expand city data if brand is selected
+  if (_matrixBrand) {
+    toggleCityData(_matrixBrand, true);
+  } else {
+    const container = document.getElementById('cityDataContainer');
+    if (container) container.innerHTML = '';
+  }
 }
 
 // ═══ CITY DATA TOGGLE ═══
 let _expandedBrand = null;
-function toggleCityData(brand) {
-  _expandedBrand = _expandedBrand === brand ? null : brand;
+function toggleCityData(brand, forceExpand) {
   const container = document.getElementById('cityDataContainer');
-  if (!container || !_expandedBrand) { if (container) container.innerHTML = ''; return; }
+  if (!container) return;
+  
+  if (forceExpand) {
+    _expandedBrand = brand;
+  } else {
+    _expandedBrand = _expandedBrand === brand ? null : brand;
+    if (!_expandedBrand) { container.innerHTML = ''; return; }
+  }
+  
   const cityData = genCitySales(_expandedBrand);
   const b = BRANDS[_expandedBrand] || ['?','#666'];
   const cityColors = ['#f87171','#fb923c','#60a5fa','#4ade80','#a78bfa'];
@@ -2421,7 +2434,7 @@ function toggleCityData(brand) {
     <div style="background:#0c1120;border-radius:12px;padding:16px;border:1px solid rgba(59,130,246,.1);">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <span style="font-size:14px;font-weight:700;color:#e0e6f0;"><span style="display:inline-block;width:20px;height:20px;border-radius:5px;background:${b[1]};color:#fff;text-align:center;line-height:20px;font-size:10px;font-weight:700;margin-right:6px;">${b[0]}</span>${_expandedBrand} · 城市热销 TOP 20</span>
-        <span style="font-size:11px;color:#4a5568;cursor:pointer;" onclick="document.getElementById('cityDataContainer').innerHTML='';_expandedBrand=null">✕ 关闭</span>
+        <span style="font-size:11px;color:#4a5568;cursor:pointer;" onclick="toggleCityData('${_expandedBrand}')">🔼 收起</span>
       </div>
       <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;">
         ${CITIES.map((city, ci) => `
@@ -2441,7 +2454,7 @@ function toggleCityData(brand) {
           </div>
         `).join('')}
       </div>
-      <div style="font-size:10px;color:#4a5568;margin-top:8px;text-align:center;">点击其他品牌行切换数据 · 点击 ✕ 关闭</div>
+      <div style="font-size:10px;color:#4a5568;margin-top:8px;text-align:center;">点击表格品牌行或 🔼 收起切换 · 下拉框选其他品牌自动更新</div>
     </div>
   `;
 }
