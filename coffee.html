@@ -1644,7 +1644,12 @@ function rankItem(emoji, name, delta, heat, i) {
 }
 
 const CARDS = [
-  { id:18, brand:'喜茶', time:'09/03', score:78,  title:'喜茶设计师工作内容全网刷屏，这比最好的广告还管用 - 4A广告网',  desc:'但最近蜜雪冰城和美团外卖、广东粤剧院的三方联名，却生出了“恨海情天”的感觉。而蜜雪冰城的这行“免责”声明非但没有招致方案，反而成为全网玩梗的传播爆点，在于它将官方话术变成了普通人的吐槽，使品牌充满强烈的 “活人感” 与烟火气。  喜茶新品包装被指撞色“纸钱”，…',  tags:['📈 行业'], src:'4anet.com', url:'https://www.4anet.com/p/01m1je3veq3c4b03r781ak6g7v' },
+  { id:33, brand:'星巴克中国', time:'09/06', score:84,  title:'日常饮食记录与星巴克新品分享|星巴克|乔拉记|熔岩维也纳咖啡_新浪新闻',  desc:'生活手记# 天天真的是我见过最爱菌菇的小孩一碗粉只要配点香菇就嗦的好开心星巴克这季新品看图片跟描述都好诱人想试试看但又觉得肯定喝两口就腻',  tags:['🆕 新品'], src:'sina.cn', url:'https://www.sina.cn/news/detail/5340130074428851.html' },
+  { id:34, brand:'霸王茶姬', time:'09/04', score:84,  title:'单季17款新品留不住用户，霸王茶姬进入“改革深水区” - CBNData',  desc:'### 单季推17个新品，为何活跃会员还是掉了近300万？  在消费者的体感上，霸王茶姬在产品端的动作最为迫切。曾经靠着“伯牙绝弦”的大单品吃遍天下的品牌，开始以前所未有的方式快跑推新。  不止是电话会上声称“创下记录”的Q2，2026年刚过去的9个月里霸王茶…',  tags:['🆕 新品'], src:'cbndata.com', url:'https://www.cbndata.com/information/295742' },
+  { id:32, brand:'星巴克中国', time:'08/31', score:84,  title:'【即時新聞】星巴克(SBUX)秋季新品上市遇阻！上萬名工會成員發起抵制抗議 | CMoney投資網誌',  desc:'星巴克(SBUX)")是全球最知名的連鎖餐廳品牌之一，在80多個國家與地區擁有近34,000家門店。該公司主要在北美、國際市場和通路開發等三大領域開展業務，營收來源涵蓋直營店、特許經營費、設備與產品銷售，以及即飲飲料和包裝咖啡等。在最新一個交易日中，收盤價為1…',  tags:['🆕 新品'], src:'cmnews.com.tw', url:'https://cmnews.com.tw/article/newsyoudeservetoknow-52d0dd39-a10b-11f1-887e-41ee00314fae' },
+  { id:35, brand:'霸王茶姬', time:'08/29', score:84,  title:'霸王茶姬抽2万杯新品 分四期每日参与',  desc:'丐帮羊毛日记VIP4  8-29 14:38来自 微博 weibo.com  霸王茶姬 抽2万杯兔単 V打开 霸王茶姬 截31日 每天都能参与 当天⏰23点开桨 每期抽5k份0.01新品 分四期抽 共2w份 去换号拉满 #小程序://霸王茶姬/UrrNIkzF…',  tags:['🆕 新品'], src:'weibo.com', url:'https://weibo.com/2/detail/5337260538990393' },
+  { id:31, brand:'瑞幸咖啡', time:'08/24', score:84,  title:'一杯“有故事的泰奶”火了 瑞幸泰奶系列首周销量破新品纪录-证券日报网',  desc:'网站首页  |  |  证券日报电子报      微 信  证券日报微信    微 博  证券日报微博    首页       财经  公司  金融  视频  ESG  路演  投服  地产  汽车  食品  TMT  您所在的位置： 网站首页 > 食品频道…',  tags:['🆕 新品','🎯 营销'], src:'zqrb.cn', url:'http://www.zqrb.cn/shipin/shipinhangye/2026-08-24/A1787499863910.html' },
+{ id:18, brand:'喜茶', time:'09/03', score:78,  title:'喜茶设计师工作内容全网刷屏，这比最好的广告还管用 - 4A广告网',  desc:'但最近蜜雪冰城和美团外卖、广东粤剧院的三方联名，却生出了“恨海情天”的感觉。而蜜雪冰城的这行“免责”声明非但没有招致方案，反而成为全网玩梗的传播爆点，在于它将官方话术变成了普通人的吐槽，使品牌充满强烈的 “活人感” 与烟火气。  喜茶新品包装被指撞色“纸钱”，…',  tags:['📈 行业'], src:'4anet.com', url:'https://www.4anet.com/p/01m1je3veq3c4b03r781ak6g7v' },
   { id:23, brand:'霸王茶姬', time:'09/03', score:84,  title:'单季17个新品，会员仍流失近300万，霸王茶姬进入“改革深水区” - 36氪',  desc:'Image 6  截自奈雪Q2财报  古茗是一个例外。其单店GMV和杯数双双实现了正向增长，他们在财报中将原因归结为更优质的门店，以及咖啡等新产品线的增量在一定程度上冲销了外卖大战的负面影响。  Image 7  截自古茗Q2财报  相比之下，霸王茶姬的门店降…',  tags:['🆕 新品'], src:'m.36kr.com', url:'https://m.36kr.com/p/3967387637192321' },
   { id:13, brand:'瑞幸咖啡', time:'09/01', score:78,  title:'瑞幸盯上百亿即饮咖啡市场：将首次杀入瓶装咖啡赛道，雀巢、星巴克、可口可乐公司迎来即饮劲敌？-36氪',  desc:'在大股东收购蓝瓶咖啡的传言引发热议之际，瑞幸又悄然将触角伸向了新赛道。  小食代留意到，日前多位网友在社交媒体上发布的笔记显示，在饮料旺季到来前，瑞幸推出了三款瓶装即饮咖啡新品，包含两款美式及一款拿铁，并在部分地区启动招商。  对此，小食代今天向瑞幸咖啡进行求…',  tags:['📈 行业'], src:'m.36kr.com', url:'https://m.36kr.com/p/3715787067012486' },
   { id:26, brand:'茶百道', time:'09/01', score:84,  title:'茶百道石榴系列回归 新品茉莉石榴冰奶上市',  desc:'茶百道石榴相关产品重磅回归，此次采用纯手剥石榴制作，推出新品茉莉石榴冰奶，以七窖茉香雪芽为底搭配鲜榨石榴汁，果香、奶香、茶香融合，无需吐籽，',  tags:['🆕 新品'], src:'weibo.com', url:'https://weibo.com/2/detail/5336845884067412' },
@@ -2024,7 +2029,7 @@ function buildNewProducts() {
       </div>
       <div style="margin-bottom:12px;display:flex;justify-content:space-between;">
         <span style="font-size:13px;color:#6b7a92;">本季 ${Object.keys(PRODUCT_ANALYSIS).length} 款重点新品</span>
-        <span style="font-size:11px;color:#4a5568;">🕐 更新于 2026-09-04</span>
+        <span style="font-size:11px;color:#4a5568;">🕐 更新于 2026-09-07</span>
       </div>
       ${items.map(renderCard).join('')}
     `,
