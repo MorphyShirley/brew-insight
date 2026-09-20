@@ -640,7 +640,15 @@
     .month-cal .mc-ev:hover { background: rgba(59,130,246,.16); }
     .month-cal .mc-ev .mc-b { font-weight: 700; color: var(--c); flex-shrink: 0; max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .month-cal .mc-ev .mc-t { color: #cbd5e1; font-size: 9px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .month-cal .mc-more { font-size: 8px; color: #6b7a92; padding-left: 2px; }
+    .month-cal .mc-more { font-size: 9px; color: #60a5fa; padding-left: 2px; cursor: pointer; text-decoration: none; user-select: none; }
+    .month-cal .mc-more:hover { text-decoration: underline; }
+    .month-cal .mc-extra { display: none; }
+    .month-cal .mc-cell.open { overflow: visible; }
+    .month-cal .mc-cell.open .mc-extra { display: flex; flex-direction: column; gap: 3px; }
+    .month-cal .mc-cell.open { min-height: auto; }
+    .month-cal .mc-ev.fit { background: rgba(234,179,8,.1); border-left-color: #eab308; }
+    .month-cal .mc-ev.fit .mc-t { color: #ffd77a; }
+    .month-cal .mc-fit-ok { color: #eab308; font-weight: 600; }
     .month-cal .mc-cats { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     .month-cal .mc-cat { font-size: 10px; padding: 2px 8px; border-radius: 100px; cursor: pointer; border: 1px solid transparent; transition: all .15s; color: #94a3b8; background: rgba(59,130,246,.08); }
     .month-cal .mc-cat:hover { background: rgba(59,130,246,.16); }
@@ -2265,6 +2273,28 @@ function buildFlash() {
 
 // ═══ MONTHLY CALENDAR ═══
 let _calBack = 0;
+// 咖啡品牌适配节点：类型词 + 高价值营销节日 + 饮品/茶/节日词
+const COFFEE_HOLIDAYS = ['情人节', '七夕', '中秋节', '端午', '春节', '元旦', '除夕',
+  '圣诞节', '平安夜', '万圣节', '双十一', '双11', '双十二', '双12', '618',
+  '世界咖啡日', '国际咖啡日', '咖啡日', '母亲节', '父亲节', '妇女节', '女神节',
+  '女王节', '教师节', '儿童节', '开学', '元宵节', '劳动节', '国庆', '感恩节',
+  '春分', '立秋', '白露', '中秋', '冬至', '霜降', '大雪', '小寒', '大寒', '处暑',
+  '七夕节', '粽子', '月饼', '汤圆', '立秋'];
+const COFFEE_KEYWORDS = ['咖啡', '茶', '奶茶', '冰淇淋', '甜品', '蛋糕', '烘焙',
+  '早餐', '可乐', '饮品', '乳茶', '雪糕', '拿铁', '速溶'];
+function isCoffeeFit(cat, name) {
+  if (cat === '节气') return true;
+  if (cat === '纪念日') return false; // 历史纪念日不标咖啡适配
+  for (const k of COFFEE_HOLIDAYS) if ((name || '').includes(k)) return true;
+  for (const k of COFFEE_KEYWORDS) if ((name || '').includes(k)) return true;
+  return false;
+}
+function toggleCalDayExtra(el, key) {
+  const cell = el.closest('.mc-cell');
+  if (!cell) return;
+  cell.classList.toggle('open');
+  el.textContent = cell.classList.contains('open') ? '▲ 收起' : ('+' + String(el.dataset.n || 0) + ' 条');
+}
 const CAL_COLORS = {'LTO上新':'#4ade80','GWP联名':'#a78bfa','财报':'#60a5fa','出海':'#facc15',
                     '营销战役':'#f87171','扩店':'#34d399','乐推':'#fbbf24','行业观察':'#94a3b8'};
 function calColor(label) { return CAL_COLORS[label] || '#94a3b8'; }
@@ -2294,13 +2324,15 @@ function buildMonthCalendar() {
   for (let d = 1; d <= days; d++) {
     const dateKey = `${year}-${mm}-${String(d).padStart(2,'0')}`;
     const cls = dateKey === todayKey ? 'mc-cell today' : 'mc-cell';
-    const evs = (events[d] || []).slice(0, 3);
-    const extra = (events[d] || []).length - evs.length;
+    const all = events[d] || [];
+    const evs = all.slice(0, 3);
+    const extra = all.length - evs.length;
     cells.push(`<div class="${cls}" title="${mm}/${String(d).padStart(2,'0')}">
       <div class="mc-num">${d}</div>
       <div class="mc-events">
         ${evs.map(e => `<a class="mc-ev" style="--c:${calColor(e.label)}" href="${e.url || '#'}" target="_blank" rel="noopener" title="${e.brand} · ${e.title}"><span class="mc-b">${e.brand}</span><span class="mc-t">${e.label}</span></a>`).join('')}
-        ${extra > 0 ? `<div class="mc-more">+${extra} 条</div>` : ''}
+        ${extra > 0 ? `<div class="mc-extra">${all.slice(3).map(e => `<a class="mc-ev" style="--c:${calColor(e.label)}" href="${e.url || '#'}" target="_blank" rel="noopener" title="${e.brand} · ${e.title}"><span class="mc-b">${e.brand}</span><span class="mc-t">${e.label}</span></a>`).join('')}</div>` : ''}
+        ${extra > 0 ? `<a class="mc-more" data-n="${extra}" onclick="event.preventDefault();toggleCalDayExtra(this)">+${extra} 条</a>` : ''}
       </div>
     </div>`);
   }
@@ -2370,6 +2402,8 @@ function calNodeNav(d) {
   _calNodeIdx = Math.max(0, Math.min(arr.length - 1, _calNodeIdx + d));
   activatePage('marketing-cal');
 }
+let _calFitOnly = false;
+function toggleCalFitOnly() { _calFitOnly = !_calFitOnly; activatePage('marketing-cal'); }
 function buildMarketingCal() {
   initCalNodeState();
   const arr = calNodeMonths();
@@ -2383,6 +2417,8 @@ function buildMarketingCal() {
   let shownCount = 0;
   for (const it of raw) {
     if (!_calNodeCats.includes(it.c)) continue;
+    if (_calFitOnly && !isCoffeeFit(it.c, it.t)) continue;
+    it.fit = isCoffeeFit(it.c, it.t);
     (events[it.d] = events[it.d] || []).push(it);
     shownCount++;
   }
@@ -2391,13 +2427,15 @@ function buildMarketingCal() {
   const cells = [];
   for (let i = 0; i < offset; i++) cells.push('<div class="mc-cell empty"></div>');
   for (let d = 1; d <= days; d++) {
-    const evs = (events[d] || []).slice(0, 3);
-    const extra = (events[d] || []).length - evs.length;
+    const all = events[d] || [];
+    const evs = all.slice(0, 3);
+    const extra = all.length - evs.length;
     cells.push(`<div class="mc-cell">
       <div class="mc-num">${d}</div>
       <div class="mc-events">
-        ${evs.map(e => `<a class="mc-ev" style="--c:${colors[e.c] || '#64748b'}" href="${e.u || '#'}" target="_blank" rel="noopener" title="${e.c} · ${e.t}"><span class="mc-t">${e.t}</span></a>`).join('')}
-        ${extra > 0 ? `<div class="mc-more">+${extra} 条</div>` : ''}
+        ${evs.map(e => `<a class="mc-ev${e.fit ? ' fit' : ''}" style="--c:${colors[e.c] || '#64748b'}" href="${e.u || '#'}" target="_blank" rel="noopener" title="${e.c} · ${e.t}"><span class="mc-t">${e.fit ? '☕ ' : ''}${e.t}</span></a>`).join('')}
+        ${extra > 0 ? `<div class="mc-extra">${all.slice(3).map(e => `<a class="mc-ev${e.fit ? ' fit' : ''}" style="--c:${colors[e.c] || '#64748b'}" href="${e.u || '#'}" target="_blank" rel="noopener" title="${e.c} · ${e.t}"><span class="mc-t">${e.fit ? '☕ ' : ''}${e.t}</span></a>`).join('')}</div>` : ''}
+        ${extra > 0 ? `<a class="mc-more" data-n="${extra}" onclick="event.preventDefault();toggleCalDayExtra(this)">+${extra} 条</a>` : ''}
       </div>
     </div>`);
   }
@@ -2411,19 +2449,20 @@ function buildMarketingCal() {
             <div class="mc-title">📅 营销节点<span class="mc-sub">${year}年${mon}月 · ${shownCount} 个节点</span></div>
             <button onclick="calNodeNav(1)" ${_calNodeIdx >= arr.length - 1 ? 'disabled style="opacity:.35"' : ''}>›</button>
           </div>
-          <div class="mc-legend">${presentCats.filter(c => _calNodeCats.includes(c)).map(c => `<span><span class="mc-lg-dot" style="background:${colors[c] || '#64748b'}"></span>${c}</span>`).join('')}</div>
+          <div class="mc-legend">${presentCats.filter(c => _calNodeCats.includes(c)).map(c => `<span><span class="mc-lg-dot" style="background:${colors[c] || '#64748b'}"></span>${c}</span>`).join('')}${_calFitOnly ? '' : '<span class="mc-fit-ok">☕ 适宜咖啡营销</span>'}</div>
         </div>
         <div class="mc-cats" style="margin-bottom:10px;">
           ${['国际节日','品牌日','公历','农历','展会活动','重要事件','节气','纪念日','影视上映','颁奖典礼'].concat(presentCats).filter((v,i,arr)=>arr.indexOf(v)===i).map(c => {
             const cnt = raw.filter(it => it.c === c).length;
             return `<span class="mc-cat ${_calNodeCats.includes(c) ? 'active' : ''}" style="--c:${colors[c] || '#64748b'}" onclick="toggleCalNodeCat('${c}')">${c}${cnt ? '·'+cnt : ''}</span>`;
           }).join('')}
+          <span class="mc-cat ${_calFitOnly ? 'active' : ''}" style="--c:#eab308" onclick="toggleCalFitOnly()">☕ 只看咖啡适宜</span>
         </div>
         <div class="mc-grid">
           ${['一','二','三','四','五','六','日'].map(w => `<div class="mc-dow">${w}</div>`).join('')}
           ${cells.join('')}
         </div>
-        <div class="mc-foot">数据源：广告指南 www.adguider.com/calendar · 已固化于本地（${meta.updated || '-'}），点击节点可在广告指南内搜索该主题；营销高相关分类为默认展示，可点筛选切换</div>
+        <div class="mc-foot">☕ = 适宜咖啡品牌营销节点 · 点击「+N 条」可展开当日全部节点 · 点分类筛选切换（数据源：广告指南 www.adguider.com/calendar，固化于 ${meta.updated || '-'}）</div>
       </div>
     `,
     side: sideRank('📌 常用节点', [
