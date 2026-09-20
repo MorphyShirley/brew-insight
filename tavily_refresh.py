@@ -350,7 +350,9 @@ def main():
 
     if deploy:
         import subprocess
+        import shutil
         repo = os.path.dirname(os.path.abspath(__file__))
+        shutil.copyfile(html_path, os.path.join(repo, 'index.html'))
         date = datetime.now().strftime('%Y-%m-%d')
         subprocess.run(['git', 'add', 'coffee.html', 'index.html'], cwd=repo, check=True)
         subprocess.run(['git', 'commit', '-m', f'🤖 自动刷新资讯 {date} (+{len(new_cards)})'], cwd=repo, check=True)
