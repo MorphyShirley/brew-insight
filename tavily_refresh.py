@@ -393,25 +393,34 @@ def main():
             print(f"  → [{c['time']}] [{c['brand']}] {c['title'][:50]}")
         return
 
-    if not new_cards:
-        print('ℹ️  无新资讯，跳过更新')
-        return
-
-    updated = update_html(html, new_cards)
-    with open(html_path, 'w', encoding='utf-8') as f:
-        f.write(updated)
-    print(f"✅ 已更新 {html_path}")
+    if new_cards:
+        updated = update_html(html, new_cards)
+        with open(html_path, 'w', encoding='utf-8') as f:
+            f.write(updated)
+        print(f"✅ 已更新 {html_path}（+{len(new_cards)} 条）")
+    else:
+        print('ℹ️  无新资讯卡片')
 
     if deploy:
         import subprocess
         import shutil
         repo = os.path.dirname(os.path.abspath(__file__))
+        # 顺带刷新营销节点日历（月度切换/节气等，失败不阻塞部署）
+        try:
+            subprocess.run([sys.executable, os.path.join(repo, 'cal_fetch.py')], cwd=repo, check=True)
+        except Exception as e:
+            print(f"ℹ️  营销节点未更新（不影响部署）: {str(e)[:80]}")
         shutil.copyfile(html_path, os.path.join(repo, 'index.html'))
-        date = datetime.now().strftime('%Y-%m-%d')
+        now = datetime.now().strftime('%Y-%m-%d %H:%M')
         subprocess.run(['git', 'add', 'coffee.html', 'index.html'], cwd=repo, check=True)
-        subprocess.run(['git', 'commit', '-m', f'🤖 自动刷新资讯 {date} (+{len(new_cards)})'], cwd=repo, check=True)
-        subprocess.run(['git', 'push', 'origin', 'main'], cwd=repo, check=True)
-        print('🚀 已自动部署')
+        changed = subprocess.run(['git', 'diff', '--cached', '--quiet'], cwd=repo).returncode != 0
+        if changed:
+            msg = f"🤖 自动刷新 {now}" + (f" (+{len(new_cards)})" if new_cards else "（营销节点更新）")
+            subprocess.run(['git', 'commit', '-m', msg], cwd=repo, check=True)
+            subprocess.run(['git', 'push', 'origin', 'main'], cwd=repo, check=True)
+            print('🚀 已自动部署')
+        else:
+            print('ℹ️  无任何变更，跳过提交')
 
 if __name__ == '__main__':
     main()
