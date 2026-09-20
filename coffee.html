@@ -1959,7 +1959,7 @@ function buildFeaturedAndRender() {
 
 // ═══ PAGE BUILDERS ═══
 function buildFeatured() {
-  const allItems = dedupCards([...CARDS]);
+  const allItems = dedupCards([...CARDS]).sort((a, b) => (b.time || '00/00').localeCompare(a.time || '00/00') || b.score - a.score);
   const filteredItems = _activeBrand ? allItems.filter(c => c.brand === _activeBrand) : allItems;
   const hotItems = filteredItems.slice(0, 10);
   const rankMap = {'喜茶':1,'茶百道':2,'Manner':3,'瑞幸咖啡':4,'霸王茶姬':5,'奈雪的茶':6,'乐乐茶':7,'蜜雪冰城':8,'库迪咖啡':9,'M Stand':10,'Tims天好咖啡':11,'肯德基':12,'麦当劳':13,'茉莉奶白':14};
@@ -2009,7 +2009,7 @@ function buildFeatured() {
 }
 
 function buildAll() {
-  const cards = dedupCards([...CARDS]);
+  const cards = dedupCards([...CARDS]).sort((a, b) => (b.time || '00/00').localeCompare(a.time || '00/00') || b.score - a.score);
   return {
     content: `
       <div style="margin-bottom:16px;font-size:13px;color:#6b7a92;">共 ${cards.length} 条资讯 · 按时间倒序</div>
@@ -2286,7 +2286,7 @@ function buildBrandOverview() {
 
 // ═══ WEEK REPORT ═══
 function generateWeekReport() {
-  const latest = [...CARDS].map(c => {
+  const latest = dedupCards([...CARDS]).map(c => {
     const [mm, dd] = (c.time || '01/01').split('/').map(Number);
     return {...c, _t: (mm || 0) * 100 + (dd || 0)};
   }).sort((a, b) => b._t - a._t || b.score - a.score).slice(0, 5);
