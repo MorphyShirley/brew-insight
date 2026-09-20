@@ -1977,7 +1977,7 @@ function buildFeatured() {
         <div class="label"><span class="fire">🔥</span> ${_activeBrand ? `${_activeBrand} 相关动态` : '今日热点 TOP 1'}</div>
         <h2 style="font-size:17px;">${_activeBrand ? `${_activeBrand} 共有 ${filteredItems.length} 条相关资讯` : '立秋"秋一杯"引爆销量、瑞幸Q2财报亮眼、茉莉奶白进军瓶装茶'}</h2>
         <div class="meta">
-          <span>${_activeBrand ? `${filteredItems.length} 条筛选结果` : `${CARDS.length} 条最新资讯 · 截至 7 月 5 日`}</span>
+          <span>${_activeBrand ? `${filteredItems.length} 条筛选结果` : `${allItems.length} 条最新资讯 · 截至 ${allItems[0].time}`}</span>
           <span class="tag">${_activeBrand || '联名'}</span>
           <span class="tag">趋势</span>
         </div>
