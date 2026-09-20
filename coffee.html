@@ -608,10 +608,13 @@
     .week-report { background: linear-gradient(135deg,#0f1a2e,#141e34); border-radius: 12px; padding: 16px 20px; border: 1px solid rgba(59,130,246,.1); margin-bottom: 16px; }
     .week-report .wr-label { font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: #60a5fa; margin-bottom: 6px; display: flex; align-items: center; gap: 4px; }
     .week-report .wr-items { display: flex; flex-direction: column; gap: 6px; }
-    .week-report .wr-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #e0e6f0; padding: 4px 0; border-bottom: 1px solid rgba(59,130,246,.04); }
+    .week-report .wr-item { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #e0e6f0; padding: 4px 0; border-bottom: 1px solid rgba(59,130,246,.04); cursor: pointer; text-decoration: none; border-radius: 6px; }
     .week-report .wr-item:last-child { border-bottom: none; }
+    .week-report .wr-item:hover { background: rgba(59,130,246,.06); }
     .week-report .wr-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
-    .week-report .wr-brand { font-size: 10px; color: #60a5fa; font-weight: 600; width: 60px; flex-shrink: 0; }
+    .week-report .wr-brand { font-size: 10px; color: #60a5fa; font-weight: 600; width: 58px; flex-shrink: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .week-report .wr-case { font-size: 9px; padding: 2px 6px; border-radius: 100px; background: rgba(96,165,250,.12); color: #93c5fd; font-weight: 700; flex-shrink: 0; }
+    .week-report .wr-title { flex: 1; color: #e0e6f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .week-report .wr-tag { font-size: 9px; padding: 1px 6px; border-radius: 100px; background: rgba(59,130,246,.08); color: #6b7a92; margin-left: auto; flex-shrink: 0; }
 
     /* ── Timeline ── */
@@ -2285,18 +2288,53 @@ function buildBrandOverview() {
 }
 
 // ═══ WEEK REPORT ═══
+// 品牌名 → 规范名（标题中出现某个品牌时优先用标题里的品牌，避免错配）
+const BRAND_ALIAS = {'奈雪':'奈雪的茶','蜜雪':'蜜雪冰城','星巴克':'星巴克中国','Tims':'Tims天好咖啡',
+                     '库迪':'库迪咖啡','霸王茶姬':'霸王茶姬','喜茶':'喜茶','瑞幸':'瑞幸咖啡','茶百道':'茶百道',
+                     '乐乐茶':'乐乐茶','肯德基':'肯德基','麦当劳':'麦当劳','M Stand':'M Stand','Manner':'Manner',
+                     'Peets':'Peets Coffee','T97咖啡':'T97咖啡','冰雪时光':'冰雪时光','茶颜悦色':'茶颜悦色',
+                     '茉莉奶白':'茉莉奶白','沪上阿姨':'沪上阿姨','古茗':'古茗','贡茶':'贡茶','一点点':'一点点',
+                     'CoCo都可':'CoCo都可','书亦烧仙草':'书亦烧仙草'};
+function cardBrand(c) {
+  const t = String(c.title || '');
+  for (const k in BRAND_ALIAS) { if (t.includes(k)) return BRAND_ALIAS[k]; }
+  return c.brand;
+}
+// big case 类型：tags → 业务口播标签
+function bigCaseLabel(tags) {
+  const map = {'🆕 新品':'LTO上新','🥂 联名':'GWP联名','📊 财报':'财报','🌍 出海':'出海',
+               '🏪 门店':'扩店','🎯 营销':'营销战役','📈 行业':'行业观察'};
+  for (const t of (tags || [])) { if (map[t]) return map[t]; }
+  return '行业观察';
+}
 function generateWeekReport() {
-  const latest = dedupCards([...CARDS]).map(c => {
-    const [mm, dd] = (c.time || '01/01').split('/').map(Number);
-    return {...c, _t: (mm || 0) * 100 + (dd || 0)};
-  }).sort((a, b) => b._t - a._t || b.score - a.score).slice(0, 5);
+  const byBrand = {};
+  for (const c of dedupCards([...CARDS])) {
+    const b = cardBrand(c);
+    // 优先选具体 case（LTO上新/GWP联名/财报/出海/营销），再按时间/评分
+    const isCase = bigCaseLabel(c.tags) !== '行业观察';
+    if (!byBrand[b] || (isCase && !byBrand[b].isCase) ||
+        (isCase === byBrand[b].isCase && (c.time || '00/00').localeCompare(byBrand[b].c.time || '00/00') > 0)) {
+      byBrand[b] = { c, isCase, brand: b };
+    }
+  }
+  const rows = Object.values(byBrand)
+    .map(o => Object.assign({}, o.c, { brand: o.brand }))
+    .sort((a, b) => (b.time || '00/00').localeCompare(a.time || '00/00') || b.score - a.score)
+    .slice(0, 6);
   return `<div class="week-report">
     <div class="wr-label">📋 AI 本周简报 · ${new Date().toISOString().slice(0,10)}</div>
     <div class="wr-items">
-      ${latest.map((v,i) => {
-        const colors = ['#3b82f6','#4ade80','#f87171','#facc15','#a78bfa'];
-        const title = v.title.length > 26 ? v.title.slice(0, 26) + '…' : v.title;
-        return `<div class="wr-item"><span class="wr-dot" style="background:${colors[i%5]}"></span><span class="wr-brand">${v.brand}</span>${title}<span class="wr-tag">${v.time} · ${v.score}</span></div>`;
+      ${rows.map((v,i) => {
+        const colors = ['#3b82f6','#4ade80','#f87171','#facc15','#a78bfa','#34d399'];
+        const title = v.title.length > 30 ? v.title.slice(0, 30) + '…' : v.title;
+        return `<a class="wr-item" href="${v.url || '#'}" target="_blank" rel="noopener" title="点击查看详情：${v.title}">
+          <span class="wr-dot" style="background:${colors[i%6]}"></span>
+          <span class="wr-brand">${v.brand}</span>
+          <span class="wr-case">${bigCaseLabel(v.tags)}</span>
+          <span class="wr-title">${title}</span>
+          <span class="wr-tag">${v.time}</span>
+        </a>`;
       }).join('')}
     </div>
   </div>`;
