@@ -655,6 +655,42 @@
     .month-cal .mc-cat.active { background: rgba(59,130,246,.18); border-color: var(--c); color: var(--c); font-weight: 600; }
     .month-cal .mc-foot { font-size: 10px; color: #4a5568; margin-top: 10px; }
 
+    /* ── Brand Universe 2 (业绩份额气泡) ── */
+    .universe2 { background: linear-gradient(135deg,#0f1a2e,#141e34); border-radius: 12px; padding: 14px 18px; border: 1px solid rgba(59,130,246,.1); margin-bottom: 16px; }
+    .universe2 .u2-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .universe2 .u2-mod { background: rgba(10,15,26,.55); border: 1px solid rgba(59,130,246,.06); border-radius: 10px; padding: 10px 8px; }
+    .universe2 .u2-title { font-size: 12px; font-weight: 800; color: #60a5fa; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+    .universe2 .u2-sub { font-size: 9px; color: #4a5568; margin-bottom: 8px; }
+    .universe2 .u2-bubbles { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; min-height: 150px; }
+    .universe2 .u2-bubble { border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; cursor: pointer; position: relative; transition: transform .15s, box-shadow .15s; box-shadow: 0 2px 8px rgba(0,0,0,.35); text-shadow: 0 1px 2px rgba(0,0,0,.6); }
+    .universe2 .u2-bubble:hover { transform: scale(1.12); box-shadow: 0 4px 16px var(--bc); z-index: 3; }
+    .universe2 .u2-bubble .u2-tip { position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: #0a0f18; border: 1px solid rgba(59,130,246,.25); color: #e0e6f0; font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s; z-index: 5; text-shadow: none; }
+    .universe2 .u2-bubble:hover .u2-tip { opacity: 1; }
+    .universe2 .u2-legend { font-size: 9px; color: #6b7a92; margin-top: 8px; }
+
+    .u2-metrics { background: linear-gradient(135deg,#0f1a2e,#141e34); border: 1px solid rgba(59,130,246,.1); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; }
+    .u2-metrics .um-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
+    .u2-metrics .um-name { font-size: 14px; font-weight: 800; color: #e0e6f0; display: flex; align-items: center; gap: 8px; }
+    .u2-metrics .um-close { cursor: pointer; color: #6b7a92; font-size: 11px; border: 1px solid rgba(59,130,246,.2); border-radius: 8px; padding: 2px 10px; }
+    .u2-metrics .um-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px,1fr)); gap: 10px; }
+    .u2-metrics .um-cell { background: rgba(10,15,26,.6); border: 1px solid rgba(59,130,246,.08); border-radius: 10px; padding: 10px 12px; }
+    .u2-metrics .um-cell .um-v { font-size: 18px; font-weight: 800; color: #60a5fa; }
+    .u2-metrics .um-cell .um-k { font-size: 10px; color: #6b7a92; margin-top: 2px; }
+    .u2-metrics .um-btn { display: inline-block; cursor: pointer; color: #93c5fd; font-size: 10px; border: 1px solid rgba(59,130,246,.25); border-radius: 8px; padding: 3px 10px; background: rgba(59,130,246,.08); }
+    .u2-metrics .um-btn:hover { background: rgba(59,130,246,.18); }
+    .u2-metrics .um-prods { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+    .u2-metrics .um-prod { font-size: 9px; padding: 2px 8px; border-radius: 100px; background: rgba(96,165,250,.1); color: #93c5fd; }
+
+    .modal-mask { position: fixed; inset: 0; background: rgba(5,8,15,.72); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal-box { background: #0e1526; border: 1px solid rgba(59,130,246,.2); border-radius: 14px; max-width: 460px; width: 100%; max-height: 80vh; overflow: auto; padding: 18px 20px; }
+    .modal-box .mb-title { font-size: 14px; font-weight: 800; color: #e0e6f0; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+    .modal-box .mb-x { cursor: pointer; color: #6b7a92; }
+    .modal-box .mb-row { display: flex; justify-content: space-between; padding: 6px 4px; border-bottom: 1px solid rgba(59,130,246,.06); font-size: 12px; color: #cbd5e1; }
+    .modal-box .mb-row .n { color: #60a5fa; font-weight: 700; }
+    .modal-box .mb-note { font-size: 9px; color: #4a5568; margin-top: 8px; }
+
+    @media (max-width: 860px) { .universe2 .u2-wrap { grid-template-columns: 1fr; } }
+
     /* ── Timeline ── */
     .tl-wrap { position: relative; padding: 0 0 0 20px; }
     .tl-wrap::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: rgba(59,130,246,.08); }
@@ -2047,6 +2083,7 @@ function buildFeatured() {
       ${statusBar()}
       ${generateAIBrief()}
       ${generateWeekReport()}
+      ${buildBrandUniverse2()}
       ${_activeBrand ? `<div class="brand-filter-bar"><span class="bf-label">🌌 正在查看</span><span class="bf-brand">${_activeBrand}</span><span class="bf-clear" onclick="_activeBrand=null;buildFeaturedAndRender()">✕ 清除筛选</span></div>` : ''}
       ${_activeBrand ? `<div class="hot-hero" style="padding:20px 24px;">
         <div class="label"><span class="fire">🔥</span> ${_activeBrand} 相关动态</div>
@@ -2081,18 +2118,11 @@ function buildFeatured() {
       ${_activeBrand ? `<div style="text-align:center;margin-bottom:12px;"><a href="#" style="color:#60a5fa;font-size:12px;" onclick="event.preventDefault();_activeBrand=null;buildFeaturedAndRender()">🌌 查看全部品牌 →</a></div>` : '<div style="text-align:center;"><a href="#" style="color:#60a5fa;font-size:12px;text-decoration:none;" onclick="event.preventDefault();document.querySelector(\'[data-page=all]\').click()">查看全部 ' + CARDS.length + ' 条动态 →</a></div>'}
     `,
     side: `
-      <div class="universe-wrap">
-        <div class="uv-title">🌌 品牌宇宙 <span class="uv-tip">${_activeBrand ? '再次点击星球取消筛选' : '点击星球查看该品牌动态'}</span></div>
-        <canvas id="brandUniverse"></canvas>
-        <div class="uv-hover-info" id="uvHoverInfo"></div>
-        <div class="uv-legend">${UNIVERSE_BRANDS.map(b => `<span class="${_activeBrand === b.name ? 'active' : ''}" onclick="_activeBrand='${b.name}';buildFeaturedAndRender()">${b.emoji} ${b.name}</span>`).join('')}</div>
-      </div>
       <div class="insight-card">
-        <div class="insight-title">💡 ${_activeBrand ? `当前筛选: ${_activeBrand}` : '品牌宇宙'}</div>
-        <p>${_activeBrand 
-          ? `${UNIVERSE_BRANDS.find(b=>b.name===_activeBrand)?.emoji} <span class="highlight">${_activeBrand}</span> 热度 ${UNIVERSE_BRANDS.find(b=>b.name===_activeBrand)?.heat}，共 ${filteredItems.length} 条资讯。`
-          : '点击上方星球查看对应品牌的最新动态。<br><span class="highlight">星球越大</span> 表示品牌热度越高，当前展示 <span class="highlight">全品牌</span> 资讯。'}</p>
+        <div class="insight-title">🌌 品牌宇宙 · 业绩份额</div>
+        <p>上方主区已按 <span class="highlight">咖啡&茶饮</span> 与 <span class="highlight">QSR快餐</span> 分双模块展示。<br>气泡大小 = <span class="highlight">业绩份额</span>，点击气泡查看月度份额、门店数、覆盖城市、客单价与热销品。<br>当前 ${_activeBrand ? `正在查看 <span class="highlight">${_activeBrand}</span>，共 ${filteredItems.length} 条资讯。` : '未筛选，展示全品牌资讯。'}</p>
       </div>
+      <div class="trend-card"><div class="trend-title">🔥 份额 TOP</div>${Object.entries(BRAND_METRICS).sort((a,b)=>b[1].share-a[1].share).slice(0,8).map(([b,m],i)=>`<div style="display:flex;align-items:center;gap:6px;padding:5px 2px;border-bottom:1px solid rgba(59,130,246,.05);"><span style="width:18px;height:18px;border-radius:50%;background:${U2_COLOR[b]||'#3b82f6'}22;color:${U2_COLOR[b]||'#3b82f6'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;">${i+1}</span><span style="font-size:12px;color:#e0e6f0;flex:1;">${b}</span><span style="font-size:11px;color:#60a5fa;font-weight:700;">${m.share}%</span></div>`).join('')}</div>
     `
   };
 }
@@ -2504,6 +2534,131 @@ function buildMarketingCal() {
       ['🥧','双11','↑','—'], ['🏵️','品牌日','↑','—'], ['🌱','二十四节气','↑','—'],
     ]),
   };
+}
+
+// ═══ BRAND UNIVERSE 2（咖啡&茶饮 / QSR 分模块 · 气泡=业绩份额）═══
+const QSR_BRANDS = ['肯德基','麦当劳','华莱士','塔斯汀','德克士','汉堡王','必胜客','达美乐','老乡鸡','真功夫','乡村基','Subway'];
+const isQsr = b => QSR_BRANDS.includes(b);
+const U2_EMOJI = {'瑞幸咖啡':'☕','星巴克中国':'⭐','喜茶':'🧋','奈雪的茶':'🌰','霸王茶姬':'🥤','蜜雪冰城':'🍦','库迪咖啡':'☕','茶百道':'🍋','Tims天好咖啡':'☕','Manner':'☕','M Stand':'☕','乐乐茶':'🧋','Peets Coffee':'P','书亦烧仙草':'🌿','古茗':'🍵','沪上阿姨':'🧑','茉莉奶白':'💐','一点点':'🫘','CoCo都可':'🥥','肯德基':'K','麦当劳':'麦','华莱士':'🍗','塔斯汀':'🍔','德克士':'🍗','汉堡王':'🍔','必胜客':'🍕','达美乐':'🍕','老乡鸡':'🍚','真功夫':'🍚','乡村基':'🍚','Subway':'🥖'};
+const U2_COLOR = {'瑞幸咖啡':'#003366','星巴克中国':'#006241','喜茶':'#d32f2f','奈雪的茶':'#7b1fa2','霸王茶姬':'#8d6e2e','蜜雪冰城':'#e53935','库迪咖啡':'#1565c0','茶百道':'#2e7d32','Tims天好咖啡':'#b71c1c','Manner':'#f57c00','M Stand':'#37474f','乐乐茶':'#e91e63','Peets Coffee':'#1b5e20','书亦烧仙草':'#3e2723','古茗':'#4caf50','沪上阿姨':'#ff6b6b','茉莉奶白':'#8e6e3a','一点点':'#7c4dff','CoCo都可':'#ff9800','肯德基':'#c62828','麦当劳':'#daa520','华莱士':'#e67e22','塔斯汀':'#16a34a','德克士':'#c2410c','汉堡王':'#e65100','必胜客':'#e11d48','达美乐':'#dc2626','老乡鸡':'#f59e0b','真功夫':'#334155','乡村基':'#65a30d','Subway':'#2e7d32'};
+// 业绩份额(%)、门店数、客单价(元)、重点城市门店分布（示意，基于公开资料估）
+const BRAND_METRICS = {
+  '瑞幸咖啡': { share:18.5, stores:36310, aov:15.6, cities:{'上海':2900,'北京':2500,'深圳':1700,'广州':1600,'杭州':1300,'成都':1200,'重庆':1100,'武汉':900,'西安':850,'苏州':900,'南京':800,'长沙':700,'郑州':650,'东莞':750,'合肥':600,'青岛':520,'沈阳':480,'福州':430,'昆明':500,'天津':460} },
+  '蜜雪冰城': { share:16.0, stores:59823, aov:8.5, cities:{'郑州':2600,'成都':2300,'重庆':2200,'西安':1900,'武汉':1800,'长沙':1700,'合肥':1600,'南阳':950,'周口':850,'商丘':820,'菏泽':800,'临沂':780,'保定':760,'衡阳':720,'赣州':700,'柳州':680,'湛江':660,'渭南':640,'德阳':620,'驻马店':610} },
+  '星巴克中国': { share:9.2, stores:8000, aov:34.0, cities:{'上海':1400,'北京':1100,'深圳':520,'广州':480,'杭州':420,'成都':400,'西安':290,'南京':300,'武汉':280,'苏州':300,'重庆':300,'天津':240,'长沙':220,'沈阳':200,'厦门':180,'青岛':200,'郑州':220,'合肥':170,'昆明':180,'无锡':190} },
+  '肯德基': { share:8.0, stores:10000, aov:32.0, cities:{'上海':420,'北京':390,'广州':300,'深圳':290,'成都':260,'武汉':250,'西安':220,'杭州':230,'南京':240,'重庆':210,'天津':200,'长沙':190,'郑州':180,'青岛':170,'沈阳':180,'合肥':170,'昆明':160,'大连':150,'东莞':180,'苏州':190} },
+  '华莱士': { share:6.5, stores:20000, aov:22.0, cities:{'福州':800,'温州':720,'泉州':680,'广州':900,'深圳':760,'成都':820,'重庆':700,'西安':640,'郑州':600,'武汉':590,'长沙':560,'南昌':540,'合肥':530,'贵阳':500,'昆明':520,'南宁':480,'沈阳':470,'哈尔滨':460,'兰州':440,'乌鲁木齐':380} },
+  '麦当劳': { share:5.5, stores:5500, aov:29.0, cities:{'上海':280,'北京':270,'广州':190,'深圳':170,'成都':130,'武汉':110,'西安':100,'杭州':120,'南京':110,'重庆':130,'天津':110,'长沙':95,'沈阳':90,'郑州':90,'青岛':85,'合肥':80,'苏州':100,'大连':80,'福州':75,'厦门':70} },
+  '喜茶': { share:5.0, stores:3000, aov:19.0, cities:{'广州':260,'深圳':240,'上海':210,'北京':170,'成都':120,'杭州':110,'长沙':100,'武汉':90,'西安':85,'南京':90,'重庆':90,'东莞':120,'佛山':110,'苏州':80,'天津':60,'厦门':65,'福州':55,'合肥':60,'青岛':55,'昆明':50} },
+  '霸王茶姬': { share:4.8, stores:8000, aov:17.5, cities:{'昆明':420,'成都':380,'重庆':360,'西安':300,'贵阳':280,'昆明':420,'长沙':340,'武汉':320,'杭州':300,'南京':280,'北京':260,'上海':240,'广州':220,'深圳':210,'郑州':260,'合肥':240,'南宁':220,'兰州':180,'西宁':160,'银川':140} },
+  '奈雪的茶': { share:3.6, stores:1685, aov:24.0, cities:{'深圳':130,'广州':120,'上海':110,'北京':100,'杭州':85,'成都':75,'武汉':65,'西安':60,'南京':55,'重庆':60,'苏州':50,'天津':45,'长沙':55,'郑州':45,'青岛':40,'厦门':35,'合肥':40,'昆明':35,'无锡':30,'东莞':45} },
+  '必胜客': { share:3.2, stores:3000, aov:60.0, cities:{'上海':210,'北京':200,'广州':150,'深圳':130,'成都':120,'武汉':100,'西安':90,'杭州':100,'南京':90,'重庆':90,'天津':85,'长沙':80,'郑州':80,'青岛':75,'沈阳':70,'大连':70,'苏州':75,'合肥':70,'昆明':60,'厦门':55} },
+  '塔斯汀': { share:2.8, stores:3000, aov:25.0, cities:{'福州':160,'泉州':150,'长沙':120,'成都':110,'重庆':100,'武汉':95,'南昌':90,'合肥':85,'西安':80,'郑州':90,'杭州':75,'南京':70,'贵阳':80,'南宁':85,'昆明':70,'深圳':60,'广州':70,'东莞':80,'福州':160,'温州':90} },
+  '老乡鸡': { share:2.4, stores:1400, aov:30.0, cities:{'合肥':180,'武汉':120,'南京':110,'上海':90,'北京':80,'苏州':70,'杭州':65,'郑州':60,'西安':60,'长沙':55,'无锡':50,'常州':50,'宁波':45,'成都':40,'广州':40,'深圳':35,'温州':35,'嘉兴':30,'武汉':120,'重庆':30} },
+  '德克士': { share:2.0, stores:2000, aov:30.0, cities:{'成都':90,'重庆':85,'西安':80,'郑州':70,'武汉':65,'长沙':60,'昆明':55,'贵阳':50,'兰州':48,'乌鲁木齐':45,'南宁':45,'海口':40,'三亚':40,'合肥':40,'南昌':38,'太原':36,'沈阳':35,'长春':34,'哈尔滨':33,'呼和浩特':30} },
+  '达美乐': { share:1.8, stores:1200, aov:55.0, cities:{'上海':95,'北京':85,'广州':70,'深圳':65,'杭州':50,'南京':45,'苏州':40,'武汉':45,'成都':42,'天津':35,'西安':30,'重庆':30,'长沙':28,'青岛':25,'大连':24,'厦门':22,'宁波':22,'福州':20,'无锡':20,'合肥':18} },
+  '汉堡王': { share:1.6, stores:1500, aov:35.0, cities:{'上海':90,'北京':80,'广州':60,'深圳':55,'成都':50,'西安':45,'武汉':42,'杭州':45,'南京':40,'重庆':40,'天津':35,'长沙':32,'苏州':35,'青岛':28,'沈阳':28,'合肥':26,'昆明':25,'厦门':20,'大连':22,'郑州':30} },
+  '乡村基': { share:1.4, stores:1100, aov:28.0, cities:{'重庆':180,'成都':130,'西安':75,'长沙':70,'武汉':65,'贵阳':60,'昆明':60,'合肥':55,'南宁':50,'郑州':48,'南昌':45,'太原':40,'沈阳':38,'哈尔滨':36,'长春':35,'青岛':34,'济南':33,'天津':32,'大连':30,'兰州':28} },
+  '真功夫': { share:1.2, stores:600, aov:32.0, cities:{'广州':70,'深圳':60,'东莞':48,'佛山':45,'上海':42,'北京':35,'武汉':30,'长沙':25,'成都':22,'重庆':20,'杭州':18,'南京':18,'西安':16,'郑州':16,'青岛':14,'厦门':12,'昆明':12,'合肥':12,'天津':12,'济南':11} },
+  'Subway': { share:1.0, stores:1200, aov:35.0, cities:{'上海':100,'北京':90,'广州':70,'深圳':65,'成都':55,'武汉':50,'杭州':55,'南京':50,'西安':40,'重庆':45,'天津':40,'长沙':38,'苏州':45,'青岛':32,'大连':30,'厦门':28,'合肥':28,'昆明':26,'郑州':35,'沈阳':30} },
+  '书亦烧仙草': { share:2.2, stores:7000, aov:11.0, cities:{'成都':460,'重庆':420,'西安':330,'贵阳':300,'昆明':310,'武汉':320,'长沙':340,'南宁':280,'合肥':280,'郑州':330,'兰州':220,'西宁':180,'太原':260,'济南':240,'石家庄':230,'青岛':210,'天津':200,'南昌':240,'福州':210,'厦门':180} },
+  '古茗': { share:4.2, stores:14351, aov:13.5, cities:{'台州':520,'温州':500,'泉州':430,'台州':520,'福州':420,'广州':400,'深圳':380,'杭州':360,'宁波':350,'金华':340,'南昌':350,'长沙':380,'武汉':360,'成都':330,'重庆':310,'南宁':290,'贵阳':270,'合肥':300,'郑州':260,'昆明':250} },
+  '沪上阿姨': { share:3.0, stores:13000, aov:12.0, cities:{'郑州':620,'济南':560,'石家庄':540,'太原':500,'沈阳':520,'长春':480,'哈尔滨':470,'大连':450,'青岛':430,'西安':460,'兰州':380,'银川':320,'西宁':300,'乌鲁木齐':280,'呼和浩特':260,'沈阳':520,'南京':400,'淮安':300,'徐州':300,'盐城':260} },
+  'Tims天好咖啡': { share:1.5, stores:1000, aov:28.0, cities:{'上海':110,'北京':80,'广州':60,'深圳':55,'杭州':45,'成都':40,'武汉':35,'西安':30,'南京':32,'苏州':30,'南京':32,'天津':26,'青岛':24,'长沙':26,'重庆':22,'合肥':20,'昆明':18,'厦门':16,'大连':15,'沈阳':15} },
+  'Manner': { share:1.8, stores:1200, aov:20.0, cities:{'上海':160,'北京':100,'深圳':80,'广州':75,'杭州':60,'成都':55,'武汉':50,'南京':45,'苏州':45,'西安':40,'重庆':38,'长沙':35,'天津':30,'青岛':28,'合肥':25,'昆明':22,'厦门':20,'福州':18,'大连':16,'郑州':26} },
+  'M Stand': { share:0.8, stores:500, aov:32.0, cities:{'上海':60,'北京':45,'深圳':35,'广州':28,'杭州':25,'成都':20,'武汉':16,'西安':14,'南京':15,'苏州':14,'重庆':14,'长沙':12,'天津':10,'青岛':9,'合肥':8,'昆明':8,'厦门':7,'福州':6,'大连':6,'郑州':8} },
+  'Peets Coffee': { share:0.6, stores:100, aov:38.0, cities:{'上海':30,'北京':22,'广州':12,'深圳':10,'杭州':8,'成都':6,'南京':5,'武汉':4,'西安':4,'苏州':4,'重庆':3,'厦门':3,'天津':2,'青岛':2,'长沙':2,'大连':2,'合肥':1,'昆明':1,'福州':1,'郑州':1} },
+  '乐乐茶': { share:1.5, stores:500, aov:16.0, cities:{'上海':70,'北京':50,'成都':28,'杭州':25,'武汉':22,'南京':20,'重庆':18,'西安':16,'长沙':15,'苏州':14,'广州':12,'深圳':12,'合肥':10,'青岛':9,'昆明':8,'厦门':8,'福州':7,'天津':6,'郑州':7,'沈阳':5} },
+};
+function brandMetric(b) {
+  return BRAND_METRICS[b] || { share:0, stores:0, aov:0, cities:{} };
+}
+function u2BubbleHTML(b, mod) {
+  const m = BRAND_METRICS[b];
+  if (!m) return '';
+  const r = 14 + Math.sqrt(m.share) * 9; // 气泡半径 ∝ 业绩份额
+  const color = U2_COLOR[b] || '#3b82f6';
+  const emoji = U2_EMOJI[b] || '🏷️';
+  const label = b.replace('咖啡', '').replace('天好', '').replace('中国', '');
+  const tip = `${b} · 份额 ${m.share}% · 门店 ${(m.stores/1000).toFixed(1)}k`;
+  return `<div class="u2-bubble" style="width:${r*2}px;height:${r*2}px;background:radial-gradient(circle at 32% 28%, ${color}cc, ${color});--bc:${color};font-size:${Math.max(9, r*0.55)}px;" onclick="showBrandMetric('${b}')" title="">
+    <span class="u2-tip">${tip}</span>${emoji}
+  </div>`;
+}
+function buildBrandUniverse2() {
+  const names = Object.keys(BRAND_METRICS);
+  const coffee = names.filter(b => !isQsr(b));
+  const qsr = names.filter(b => isQsr(b));
+  const coffHtml = coffee.map(b => u2BubbleHTML(b)).join('');
+  const qsrHtml = qsr.map(b => u2BubbleHTML(b)).join('');
+  return `<div class="universe2">
+    <div class="u2-title">🌌 品牌宇宙 <span style="font-weight:400;font-size:10px;color:#6b7a92;">（气泡大小 = 业绩份额 · 点击查看详情）</span></div>
+    <div class="u2-wrap" style="margin-top:10px;">
+      <div class="u2-mod">
+        <div class="u2-title">🥤 咖啡 & 茶饮 <span class="u2-sub">${coffee.length} 品牌</span></div>
+        <div class="u2-bubbles">${coffHtml}</div>
+      </div>
+      <div class="u2-mod">
+        <div class="u2-title">🍟 QSR 快餐 <span class="u2-sub">${qsr.length} 品牌</span></div>
+        <div class="u2-bubbles">${qsrHtml}</div>
+      </div>
+    </div>
+    <div class="u2-legend">业绩份额为公开资料估算口径 · 圆点越大代表市场份额越高 · 点击气泡查看：月度份额 / 门店数 / 覆盖城市 / 客单价 / 热销品</div>
+  </div>
+  <div id="brandMetricPanel"></div>`;
+}
+function renderBrandMetricHTML(b) {
+  const m = brandMetric(b);
+  const cityCount = Object.keys(m.cities).length;
+  const emoji = U2_EMOJI[b] || '🏷️';
+  const prods = (TOP_PRODUCTS[b] || []).slice(0, 6);
+  return `<div class="u2-metrics" id="brandMetricPanel">
+    <div class="um-head">
+      <div class="um-name"><span style="font-size:18px;">${emoji}</span> ${b} 品牌档案 ${isQsr(b) ? '<span style="font-size:9px;color:#e67e22;border:1px solid #e67e22;border-radius:100px;padding:2px 6px;">QSR</span>' : '<span style="font-size:9px;color:#16a34a;border:1px solid #16a34a;border-radius:100px;padding:2px 6px;">咖啡&茶饮</span>'}</div>
+      <span class="um-close" onclick="document.getElementById('brandMetricPanel').innerHTML=''">✕ 收起</span>
+    </div>
+    <div class="um-grid">
+      <div class="um-cell"><div class="um-v">${m.share}%</div><div class="um-k">月度业绩份额（估）</div></div>
+      <div class="um-cell"><div class="um-v">${(m.stores/1000).toFixed(0)}k+</div><div class="um-k">门店数</div></div>
+      <div class="um-cell"><div class="um-v">${cityCount}</div><div class="um-k">重点覆盖城市数 <span class="um-btn" onclick="openCityModal('${b}')">查看各城市门店</span></div></div>
+      <div class="um-cell"><div class="um-v">¥${m.aov}</div><div class="um-k">客单价</div></div>
+      <div class="um-cell"><div class="um-v" style="font-size:14px;">${prods.slice(0,3).join(' · ')}</div><div class="um-k">热销品</div>
+        <div class="um-prods">${prods.map(p => `<span class="um-prod">${p}</span>`).join('')}</div>
+      </div>
+    </div>
+  </div>`;
+}
+function showBrandMetric(b) {
+  const panel = document.getElementById('brandMetricPanel');
+  let node;
+  if (panel) { node = panel; }
+  else {
+    node = document.createElement('div'); node.id = 'brandMetricPanel';
+    document.getElementById('pageContent').querySelector('.universe2').after(node);
+  }
+  node.innerHTML = renderBrandMetricHTML(b);
+  node.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+function openCityModal(b) {
+  const m = brandMetric(b);
+  const cities = Object.entries(m.cities).sort((a, b2) => b2[1] - a[1]);
+  const total = cities.reduce((s, c) => s + c[1], 0);
+  const rows = cities.map(([c, n]) => `<div class="mb-row"><span>${c}</span><span class="n">${n} 家</span></div>`).join('');
+  const mask = document.createElement('div');
+  mask.className = 'modal-mask';
+  mask.id = 'cityModalMask';
+  mask.innerHTML = `<div class="modal-box">
+    <div class="mb-title">🏙️ ${b} · 重点城市门店分布 <span class="mb-x" onclick="closeCityModal()">✕</span></div>
+    ${rows || '<div class="mb-row">暂无城市数据</div>'}
+    <div class="mb-row"><span style="font-weight:700;color:#93c5fd;">合计</span><span class="n">≈${total} 家</span></div>
+    <div class="mb-note">* 所示为核心市场重点城市门店数，为公开资料估算示意</div>
+  </div>`;
+  mask.addEventListener('click', e => { if (e.target === mask) closeCityModal(); });
+  document.body.appendChild(mask);
+}
+function closeCityModal() {
+  const m = document.getElementById('cityModalMask');
+  if (m) m.remove();
 }
 
 const PAGE_BUILDERS = {
