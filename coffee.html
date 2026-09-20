@@ -629,17 +629,17 @@
     .month-cal .mc-lg-dot { width: 8px; height: 8px; border-radius: 3px; display: inline-block; margin-right: 3px; vertical-align: -1px; }
     .month-cal .mc-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
     .month-cal .mc-dow { text-align: center; font-size: 10px; color: #6b7a92; padding: 4px 0; font-weight: 600; }
-    .month-cal .mc-cell { min-height: 64px; background: rgba(10,15,26,.6); border: 1px solid rgba(59,130,246,.06); border-radius: 8px; padding: 5px 6px; display: flex; flex-direction: column; gap: 3px; position: relative; transition: border-color .15s; }
+    .month-cal .mc-cell { min-height: 80px; background: rgba(10,15,26,.6); border: 1px solid rgba(59,130,246,.06); border-radius: 8px; padding: 5px 6px; display: flex; flex-direction: column; gap: 3px; position: relative; overflow: hidden; transition: border-color .15s; }
     .month-cal .mc-cell:hover { border-color: rgba(59,130,246,.25); }
     .month-cal .mc-cell.empty { opacity: .35; min-height: 0; padding: 0; border: none; }
     .month-cal .mc-cell.today { border-color: rgba(96,165,250,.6); box-shadow: 0 0 10px rgba(96,165,250,.15); background: rgba(30,40,64,.7); }
     .month-cal .mc-cell .mc-num { font-size: 10px; font-weight: 700; color: #4a5568; }
     .month-cal .mc-cell.today .mc-num { color: #60a5fa; }
     .month-cal .mc-events { display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
-    .month-cal .mc-ev { display: flex; align-items: center; gap: 4px; font-size: 9px; color: #e0e6f0; text-decoration: none; background: rgba(59,130,246,.08); border-left: 2px solid var(--c); border-radius: 4px; padding: 1px 4px; white-space: nowrap; overflow: hidden; max-width: 100%; }
+    .month-cal .mc-ev { display: flex; align-items: center; gap: 4px; width: 100%; min-width: 0; font-size: 10px; color: #e0e6f0; text-decoration: none; background: rgba(59,130,246,.08); border-left: 2px solid var(--c); border-radius: 4px; padding: 2px 5px; overflow: hidden; box-sizing: border-box; }
     .month-cal .mc-ev:hover { background: rgba(59,130,246,.16); }
-    .month-cal .mc-ev .mc-b { font-weight: 700; color: var(--c); flex-shrink: 0; }
-    .month-cal .mc-ev .mc-t { color: #94a3b8; font-size: 8px; flex-shrink: 0; }
+    .month-cal .mc-ev .mc-b { font-weight: 700; color: var(--c); flex-shrink: 0; max-width: 42%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .month-cal .mc-ev .mc-t { color: #cbd5e1; font-size: 9px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .month-cal .mc-more { font-size: 8px; color: #6b7a92; padding-left: 2px; }
     .month-cal .mc-cats { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
     .month-cal .mc-cat { font-size: 10px; padding: 2px 8px; border-radius: 100px; cursor: pointer; border: 1px solid transparent; transition: all .15s; color: #94a3b8; background: rgba(59,130,246,.08); }
@@ -2294,7 +2294,7 @@ function buildMonthCalendar() {
   for (let d = 1; d <= days; d++) {
     const dateKey = `${year}-${mm}-${String(d).padStart(2,'0')}`;
     const cls = dateKey === todayKey ? 'mc-cell today' : 'mc-cell';
-    const evs = (events[d] || []).slice(0, 4);
+    const evs = (events[d] || []).slice(0, 3);
     const extra = (events[d] || []).length - evs.length;
     cells.push(`<div class="${cls}" title="${mm}/${String(d).padStart(2,'0')}">
       <div class="mc-num">${d}</div>
@@ -2391,7 +2391,7 @@ function buildMarketingCal() {
   const cells = [];
   for (let i = 0; i < offset; i++) cells.push('<div class="mc-cell empty"></div>');
   for (let d = 1; d <= days; d++) {
-    const evs = (events[d] || []).slice(0, 4);
+    const evs = (events[d] || []).slice(0, 3);
     const extra = (events[d] || []).length - evs.length;
     cells.push(`<div class="mc-cell">
       <div class="mc-num">${d}</div>
