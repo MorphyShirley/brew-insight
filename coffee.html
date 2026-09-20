@@ -617,6 +617,31 @@
     .week-report .wr-title { flex: 1; color: #e0e6f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .week-report .wr-tag { font-size: 9px; padding: 1px 6px; border-radius: 100px; background: rgba(59,130,246,.08); color: #6b7a92; margin-left: auto; flex-shrink: 0; }
 
+    /* ── Monthly Calendar ── */
+    .month-cal { background: linear-gradient(135deg,#0f1a2e,#141e34); border-radius: 12px; padding: 16px 20px; border: 1px solid rgba(59,130,246,.1); margin-bottom: 16px; }
+    .month-cal .mc-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+    .month-cal .mc-nav { display: flex; align-items: center; gap: 8px; }
+    .month-cal .mc-nav button { background: rgba(59,130,246,.1); border: 1px solid rgba(59,130,246,.2); color: #93c5fd; font-size: 12px; padding: 3px 10px; border-radius: 8px; cursor: pointer; transition: all .15s; }
+    .month-cal .mc-nav button:hover { background: rgba(59,130,246,.22); }
+    .month-cal .mc-title { font-size: 12px; font-weight: 800; letter-spacing: .5px; color: #60a5fa; }
+    .month-cal .mc-sub { font-size: 10px; color: #6b7a92; margin-left: 6px; font-weight: 400; }
+    .month-cal .mc-legend { display: flex; gap: 8px; flex-wrap: wrap; font-size: 9px; color: #94a3b8; align-items: center; }
+    .month-cal .mc-lg-dot { width: 8px; height: 8px; border-radius: 3px; display: inline-block; margin-right: 3px; vertical-align: -1px; }
+    .month-cal .mc-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; }
+    .month-cal .mc-dow { text-align: center; font-size: 10px; color: #6b7a92; padding: 4px 0; font-weight: 600; }
+    .month-cal .mc-cell { min-height: 64px; background: rgba(10,15,26,.6); border: 1px solid rgba(59,130,246,.06); border-radius: 8px; padding: 5px 6px; display: flex; flex-direction: column; gap: 3px; position: relative; transition: border-color .15s; }
+    .month-cal .mc-cell:hover { border-color: rgba(59,130,246,.25); }
+    .month-cal .mc-cell.empty { opacity: .35; min-height: 0; padding: 0; border: none; }
+    .month-cal .mc-cell.today { border-color: rgba(96,165,250,.6); box-shadow: 0 0 10px rgba(96,165,250,.15); background: rgba(30,40,64,.7); }
+    .month-cal .mc-cell .mc-num { font-size: 10px; font-weight: 700; color: #4a5568; }
+    .month-cal .mc-cell.today .mc-num { color: #60a5fa; }
+    .month-cal .mc-events { display: flex; flex-direction: column; gap: 3px; overflow: hidden; }
+    .month-cal .mc-ev { display: flex; align-items: center; gap: 4px; font-size: 9px; color: #e0e6f0; text-decoration: none; background: rgba(59,130,246,.08); border-left: 2px solid var(--c); border-radius: 4px; padding: 1px 4px; white-space: nowrap; overflow: hidden; max-width: 100%; }
+    .month-cal .mc-ev:hover { background: rgba(59,130,246,.16); }
+    .month-cal .mc-ev .mc-b { font-weight: 700; color: var(--c); flex-shrink: 0; }
+    .month-cal .mc-ev .mc-t { color: #94a3b8; font-size: 8px; flex-shrink: 0; }
+    .month-cal .mc-more { font-size: 8px; color: #6b7a92; padding-left: 2px; }
+
     /* ── Timeline ── */
     .tl-wrap { position: relative; padding: 0 0 0 20px; }
     .tl-wrap::before { content: ''; position: absolute; left: 7px; top: 0; bottom: 0; width: 2px; background: rgba(59,130,246,.08); }
@@ -1992,16 +2017,16 @@ function buildFeatured() {
         </div>
         <div style="font-size:11px;color:#60a5fa;margin-top:8px;">点击查看该条资讯详情 →</div>
       </a>`}
-      <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
+      ${_activeBrand ? `<div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
         ${hotItems.length > 0 ? hotItems.map(c => `
-          <a href="${c.url||'#'}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:#0c1120;border-radius:10px;border:1px solid rgba(59,130,246,.06);font-size:13px;text-decoration:none;transition:all .15s;${_activeBrand ? 'border-color:rgba(59,130,246,.2);box-shadow:0 0 12px rgba(59,130,246,.08);' : ''}" onmouseover="this.style.borderColor='rgba(59,130,246,.25)';this.style.background='#111827'" onmouseout="this.style.borderColor='rgba(59,130,246,.06)';this.style.background='#0c1120'">
+          <a href="${c.url||'#'}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:#0c1120;border-radius:10px;border:1px solid rgba(59,130,246,.2);box-shadow:0 0 12px rgba(59,130,246,.08);font-size:13px;text-decoration:none;transition:all .15s;" onmouseover="this.style.borderColor='rgba(59,130,246,.35)';this.style.background='#111827'" onmouseout="this.style.borderColor='rgba(59,130,246,.2)';this.style.background='#0c1120'">
             ${brandIcon(c.brand, 22)}
             <span style="color:#e0e6f0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${c.title}</span>
             <span style="color:#4a5568;font-size:11px;flex-shrink:0;">${c.time}</span>
             <span style="font-size:10px;padding:2px 8px;border-radius:100px;background:rgba(59,130,246,.1);color:#6b7a92;flex-shrink:0;">热度 ${c.score}</span>
             <span style="font-size:11px;color:#60a5fa;flex-shrink:0;">→</span>
           </a>`).join('') : '<div class="news-card" style="text-align:center;padding:30px;color:#4a5568;">暂无相关资讯</div>'}
-      </div>
+      </div>` : buildMonthCalendar()}
       ${_activeBrand ? `<div style="text-align:center;margin-bottom:12px;"><a href="#" style="color:#60a5fa;font-size:12px;" onclick="event.preventDefault();_activeBrand=null;buildFeaturedAndRender()">🌌 查看全部品牌 →</a></div>` : '<div style="text-align:center;"><a href="#" style="color:#60a5fa;font-size:12px;text-decoration:none;" onclick="event.preventDefault();document.querySelector(\'[data-page=all]\').click()">查看全部 ' + CARDS.length + ' 条动态 →</a></div>'}
     `,
     side: `
@@ -2227,6 +2252,70 @@ function buildFlash() {
       </div>
     `
   };
+}
+
+// ═══ MONTHLY CALENDAR ═══
+let _calBack = 0;
+const CAL_COLORS = {'LTO上新':'#4ade80','GWP联名':'#a78bfa','财报':'#60a5fa','出海':'#facc15',
+                    '营销战役':'#f87171','扩店':'#34d399','乐推':'#fbbf24','行业观察':'#94a3b8'};
+function calColor(label) { return CAL_COLORS[label] || '#94a3b8'; }
+function changeCal(d) { _calBack = Math.max(0, Math.min(6, _calBack + d)); buildFeaturedAndRender(); }
+function buildMonthCalendar() {
+  const now = new Date();
+  const m0 = now.getMonth() - _calBack;
+  const year = m0 < 0 ? now.getFullYear() - 1 : now.getFullYear();
+  const mon = ((m0 % 12) + 12) % 12 + 1; // 1..12
+  const mm = String(mon).padStart(2, '0');
+  const first = new Date(year, mon - 1, 1);
+  const days = new Date(year, mon, 0).getDate();
+  const offset = (first.getDay() + 6) % 7; // 周一为首
+  const todayKey = now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');
+  // 按天聚合各品牌 big case
+  const events = {};
+  for (const c of dedupCards([...CARDS])) {
+    const [tm, dd] = (c.time || '').split('/');
+    if (tm === mm) {
+      const b = cardBrand(c);
+      const label = bigCaseLabel(c.tags);
+      (events[+dd] = events[+dd] || []).push({ brand: b, label, title: c.title, url: c.url, dd: +dd });
+    }
+  }
+  const cells = [];
+  for (let i = 0; i < offset; i++) cells.push('<div class="mc-cell empty"></div>');
+  for (let d = 1; d <= days; d++) {
+    const dateKey = `${year}-${mm}-${String(d).padStart(2,'0')}`;
+    const cls = dateKey === todayKey ? 'mc-cell today' : 'mc-cell';
+    const evs = (events[d] || []).slice(0, 4);
+    const extra = (events[d] || []).length - evs.length;
+    cells.push(`<div class="${cls}" title="${mm}/${String(d).padStart(2,'0')}">
+      <div class="mc-num">${d}</div>
+      <div class="mc-events">
+        ${evs.map(e => `<a class="mc-ev" style="--c:${calColor(e.label)}" href="${e.url || '#'}" target="_blank" rel="noopener" title="${e.brand} · ${e.title}"><span class="mc-b">${e.brand}</span><span class="mc-t">${e.label}</span></a>`).join('')}
+        ${extra > 0 ? `<div class="mc-more">+${extra} 条</div>` : ''}
+      </div>
+    </div>`);
+  }
+  return `<div class="month-cal">
+    <div class="mc-head">
+      <div class="mc-nav">
+        <button onclick="changeCal(1)" ${_calBack >= 6 ? 'disabled style="opacity:.35"' : ''}>‹</button>
+        <div class="mc-title">📅 月度热点日历<span class="mc-sub">${year}年${mon}月 · ${cardBrandCount(mm)} 个品牌爆点</span></div>
+        <button onclick="changeCal(-1)" ${_calBack <= 0 ? 'disabled style="opacity:.35"' : ''}>›</button>
+      </div>
+      <div class="mc-legend">
+        ${Object.keys(CAL_COLORS).map(k => `<span><span class="mc-lg-dot" style="background:${CAL_COLORS[k]}"></span>${k}</span>`).join('')}
+      </div>
+    </div>
+    <div class="mc-grid">
+      ${['一','二','三','四','五','六','日'].map(w => `<div class="mc-dow">${w}</div>`).join('')}
+      ${cells.join('')}
+    </div>
+  </div>`;
+}
+function cardBrandCount(mm) {
+  const s = new Set();
+  for (const c of CARDS) { if ((c.time || '').split('/')[0] === mm) s.add(cardBrand(c)); }
+  return s.size;
 }
 
 const PAGE_BUILDERS = {
