@@ -254,6 +254,32 @@ def update_html(html, new_cards):
     new_html = re.sub(r'数据更新至 \d{4}-\d{2}-\d{2}', f'数据更新至 {today}', new_html)
     return new_html
 
+def check_usage(api_key):
+    """查询 Tavily 套餐用量，接近上限时提醒"""
+    import urllib.request
+    import json as _json
+    try:
+        req = urllib.request.Request(
+            'https://api.tavily.com/usage',
+            headers={'Authorization': f'Bearer {api_key}'},
+        )
+        with urllib.request.urlopen(req, timeout=15) as resp:
+            data = _json.loads(resp.read().decode())
+        plan = data.get('account', {})
+        used = plan.get('plan_usage', 0)
+        limit = plan.get('plan_limit', 0)
+        if limit:
+            pct = used / limit * 100
+            print(f"📊 Tavily 用量: {used}/{limit} 积分 ({pct:.0f}%)")
+            if pct >= 80:
+                print(f"⚠️⚠️  Tavily 免费额度已用 {pct:.0f}%，即将用尽！请考虑充值/升级套餐")
+            elif pct >= 50:
+                print(f"⚠️  Tavily 免费额度已用 {pct:.0f}%")
+        else:
+            print(f"📊 Tavily 用量: {used} 积分")
+    except Exception as e:
+        print(f"ℹ️  Tavily 用量查询失败（不影响刷新）: {str(e)[:60]}")
+
 def main():
     global DAYS_BACK
     deploy = '--deploy' in sys.argv
@@ -279,6 +305,8 @@ def main():
     if not api_key:
         print('❌ 未设置 TAVILY_API_KEY 环境变量（可用 .env 文件或环境变量提供）')
         sys.exit(1)
+
+    check_usage(api_key)
 
     html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'coffee.html')
     with open(html_path, 'r', encoding='utf-8') as f:
