@@ -1973,15 +1973,25 @@ function buildFeatured() {
       ${generateAIBrief()}
       ${generateWeekReport()}
       ${_activeBrand ? `<div class="brand-filter-bar"><span class="bf-label">🌌 正在查看</span><span class="bf-brand">${_activeBrand}</span><span class="bf-clear" onclick="_activeBrand=null;buildFeaturedAndRender()">✕ 清除筛选</span></div>` : ''}
-      <div class="hot-hero" style="padding:20px 24px;">
-        <div class="label"><span class="fire">🔥</span> ${_activeBrand ? `${_activeBrand} 相关动态` : '今日热点 TOP 1'}</div>
-        <h2 style="font-size:17px;">${_activeBrand ? `${_activeBrand} 共有 ${filteredItems.length} 条相关资讯` : '立秋"秋一杯"引爆销量、瑞幸Q2财报亮眼、茉莉奶白进军瓶装茶'}</h2>
+      ${_activeBrand ? `<div class="hot-hero" style="padding:20px 24px;">
+        <div class="label"><span class="fire">🔥</span> ${_activeBrand} 相关动态</div>
+        <h2 style="font-size:17px;">${_activeBrand} 共有 ${filteredItems.length} 条相关资讯</h2>
         <div class="meta">
-          <span>${_activeBrand ? `${filteredItems.length} 条筛选结果` : `${allItems.length} 条最新资讯 · 截至 ${allItems[0].time}`}</span>
-          <span class="tag">${_activeBrand || '联名'}</span>
+          <span>${filteredItems.length} 条筛选结果</span>
+          <span class="tag">${_activeBrand}</span>
           <span class="tag">趋势</span>
         </div>
-      </div>
+      </div>`
+      : `<a href="${(allItems[0] || {}).url || '#'}" target="_blank" rel="noopener" class="hot-hero" style="padding:20px 24px;display:block;text-decoration:none;transition:all .2s;cursor:pointer;" onmouseover="this.style.borderColor='rgba(59,130,246,.35)'" onmouseout="this.style.borderColor='rgba(59,130,246,.1)'">
+        <div class="label"><span class="fire">🔥</span> 今日热点 TOP 1</div>
+        <h2 style="font-size:17px;">${allItems[0].title}</h2>
+        <div class="meta">
+          <span>${allItems.length} 条最新资讯 · 截至 ${allItems[0].time}</span>
+          <span class="tag">${allItems[0].tags[0] || '热点'}</span>
+          <span class="tag">趋势</span>
+        </div>
+        <div style="font-size:11px;color:#60a5fa;margin-top:8px;">点击查看该条资讯详情 →</div>
+      </a>`}
       <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:16px;">
         ${hotItems.length > 0 ? hotItems.map(c => `
           <a href="${c.url||'#'}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;padding:8px 14px;background:#0c1120;border-radius:10px;border:1px solid rgba(59,130,246,.06);font-size:13px;text-decoration:none;transition:all .15s;${_activeBrand ? 'border-color:rgba(59,130,246,.2);box-shadow:0 0 12px rgba(59,130,246,.08);' : ''}" onmouseover="this.style.borderColor='rgba(59,130,246,.25)';this.style.background='#111827'" onmouseout="this.style.borderColor='rgba(59,130,246,.06)';this.style.background='#0c1120'">
