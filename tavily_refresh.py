@@ -267,7 +267,17 @@ def main():
 
     api_key = os.environ.get('TAVILY_API_KEY', '').strip()
     if not api_key:
-        print('❌ 未设置 TAVILY_API_KEY 环境变量')
+        env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '.env')
+        if os.path.exists(env_path):
+            with open(env_path, 'r', encoding='utf-8') as f:
+                for line in f:
+                    line = line.strip()
+                    if line and not line.startswith('#') and '=' in line:
+                        k, v = line.split('=', 1)
+                        if k.strip() == 'TAVILY_API_KEY':
+                            api_key = v.strip()
+    if not api_key:
+        print('❌ 未设置 TAVILY_API_KEY 环境变量（可用 .env 文件或环境变量提供）')
         sys.exit(1)
 
     html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'coffee.html')
