@@ -19,6 +19,7 @@
 import os
 import re
 import sys
+import difflib
 import html as html_module
 import urllib.parse
 from datetime import datetime
@@ -113,6 +114,29 @@ def is_trad_heavy(text):
     trad = sum(1 for ch in text if ch in TRAD)
     return (trad / cjk) > 0.15
 
+# 对抗式审查：低质噪音与港台/个人社交来源
+NOISE_TITLE = ['抽奖', '抽2万', '0.01元', '薅羊毛', '未中奖', '兑换码', '免费下载', '官方正版',
+               '蹭空调', '蹭wifi', '惬意', '日常饮食记录', '小红书背景图', '手记', '探店',
+               '三轮摩托', '摩托车', 'vip', 'VIP', '博主', '吃瓜', '求转发', '应用宝',
+               'Uber Eats', 'app下载', '日常vlog', '第一视角', '沉浸式体验']
+TW_HK_DOMAINS = ('travel.yam.com', 'niusnews.com', 'womenshealthmag.com', 'cmnews.com.tw',
+                 'ufood.com.hk', 'orangenews.hk', 'ulapp.hk', 'thestormmedia.com', 'hk01.com')
+SOCIAL_DOMAINS = ('facebook.com', 'instagram.com', 'm.facebook.com')
+
+
+def adversarial_filter(title, src, desc=''):
+    """对抗式质量审查：返回校验失败原因（None = 通过）"""
+    if any(d in src for d in TW_HK_DOMAINS):
+        return '港台/繁体资讯'
+    if any(d in src for d in SOCIAL_DOMAINS):
+        return '个人社交来源'
+    if '不好喝' in title:
+        return None
+    for kw in NOISE_TITLE:
+        if kw in title:
+            return f'低质噪音(含"{kw}")'
+    return None
+
 def is_relevant(title, desc=''):
     """质量过滤：保留简体中文的行业资讯"""
     # 纯英文/无中文字符 → 剔除（看板面向中文读者）
@@ -182,9 +206,23 @@ def parse_cards(html):
     max_id = max(ids) if ids else 0
     return titles, urls, max_id
 
+def title_norm(title):
+    """标题归一化（用于模糊去重）"""
+    t = title.lower()
+    t = t.split('|')[0].strip()
+    for _ in range(3):
+        m = re.search(r'[\s_|—-]+((?:[^，。！？\s]{1,12})?(?:网|报|社|氪|新闻|财经|影视|杂志|网站|传媒|媒体|客户端|观察|频道|专题|栏目))$', t)
+        if not m:
+            break
+        t = t[:m.start()].rstrip(' -_|—-：:')
+    return ''.join(re.findall(r'[\u4e00-\u9fff0-9a-z]', t))
+
+
 def build_new_cards(news_items, existing_titles, existing_urls, next_id):
-    """把 Tavily 结果转为 CARDS 条目（去重 + 生成）"""
+    """把 Tavily 结果转为 CARDS 条目（对抗式审查 + 模糊去重 + 生成）"""
     cards = []
+    existing_norms = {title_norm(t) for t in existing_titles if len(title_norm(t)) >= 6}
+    batch_norms = []
     for it in news_items:
         if not it['title'] or not it['url']:
             continue
@@ -192,6 +230,20 @@ def build_new_cards(news_items, existing_titles, existing_urls, next_id):
             continue
         if it['title'] in existing_titles or it['url'] in existing_urls:
             continue
+        # 对抗式审查：港台/个人社交/低质噪音
+        rej = adversarial_filter(it['title'], it['domain'] or '', it.get('content') or '')
+        if rej:
+            print(f"  ⛔ 对抗式审查拦截: {it['title'][:40]} ({rej})")
+            continue
+        # 模糊去重：与现有资讯/本批已收录资讯对比标题相似度
+        norm = title_norm(it['title'])
+        if norm and len(norm) >= 8:
+            if any(difflib.SequenceMatcher(None, norm, e).ratio() >= 0.5 for e in existing_norms):
+                print(f"  ⛔ 重复资讯拦截: {it['title'][:40]}")
+                continue
+            if any(difflib.SequenceMatcher(None, norm, e).ratio() >= 0.5 for e in batch_norms):
+                print(f"  ⛔ 本批重复拦截: {it['title'][:40]}")
+                continue
         time, full_date = extract_date(it['published_date'])
         if not time:
             continue
@@ -217,6 +269,8 @@ def build_new_cards(news_items, existing_titles, existing_urls, next_id):
             'id': next_id, 'brand': it['brand'], 'time': time, 'score': score,
             'title': it['title'], 'desc': desc, 'tags': tags, 'src': src, 'url': url,
         })
+        if norm and len(norm) >= 8:
+            batch_norms.append(norm)
         next_id += 1
     # 按发布时间从新到旧排序
     def sort_key(c):
