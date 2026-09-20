@@ -2270,15 +2270,17 @@ function buildBrandOverview() {
 
 // ═══ WEEK REPORT ═══
 function generateWeekReport() {
-  const entries = Object.entries(PRODUCT_ANALYSIS);
-  const brands = [...new Set(entries.map(([,v]) => v.brand))];
-  const latest = entries.sort((a,b)=>b[1].date.localeCompare(a[1].date)).slice(0,5);
+  const latest = [...CARDS].map(c => {
+    const [mm, dd] = (c.time || '01/01').split('/').map(Number);
+    return {...c, _t: (mm || 0) * 100 + (dd || 0)};
+  }).sort((a, b) => b._t - a._t || b.score - a.score).slice(0, 5);
   return `<div class="week-report">
     <div class="wr-label">📋 AI 本周简报 · ${new Date().toISOString().slice(0,10)}</div>
     <div class="wr-items">
-      ${latest.map(([k,v],i) => {
+      ${latest.map((v,i) => {
         const colors = ['#3b82f6','#4ade80','#f87171','#facc15','#a78bfa'];
-        return `<div class="wr-item"><span class="wr-dot" style="background:${colors[i%5]}"></span><span class="wr-brand">${v.brand}</span>${k}<span class="wr-tag">${v.date}</span></div>`;
+        const title = v.title.length > 26 ? v.title.slice(0, 26) + '…' : v.title;
+        return `<div class="wr-item"><span class="wr-dot" style="background:${colors[i%5]}"></span><span class="wr-brand">${v.brand}</span>${title}<span class="wr-tag">${v.time} · ${v.score}</span></div>`;
       }).join('')}
     </div>
   </div>`;
