@@ -721,12 +721,15 @@
 
     @media (max-width: 860px) { .universe2 .u2-wrap { grid-template-columns: 1fr; } }
 
-    /* ── 份额×门店 气泡散点图 ── */
-    .share-chart { background: #fff; border: 1px solid #e2e6ec; border-radius: 12px; padding: 12px 14px 16px; margin-bottom: 16px; }
+    /* ── 份额×门店 气泡散点图（深色） ── */
+    .share-chart { background: linear-gradient(135deg,#0f1a2e,#141e34); border: 1px solid rgba(59,130,246,.1); border-radius: 12px; padding: 12px 14px 16px; margin-bottom: 16px; }
     .share-chart .sc-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
-    .share-chart .sc-seg { font-size: 11px; padding: 3px 12px; border-radius: 100px; cursor: pointer; color: #6b7a92; border: 1px solid rgba(59,130,246,.18); background: rgba(59,130,246,.06); transition: all .15s; }
-    .share-chart .sc-seg.active { color: #fff; background: #3b82f6; border-color: #3b82f6; font-weight: 600; }
-    .share-chart .sc-box { background: #F9F9F9; border: 1px solid #e8e8e8; border-radius: 8px; padding: 6px; overflow-x: auto; }
+    .share-chart .sc-seg { font-size: 11px; padding: 3px 12px; border-radius: 100px; cursor: pointer; color: #93c5fd; border: 1px solid rgba(59,130,246,.22); background: rgba(59,130,246,.08); transition: all .15s; }
+    .share-chart .sc-seg:hover { background: rgba(59,130,246,.16); }
+    .share-chart .sc-seg.active { color: #fff; background: #3b82f6; border-color: #3b82f6; font-weight: 600; box-shadow: 0 2px 10px rgba(59,130,246,.35); }
+    .share-chart .sc-box { background: #0c1220; border: 1px solid rgba(59,130,246,.08); border-radius: 8px; padding: 6px; overflow-x: auto; }
+    .share-chart svg text { font-family: "SimHei","STHeiti","Heiti SC","Microsoft YaHei",Arial,sans-serif; }
+    .share-chart .sc-bubble { cursor: pointer; transition: opacity .15s; }
     .share-chart svg text { font-family: "SimHei","STHeiti","Heiti SC","Microsoft YaHei",Arial,sans-serif; }
     .share-chart .sc-bubble { cursor: pointer; transition: opacity .15s; }
     #chartTip { position: fixed; z-index: 1200; background: rgba(13,20,34,.94); color: #e0e6f0; border: 1px solid rgba(96,165,250,.35); border-radius: 8px; padding: 7px 10px; font-size: 11px; line-height: 1.5; pointer-events: none; transform: translate(-50%,-100%); box-shadow: 0 6px 20px rgba(0,0,0,.35); white-space: nowrap; display: none; }
@@ -2745,32 +2748,32 @@ function buildShareChartModule() {
   const othersCount = brands.length - Math.min(majors.length, 12);
 
   const parts = [];
-  parts.push(`<rect width="${W}" height="${H}" fill="#F9F9F9"/>`);
-  parts.push(`<text x="${W/2}" y="44" text-anchor="middle" font-size="18" font-weight="bold" fill="#333333">品牌门店规模与市场份额分析</text>`);
+  parts.push(`<rect width="${W}" height="${H}" fill="#0c1220"/>`);
+  parts.push(`<text x="${W/2}" y="44" text-anchor="middle" font-size="18" font-weight="bold" fill="#e0e6f0">品牌门店规模与市场份额分析</text>`);
   // 网格线 + 坐标刻度
   for (let t = 0; t <= xMax; t += 10) {
     const x = xScale(t);
-    parts.push(`<line x1="${x}" y1="${T}" x2="${x}" y2="${B}" stroke="#D5D9DE" stroke-width="1" stroke-dasharray="4 4"/>`);
-    parts.push(`<text x="${x}" y="${B+16}" text-anchor="middle" font-size="11" fill="#4B5563">${t}%</text>`);
+    parts.push(`<line x1="${x}" y1="${T}" x2="${x}" y2="${B}" stroke="rgba(96,165,250,.09)" stroke-width="1" stroke-dasharray="4 4"/>`);
+    parts.push(`<text x="${x}" y="${B+16}" text-anchor="middle" font-size="11" fill="#6b7a92">${t}%</text>`);
   }
   const yTick = 10000;
   for (let t = 0; t <= yMax; t += yTick) {
     const y = yScale(t);
-    parts.push(`<line x1="${L}" y1="${y}" x2="${R}" y2="${y}" stroke="#D5D9DE" stroke-width="1" stroke-dasharray="4 4"/>`);
-    parts.push(`<text x="${L-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#4B5563">${(t/10000).toFixed(0)}万</text>`);
+    parts.push(`<line x1="${L}" y1="${y}" x2="${R}" y2="${y}" stroke="rgba(96,165,250,.09)" stroke-width="1" stroke-dasharray="4 4"/>`);
+    parts.push(`<text x="${L-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#6b7a92">${(t/10000).toFixed(0)}万</text>`);
   }
   // 轴线（只保留左/下）
-  parts.push(`<line x1="${L}" y1="${T}" x2="${L}" y2="${B}" stroke="#333" stroke-width="1.2"/>`);
-  parts.push(`<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="#333" stroke-width="1.2"/>`);
-  parts.push(`<text x="${(L+R)/2}" y="${B+36}" text-anchor="middle" font-size="12" fill="#374151">市场份额（%）</text>`);
-  parts.push(`<text transform="translate(26,${(T+B)/2}) rotate(-90)" text-anchor="middle" font-size="12" fill="#374151">门店数量（家）</text>`);
+  parts.push(`<line x1="${L}" y1="${T}" x2="${L}" y2="${B}" stroke="rgba(148,163,184,.5)" stroke-width="1.2"/>`);
+  parts.push(`<line x1="${L}" y1="${B}" x2="${R}" y2="${B}" stroke="rgba(148,163,184,.5)" stroke-width="1.2"/>`);
+  parts.push(`<text x="${(L+R)/2}" y="${B+36}" text-anchor="middle" font-size="12" fill="#cbd5e1">市场份额（%）</text>`);
+  parts.push(`<text transform="translate(26,${(T+B)/2}) rotate(-90)" text-anchor="middle" font-size="12" fill="#cbd5e1">门店数量（家）</text>`);
   // 行业均值参考线
   const vx = xScale(avgShare);
-  parts.push(`<line x1="${vx}" y1="${T}" x2="${vx}" y2="${B}" stroke="#9AA3AF" stroke-width="1" stroke-dasharray="6 3 1 3"/>`);
-  parts.push(`<text x="${vx+4}" y="${T+12}" font-size="9" fill="#6B7280">行业均值 ${avgShare}%</text>`);
+  parts.push(`<line x1="${vx}" y1="${T}" x2="${vx}" y2="${B}" stroke="#7f8ea0" stroke-width="1" stroke-dasharray="6 3 1 3"/>`);
+  parts.push(`<text x="${vx+4}" y="${T+12}" font-size="9" fill="#8b9aa8">行业均值 ${avgShare}%</text>`);
   const hy = yScale(avgStores);
-  parts.push(`<line x1="${L}" y1="${hy}" x2="${R}" y2="${hy}" stroke="#9AA3AF" stroke-width="1" stroke-dasharray="6 3 1 3"/>`);
-  parts.push(`<text x="${R-4}" y="${hy-5}" text-anchor="end" font-size="9" fill="#6B7280">行业均值 ${(avgStores/1000).toFixed(0)}k 家</text>`);
+  parts.push(`<line x1="${L}" y1="${hy}" x2="${R}" y2="${hy}" stroke="#7f8ea0" stroke-width="1" stroke-dasharray="6 3 1 3"/>`);
+  parts.push(`<text x="${R-4}" y="${hy-5}" text-anchor="end" font-size="9" fill="#8b9aa8">行业均值 ${(avgStores/1000).toFixed(0)}k 家</text>`);
   // 气泡
   const placed = [];
   for (const b of vis) {
@@ -2788,28 +2791,28 @@ function buildShareChartModule() {
     const lbl = b.replace('咖啡', '').replace('中国', '').replace('天好', '').slice(0, 6);
     if (!placed.some(p => Math.abs(p.x - x) < 17 && Math.abs(p.y - labelY) < 13)) {
       placed.push({ x, y: labelY });
-      parts.push(`<text x="${x.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="10" fill="#1F2937">${lbl}</text>`);
+      parts.push(`<text x="${x.toFixed(1)}" y="${labelY.toFixed(1)}" text-anchor="middle" font-size="10" fill="#cdd7e6">${lbl}</text>`);
     }
     parts.push(`</g>`);
   }
   // 右列：品牌图例（折叠次要）
-  parts.push(`<text x="806" y="120" font-size="12" font-weight="bold" fill="#374151">品牌</text>`);
+  parts.push(`<text x="806" y="120" font-size="12" font-weight="bold" fill="#cbd5e1">品牌</text>`);
   let legY = 142;
   majors.slice(0, 12).forEach(b => {
     const c = U2_COLOR[b] || '#8b5cf6';
     parts.push(`<circle cx="812" cy="${legY}" r="4.5" fill="${c}" stroke="${scDarken(c,0.8)}" stroke-width="0.6"/>`);
-    parts.push(`<text x="824" y="${legY+3.5}" font-size="10" fill="#1F2937">${b} <tspan fill="#4B5563">${BRAND_METRICS[b].share}%</tspan></text>`);
+    parts.push(`<text x="824" y="${legY+3.5}" font-size="10" fill="#cdd7e6">${b} <tspan fill="#6b7a92">${BRAND_METRICS[b].share}%</tspan></text>`);
     legY += 16;
   });
-  parts.push(`<circle cx="812" cy="${legY}" r="4.5" fill="#9ca3af"/>`);
-  parts.push(`<text x="824" y="${legY+3.5}" font-size="10" fill="#6b7280">其他品牌 · ${othersCount}</text>`);
+  parts.push(`<circle cx="812" cy="${legY}" r="4.5" fill="#8b9aa8"/>`);
+  parts.push(`<text x="824" y="${legY+3.5}" font-size="10" fill="#8b9aa8">其他品牌 · ${othersCount}</text>`);
   // 门店规模大小图例
-  parts.push(`<text x="806" y="${B-96}" font-size="11" font-weight="bold" fill="#374151">门店规模</text>`);
+  parts.push(`<text x="806" y="${B-96}" font-size="11" font-weight="bold" fill="#cbd5e1">门店规模</text>`);
   [1000, 10000, 50000].forEach((st, i) => {
     const rr = 8 + 52 * Math.sqrt(st) / Math.sqrt(yMax);
     const cx2 = 816 + i * 44, cy2 = B - 64;
-    parts.push(`<circle cx="${cx2}" cy="${cy2}" r="${rr.toFixed(1)}" fill="#cbd5e1" fill-opacity="0.5" stroke="#94a3b8" stroke-width="0.5"/>`);
-    parts.push(`<text x="${cx2}" y="${cy2+rr+11}" text-anchor="middle" font-size="9" fill="#4B5563">${(st/1000).toFixed(0)}k</text>`);
+    parts.push(`<circle cx="${cx2}" cy="${cy2}" r="${rr.toFixed(1)}" fill="rgba(148,163,184,.28)" fill-opacity="0.6" stroke="#64748b" stroke-width="0.5"/>`);
+    parts.push(`<text x="${cx2}" y="${cy2+rr+11}" text-anchor="middle" font-size="9" fill="#6b7a92">${(st/1000).toFixed(0)}k</text>`);
   });
 
   return `<div class="share-chart">
