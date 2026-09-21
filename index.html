@@ -661,12 +661,42 @@
     .universe2 .u2-mod { background: rgba(10,15,26,.55); border: 1px solid rgba(59,130,246,.06); border-radius: 10px; padding: 10px 8px; }
     .universe2 .u2-title { font-size: 12px; font-weight: 800; color: #60a5fa; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
     .universe2 .u2-sub { font-size: 9px; color: #4a5568; margin-bottom: 8px; }
-    .universe2 .u2-bubbles { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; min-height: 150px; }
-    .universe2 .u2-bubble { border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; cursor: pointer; position: relative; transition: transform .15s, box-shadow .15s; box-shadow: 0 2px 8px rgba(0,0,0,.35); text-shadow: 0 1px 2px rgba(0,0,0,.6); }
-    .universe2 .u2-bubble:hover { transform: scale(1.12); box-shadow: 0 4px 16px var(--bc); z-index: 3; }
-    .universe2 .u2-bubble .u2-tip { position: absolute; bottom: 110%; left: 50%; transform: translateX(-50%); background: #0a0f18; border: 1px solid rgba(59,130,246,.25); color: #e0e6f0; font-size: 10px; font-weight: 500; padding: 3px 8px; border-radius: 6px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .15s; z-index: 5; text-shadow: none; }
-    .universe2 .u2-bubble:hover .u2-tip { opacity: 1; }
-    .universe2 .u2-legend { font-size: 9px; color: #6b7a92; margin-top: 8px; }
+    .universe2 .u2-bubbles { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 10px; min-height: 172px; padding: 14px 6px; }
+    .universe2 .u2-bubble { border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; color: #fff; cursor: pointer; position: relative; user-select: none;
+      border: 1px solid rgba(255,255,255,.16);
+      background:
+        radial-gradient(circle at 30% 24%, rgba(255,255,255,.62), rgba(255,255,255,0) 32%),
+        radial-gradient(circle at 70% 80%, rgba(0,0,0,.5), rgba(0,0,0,0) 46%),
+        linear-gradient(150deg, color-mix(in srgb, var(--bc) 48%, #fff 52%) 0%, color-mix(in srgb, var(--bc) 78%, #fff 6%) 45%, var(--bc) 62%, color-mix(in srgb, var(--bc) 55%, #000 45%) 100%);
+      box-shadow:
+        0 9px 26px -8px color-mix(in srgb, var(--bc) 70%, transparent),
+        0 3px 9px rgba(0,0,0,.38),
+        inset 0 2px 2px rgba(255,255,255,.4),
+        inset 0 -8px 14px rgba(0,0,0,.28);
+      transition: transform .38s cubic-bezier(.34,1.56,.64,1), box-shadow .38s ease;
+      will-change: transform; }
+    .universe2 .u2-bubble::before { content: ''; position: absolute; inset: 0; border-radius: 50%; pointer-events: none;
+      background: linear-gradient(120deg, rgba(255,255,255,.30), rgba(255,255,255,.04) 38%, transparent 55%); }
+    .universe2 .u2-bubble::after { content: ''; position: absolute; inset: -7px; border-radius: 50%; pointer-events: none;
+      border: 2px solid color-mix(in srgb, var(--bc) 60%, transparent);
+      filter: blur(.5px); opacity: 0; transform: scale(.82); transition: all .35s ease; }
+    .universe2 .u2-bubble:hover { transform: translateY(-5px) scale(1.16); z-index: 6;
+      box-shadow:
+        0 18px 40px -10px color-mix(in srgb, var(--bc) 85%, transparent),
+        0 5px 12px rgba(0,0,0,.42),
+        inset 0 2px 2px rgba(255,255,255,.5),
+        inset 0 -8px 16px rgba(0,0,0,.32); }
+    .universe2 .u2-bubble:hover::after { opacity: 1; transform: scale(1); }
+    .universe2 .u2-bubble:active { transform: translateY(-1px) scale(1.06); }
+    .universe2 .u2-bubble.big { animation: u2Float 4.2s ease-in-out infinite; }
+    .universe2 .u2-bubble.big:hover { animation: none; }
+    .universe2 .u2-bubble .u2-mid { line-height: 1; text-shadow: 0 1px 3px rgba(0,0,0,.55), 0 0 10px rgba(255,255,255,.28); filter: drop-shadow(0 2px 2px rgba(0,0,0,.25)); }
+    .universe2 .u2-bubble .u2-lbl { max-width: 68px; font-size: 8px; font-weight: 700; letter-spacing: 1px; line-height: 1; color: rgba(255,255,255,.92); text-shadow: 0 1px 2px rgba(0,0,0,.6); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    @keyframes u2Float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-4px); } }
+    @media (prefers-reduced-motion: reduce) { .universe2 .u2-bubble.big { animation: none; } .universe2 .u2-bubble { transition: none; } }
+    .universe2 .u2-bubble .u2-tip { position: absolute; bottom: 112%; left: 50%; transform: translateX(-50%); background: rgba(10,15,24,.92); backdrop-filter: blur(4px); border: 1px solid color-mix(in srgb, var(--bc) 55%, transparent); color: #e0e6f0; font-size: 10px; font-weight: 500; padding: 3px 9px; border-radius: 7px; white-space: nowrap; opacity: 0; pointer-events: none; transition: opacity .18s ease, transform .18s ease; z-index: 12; text-shadow: none; transform: translateX(-50%) translateY(3px); }
+    .universe2 .u2-bubble:hover .u2-tip { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .universe2 .u2-legend { font-size: 9px; color: #6b7a92; margin-top: 10px; }
 
     .u2-metrics { background: linear-gradient(135deg,#0f1a2e,#141e34); border: 1px solid rgba(59,130,246,.1); border-radius: 12px; padding: 14px 18px; margin-bottom: 16px; }
     .u2-metrics .um-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 10px; }
@@ -2579,10 +2609,14 @@ function u2BubbleHTML(b, mod) {
   const r = 14 + Math.sqrt(m.share) * 9; // 气泡半径 ∝ 业绩份额
   const color = U2_COLOR[b] || '#3b82f6';
   const emoji = U2_EMOJI[b] || '🏷️';
-  const label = b.replace('咖啡', '').replace('天好', '').replace('中国', '');
+  const grade = m.share >= 8 ? ' class="big"' : '';
   const tip = `${b} · 份额 ${m.share}% · 门店 ${(m.stores/1000).toFixed(1)}k`;
-  return `<div class="u2-bubble" style="width:${r*2}px;height:${r*2}px;background:radial-gradient(circle at 32% 28%, ${color}cc, ${color});--bc:${color};font-size:${Math.max(9, r*0.55)}px;" onclick="showBrandMetric('${b}')" title="">
-    <span class="u2-tip">${tip}</span>${emoji}
+  const emojiSize = `${Math.max(10, r * 0.58)}px`;
+  const lbl = b.replace('咖啡', '').replace('天好', '').replace('中国', '').slice(0, 5);
+  return `<div class="u2-bubble${grade}" style="--bc:${color};width:${r*2}px;height:${r*2}px;" onclick="showBrandMetric('${b}')">
+    <span class="u2-tip">${tip}</span>
+    <span class="u2-mid" style="font-size:${emojiSize}">${emoji}</span>
+    <span class="u2-lbl">${lbl}</span>
   </div>`;
 }
 function buildBrandUniverse2() {
