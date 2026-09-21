@@ -733,14 +733,9 @@
     .share-chart svg text { font-family: "SimHei","STHeiti","Heiti SC","Microsoft YaHei",Arial,sans-serif; }
     .share-chart .sc-bubble { cursor: pointer; transition: opacity .15s; }
     #chartTip { position: fixed; z-index: 1200; background: rgba(13,20,34,.94); color: #e0e6f0; border: 1px solid rgba(96,165,250,.35); border-radius: 8px; padding: 7px 10px; font-size: 11px; line-height: 1.5; pointer-events: none; transform: translate(-50%,-100%); box-shadow: 0 6px 20px rgba(0,0,0,.35); white-space: nowrap; display: none; }
-    .sc-mini-wrap { display: flex; gap: 10px; margin-top: 10px; align-items: stretch; }
-    .sc-mini { background: #0c1220; border: 1px solid rgba(59,130,246,.08); border-radius: 8px; padding: 4px; flex: 1; }
-    .sc-mini svg { width: 100%; height: auto; display: block; }
-    .sc-mini-ysvg { flex: 0 0 60px; }
-    .sc-brush-sel { fill: rgba(59,130,246,.14); stroke: #3b82f6; stroke-width: 1; stroke-dasharray: 4 3; pointer-events: none; }
-    .sc-mini .lab { font-size: 9px; color: #6b7a92; padding: 2px 6px; }
-    .sc-mini-xaxis { cursor: crosshair; }
-    .sc-mini-yaxis { cursor: ns-resize; }
+    .sc-xbar { background: #0c1220; border: 1px solid rgba(59,130,246,.08); border-radius: 8px; padding: 4px 4px 2px; margin-top: 8px; }
+    .sc-xbar svg { width: 100%; height: auto; display: block; }
+    .sc-xbar .lab { font-size: 9px; color: #6b7a92; padding: 3px 6px 1px; }
 
     /* ── Timeline ── */
     .tl-wrap { position: relative; padding: 0 0 0 20px; }
@@ -2749,9 +2744,9 @@ function buildShareChartModule() {
   const xMax = 30; // 份额轴 0–30%
   const yMax = Math.ceil(Math.max.apply(null, storesAll) * 1.1 / 1000) * 1000;
   const z = _scZoom;
-  const x0 = z ? z.x0 : 0, x1 = z ? z.x1 : xMax, y0 = z ? z.y0 : 0, y1 = z ? z.y1 : yMax;
+  const x0 = z ? z.x0 : 0, x1 = z ? z.x1 : xMax;
   const xScale = v => L + (R - L) * ((v - x0) / (x1 - x0));
-  const yScale = v => B - (B - T) * ((v - y0) / (y1 - y0));
+  const yScale = v => B - (B - T) * (v / yMax);
   const avgShare = 20, avgStores = Math.round(storesAll.reduce((s, n) => s + n, 0) / storesAll.length);
   const vis = brands.filter(b => _chartMode === 'all' || (_chartMode === 'coffee' ? !isQsr(b) : isQsr(b)));
   const majors = brands.filter(b => BRAND_METRICS[b].share >= 1).sort((a, b) => BRAND_METRICS[b].share - BRAND_METRICS[a].share);
@@ -2766,8 +2761,8 @@ function buildShareChartModule() {
     parts.push(`<line x1="${x}" y1="${T}" x2="${x}" y2="${B}" stroke="rgba(96,165,250,.09)" stroke-width="1" stroke-dasharray="4 4"/>`);
     parts.push(`<text x="${x}" y="${B+16}" text-anchor="middle" font-size="11" fill="#6b7a92">${t}%</text>`);
   }
-  const yTick = (z && x1 - x0 < 10) ? 2000 : 10000;
-  for (let t = Math.ceil(y0 / yTick) * yTick; t <= y1; t += yTick) {
+  const yTick = 10000;
+  for (let t = 0; t <= yMax; t += yTick) {
     const y = yScale(t);
     parts.push(`<line x1="${L}" y1="${y}" x2="${R}" y2="${y}" stroke="rgba(96,165,250,.09)" stroke-width="1" stroke-dasharray="4 4"/>`);
     parts.push(`<text x="${L-8}" y="${y+4}" text-anchor="end" font-size="11" fill="#6b7a92">${(t/1000).toFixed(0)}k</text>`);
@@ -2783,7 +2778,7 @@ function buildShareChartModule() {
     parts.push(`<line x1="${vx}" y1="${T}" x2="${vx}" y2="${B}" stroke="#7f8ea0" stroke-width="1" stroke-dasharray="6 3 1 3"/>`);
     parts.push(`<text x="${vx+4}" y="${T+12}" font-size="9" fill="#8b9aa8">行业均值 ${avgShare}%</text>`);
   }
-  if (avgStores >= y0 && avgStores <= y1) {
+  if (avgStores >= 0 && avgStores <= yMax) {
     const hy = yScale(avgStores);
     parts.push(`<line x1="${L}" y1="${hy}" x2="${R}" y2="${hy}" stroke="#7f8ea0" stroke-width="1" stroke-dasharray="6 3 1 3"/>`);
     parts.push(`<text x="${R-4}" y="${hy-5}" text-anchor="end" font-size="9" fill="#8b9aa8">行业均值 ${(avgStores/1000).toFixed(0)}k 家</text>`);
@@ -2836,88 +2831,88 @@ function buildShareChartModule() {
       <span style="margin-left:auto;font-size:10px;color:#6b7a92;">X：市场份额 · Y：门店数 · 半径∝门店规模 · 拖动下方缩略轴可放大查看小气泡 · 点击气泡看详情</span>
     </div>
     <div class="sc-box"><svg viewBox="0 0 ${W} ${H}" width="100%" height="auto">${parts.join('')}</svg></div>
-    ${buildMiniAxes(L, R, T, B, xMax, yMax)}
+    ${buildXBar(L, R, xMax)}
   </div>
   <div id="brandMetricPanel"></div>`;
 }
 let _scZoom = null;
-let _miniDrag = null;
+let _xDrag = null;
 function scResetZoom() { _scZoom = null; buildFeaturedAndRender(); }
-function buildMiniAxes(L, R, T, B, xMax, yMax) {
-  // 纵横缩略轴（minimap）：全量域小散点 + 框选放大
-  const mw = 676, mh = 150, mL = 44, mR = 630, mT = 12, mB = 132;
-  const mpx = v => mL + (mR - mL) * (v / xMax);
-  const mpy = v => mB - (mB - mT) * (v / yMax);
-  const bits = [];
-  bits.push(`<rect x="${mL}" y="${mT}" width="${mR-mL}" height="${mB-mT}" fill="rgba(96,165,250,.045)" stroke="rgba(96,165,250,.14)"/>`);
-  Object.keys(BRAND_METRICS).forEach(b => {
-    const m = BRAND_METRICS[b];
-    const fill = m.share >= 1 ? (U2_COLOR[b] || '#3b82f6') : '#6b7280';
-    bits.push(`<circle cx="${mpx(m.share).toFixed(1)}" cy="${mpy(m.stores).toFixed(1)}" r="3" fill="${fill}" fill-opacity="0.7" stroke="${scDarken(fill,0.85)}" stroke-width="0.4" onmouseenter="chartTipShow('${b}',event)" onmousemove="chartTipMove(event)" onmouseleave="chartTipHide()"/>`);
-  });
-  // 刻度
+// 横轴下方可拖动的缩放条（内嵌，无独立模块）
+function buildXBar(L, R, xMax) {
+  const bw = R - L, bx = _scZoom || { x0: 0, x1: xMax };
+  const px0 = L + (bw * bx.x0) / xMax, px1 = L + (bw * bx.x1) / xMax;
+  const ticks = [];
   for (let t = 0; t <= xMax; t += 10) {
-    bits.push(`<line x1="${mpx(t).toFixed(1)}" y1="${mB}" x2="${mpx(t).toFixed(1)}" y2="${mB+6}" stroke="#64748b"/>`);
-    bits.push(`<text x="${mpx(t).toFixed(1)}" y="${mB+18}" text-anchor="middle" font-size="9" fill="#6b7a92">${t}%</text>`);
+    const x = L + (bw * t) / xMax;
+    ticks.push(`<line x1="${x.toFixed(1)}" y1="18" x2="${x.toFixed(1)}" y2="22" stroke="#4a5a74"/><text x="${x.toFixed(1)}" y="40" text-anchor="middle" font-size="9" fill="#6b7a92">${t}%</text>`);
   }
-  const yTicks = [0, 30000, 60000].filter(v => v <= yMax);
-  yTicks.forEach(t => {
-    bits.push(`<line x1="${mL-6}" y1="${mpy(t).toFixed(1)}" x2="${mL}" y2="${mpy(t).toFixed(1)}" stroke="#64748b"/>`);
-    bits.push(`<text x="${mL-9}" y="${mpy(t).toFixed(1)+3}" text-anchor="end" font-size="9" fill="#6b7a92">${(t/1000).toFixed(0)}k</text>`);
-  });
-  // 当前缩放窗口
-  if (_scZoom) {
-    const zx0 = mpx(_scZoom.x0), zx1 = mpx(_scZoom.x1), zy0 = mpy(_scZoom.y1), zy1 = mpy(_scZoom.y0);
-    bits.push(`<rect class="sc-brush-sel" x="${zx0}" y="${zy0}" width="${zx1-zx0}" height="${zy1-zy0}"/>`);
-  }
-  bits.push(`<rect id="scMiniSel" class="sc-brush-sel" x="0" y="0" width="0" height="0"/>`);
-  return `<div class="sc-mini-wrap">
-    <div class="sc-mini"><svg id="scMiniWrap" viewBox="0 0 ${mw} ${mh}" onmousedown="scMiniDown(event)" onmousemove="scMiniMove(event)" onmouseup="scMiniUp(event)" style="touch-action:none;cursor:crosshair;">${bits.join('')}</svg>
-      <div class="lab">🔍 缩略轴：所有品牌在小图上分布 · 拖动框选可放大查看密集区</div>
-    </div>
+  return `<div class="sc-xbar">
+    <svg id="scXBar" viewBox="0 0 960 52" width="100%" height="auto" style="cursor:crosshair;display:block;">
+      <rect x="${L}" y="14" width="${bw}" height="10" rx="5" fill="rgba(59,130,246,.10)" stroke="rgba(59,130,246,.25)"/>
+      <rect id="scXSel" x="${px0.toFixed(1)}" y="12" width="${Math.max(px1-px0,6).toFixed(1)}" height="14" rx="7" fill="rgba(59,130,246,.35)" stroke="#3b82f6" stroke-width="1"/>
+      ${ticks.join('')}
+      <text x="24" y="30" font-size="9" fill="#6b7a92">◄► 拖动选择范围</text>
+    </svg>
+    <div class="lab">拖动下方滑条即可放大 X 轴查看小份额气泡；双击空处或「⟲ 重置缩放」恢复全部</div>
   </div>`;
 }
-function scMiniNom(ev) {
-  const svg = document.getElementById('scMiniWrap');
+function scXNom(ev) {
+  const svg = document.getElementById('scXBar');
   if (!svg) return null;
   const r = svg.getBoundingClientRect();
-  return { x: (ev.clientX - r.left) / r.width * 676, y: (ev.clientY - r.top) / r.height * 150 };
+  return (ev.clientX - r.left) / r.width * 960;
 }
-function scMiniDown(ev) {
-  const p = scMiniNom(ev); if (!p) return;
-  _miniDrag = { sx: p.x, sy: p.y, x: p.x, y: p.y };
-  scMiniDraw(p.x, p.y);
+function scXDown(ev) {
+  const x = scXNom(ev); if (x == null) return;
+  const L = 100, R = 776, xMax = 30;
+  const cx = Math.max(L, Math.min(R, x));
+  const z = _scZoom || { x0: 0, x1: xMax };
+  const selL = L + (R - L) * z.x0 / xMax, selR = L + (R - L) * z.x1 / xMax;
+  _xDrag = (cx >= selL - 3 && cx <= selR + 3) ? { mode: 'move', start: cx, base: selL, width: selR - selL } : { mode: 'new', start: cx, x0: cx, x1: cx };
+  scXDraw(cx);
   if (ev.preventDefault) ev.preventDefault();
 }
-function scMiniMove(ev) {
-  if (!_miniDrag) return;
-  const p = scMiniNom(ev); if (!p) return;
-  _miniDrag.x = p.x; _miniDrag.y = p.y;
-  scMiniDraw(p.x, p.y);
+function scXMove(ev) {
+  if (!_xDrag) return;
+  const x = scXNom(ev); if (x == null) return;
+  const L = 100, R = 776;
+  const cx = Math.max(L, Math.min(R, x));
+  if (_xDrag.mode === 'move') {
+    let nl = Math.max(L, _xDrag.base + (cx - _xDrag.start));
+    let nr = Math.min(R, nl + _xDrag.width);
+    nl = Math.max(L, nr - _xDrag.width);
+    scXDraw(nl, nr);
+  } else {
+    scXDraw(Math.min(_xDrag.start, cx), Math.max(_xDrag.start, cx));
+  }
+  scXDrawCursor();
 }
-function scMiniUp(ev) {
-  if (!_miniDrag) return;
-  const d = _miniDrag; _miniDrag = null;
-  const sel = document.getElementById('scMiniSel');
-  if (sel) { sel.setAttribute('width', 0); sel.setAttribute('height', 0); }
-  const a = Math.min(d.sx, d.x), b = Math.max(d.sx, d.x);
-  const c = Math.min(d.sy, d.y), e = Math.max(d.sy, d.y);
-  const xMax = 30, yMax = Math.ceil(Math.max.apply(null, Object.keys(BRAND_METRICS).map(n => BRAND_METRICS[n].stores)) * 1.1 / 1000) * 1000;
-  const x0 = Math.max(0, (a - 44) / 586 * xMax);
-  const x1 = Math.min(xMax, (b - 44) / 586 * xMax);
-  const y1 = Math.min(yMax, (132 - c) / 120 * yMax);
-  const y0 = Math.max(0, (132 - e) / 120 * yMax);
-  if (x1 - x0 < 0.5 || y1 - y0 < 500 || (x0 <= 0.01 && x1 >= xMax - 0.01)) { _scZoom = null; }
-  else { _scZoom = { x0, x1, y0, y1 }; }
+function scXUp(ev) {
+  if (!_xDrag) return;
+  const d = _xDrag; _xDrag = null;
+  const L = 100, R = 776, xMax = 30;
+  const sel = document.getElementById('scXSel');
+  const sl = parseInt(sel.getAttribute('x'), 10), sr = sl + parseInt(sel.getAttribute('width'), 10);
+  if (d.mode === 'new') {
+    const a = sl, b = sr;
+    const x0 = Math.max(0, (a - L) / (R - L) * xMax);
+    const x1 = Math.min(xMax, (b - L) / (R - L) * xMax);
+    if (x1 - x0 < 0.5) { _scZoom = null; sel.setAttribute('x', L); sel.setAttribute('width', R - L); }
+    else _scZoom = { x0, x1 };
+  } else {
+    const x0 = Math.max(0, (sl - L) / (R - L) * xMax);
+    const x1 = Math.min(xMax, (sr - L) / (R - L) * xMax);
+    _scZoom = { x0, x1 };
+  }
   buildFeaturedAndRender();
 }
-function scMiniDraw(x, y) {
-  const sel = document.getElementById('scMiniSel'); if (!sel) return;
-  const a = Math.min(_miniDrag.sx, x), b = Math.max(_miniDrag.sx, x);
-  const c = Math.min(_miniDrag.sy, y), e = Math.max(_miniDrag.sy, y);
-  sel.setAttribute('x', a); sel.setAttribute('y', c);
-  sel.setAttribute('width', b - a); sel.setAttribute('height', e - c);
+function scXDraw(a, b) {
+  const sel = document.getElementById('scXSel'); if (!sel) return;
+  if (typeof a === 'number' && typeof b === 'number') { sel.setAttribute('x', a); sel.setAttribute('width', Math.max(b - a, 6)); }
+  else { sel.setAttribute('x', a); sel.setAttribute('width', 6); }
 }
+function scXDrawCursor() {}
 function initChartTip() { if (!document.getElementById('chartTip')) { const d = document.createElement('div'); d.id = 'chartTip'; document.body.appendChild(d); } }
 
 const PAGE_BUILDERS = {
