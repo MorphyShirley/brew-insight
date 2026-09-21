@@ -733,13 +733,11 @@
     .share-chart svg text { font-family: "SimHei","STHeiti","Heiti SC","Microsoft YaHei",Arial,sans-serif; }
     .share-chart .sc-bubble { cursor: pointer; transition: opacity .15s; }
     #chartTip { position: fixed; z-index: 1200; background: rgba(13,20,34,.94); color: #e0e6f0; border: 1px solid rgba(96,165,250,.35); border-radius: 8px; padding: 7px 10px; font-size: 11px; line-height: 1.5; pointer-events: none; transform: translate(-50%,-100%); box-shadow: 0 6px 20px rgba(0,0,0,.35); white-space: nowrap; display: none; }
-    .sc-xbar { background: #0c1220; border: 1px solid rgba(59,130,246,.08); border-radius: 8px; padding: 10px 14px 6px; margin-top: 8px; touch-action: none; }
-    .sc-xbar .sc-xtrack { position: relative; height: 16px; background: rgba(59,130,246,.08); border: 1px solid rgba(59,130,246,.22); border-radius: 10px; cursor: crosshair; }
-    .sc-xbar .sc-xfill { position: absolute; top: 0; bottom: 0; left: 0; width: 100%; background: rgba(59,130,246,.32); border-radius: 10px; cursor: grab; }
-    .sc-xbar .sc-xthumb { position: absolute; top: -4px; width: 12px; height: 22px; margin-left: -6px; background: linear-gradient(180deg,#60a5fa,#3b82f6); border: 1px solid #93c5fd; border-radius: 6px; cursor: ew-resize; z-index: 2; box-shadow: 0 1px 4px rgba(0,0,0,.4); }
-    .sc-xbar .sc-xthumb:hover { transform: scaleY(1.15); }
-    .sc-xbar .sc-xtick { display: flex; justify-content: space-between; font-size: 9px; color: #6b7a92; padding: 3px 8px 0; }
-    .sc-xbar .lab { font-size: 9px; color: #6b7a92; padding: 4px 6px 2px; }
+    .sc-zoomctl { background: #0c1220; border: 1px solid rgba(59,130,246,.08); border-radius: 8px; padding: 10px 14px 8px; margin-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+    .sc-zoomctl .zc-item { display: flex; align-items: center; gap: 12px; }
+    .sc-zoomctl .zc-k { flex: 0 0 132px; font-size: 10px; color: #93c5fd; }
+    .sc-zoomctl input[type=range] { flex: 1; accent-color: #3b82f6; cursor: pointer; height: 22px; }
+    .sc-zoomctl .zc-note { font-size: 9px; color: #6b7a92; }
 
     /* ── Timeline ── */
     .tl-wrap { position: relative; padding: 0 0 0 20px; }
@@ -2742,6 +2740,18 @@ function chartTipMove(ev) {
 }
 function chartTipHide() { const el = document.getElementById('chartTip'); if (el) el.style.display = 'none'; }
 function buildShareChartModule() {
+  return `<div class="share-chart">
+    <div class="sc-controls">
+      ${['all','coffee','qsr'].map(m => `<span class="sc-seg ${_chartMode===m?'active':''}" onclick="switchChartMode('${m}')">${scModeName(m)}</span>`).join('')}
+      ${_scZoom ? '<span class="sc-seg" style="color:#fbbf24;border-color:#fbbf24;" onclick="scResetZoom()">⟲ 重置缩放</span>' : ''}
+      <span style="margin-left:auto;font-size:10px;color:#6b7a92;">X：市场份额 · Y：门店数 · 半径∝门店规模 · 点击气泡看详情</span>
+    </div>
+    <div class="sc-box"><svg id="scMainSvg" viewBox="0 0 960 660" width="100%" height="auto">${scSvgBody()}</svg></div>
+    ${buildZoomWidget()}
+  </div>
+  <div id="brandMetricPanel"></div>`;
+}
+function scSvgBody() {
   const W = 960, H = 660, L = 100, R = 776, T = 100, B = 572;
   const brands = Object.keys(BRAND_METRICS);
   const storesAll = brands.map(b => BRAND_METRICS[b].stores);
@@ -2827,93 +2837,42 @@ function buildShareChartModule() {
     parts.push(`<circle cx="${cx2}" cy="${cy2}" r="${rr.toFixed(1)}" fill="rgba(148,163,184,.28)" fill-opacity="0.6" stroke="#64748b" stroke-width="0.5"/>`);
     parts.push(`<text x="${cx2}" y="${cy2+rr+11}" text-anchor="middle" font-size="9" fill="#6b7a92">${(st/1000).toFixed(0)}k</text>`);
   });
-
-  return `<div class="share-chart">
-    <div class="sc-controls">
-      ${['all','coffee','qsr'].map(m => `<span class="sc-seg ${_chartMode===m?'active':''}" onclick="switchChartMode('${m}')">${scModeName(m)}</span>`).join('')}
-      ${z ? '<span class="sc-seg" style="color:#fbbf24;border-color:#fbbf24;" onclick="scResetZoom()">⟲ 重置缩放</span>' : ''}
-      <span style="margin-left:auto;font-size:10px;color:#6b7a92;">X：市场份额 · Y：门店数 · 半径∝门店规模 · 拖动下方缩略轴可放大查看小气泡 · 点击气泡看详情</span>
-    </div>
-    <div class="sc-box"><svg viewBox="0 0 ${W} ${H}" width="100%" height="auto">${parts.join('')}</svg></div>
-    ${buildXBar(L, R, xMax)}
-  </div>
-  <div id="brandMetricPanel"></div>`;
+return parts.join('');
 }
+function buildZoomWidget() {
+  const z = _scZoom || { x0: 0, x1: 30 };
+  const w = Math.round((z.x1 - z.x0) * 10) / 10;
+  const c = Math.round(((z.x0 + z.x1) / 2) * 10) / 10;
+  return `<div class="sc-zoomctl">
+    <div class="zc-item"><span class="zc-k">◆ 窗口位置（中心份额）</span><input id="scZoomPos" type="range" min="0" max="30" step="0.5" value="${c}" oninput="scSlide()" ${w >= 29.5 ? 'disabled' : ''}></div>
+    <div class="zc-item"><span class="zc-k">◄► 缩放（窗口宽度 %）</span><input id="scZoomW" type="range" min="2" max="30" step="0.5" value="${w}" oninput="scSlide()"></div>
+    <div class="zc-note"><b id="scZoomLabel"></b> · 拖动上方滑块即可放大查看任意份额区间的小气泡</div>
+  </div>`;
+}
+function scSlide() {
+  const ww = document.getElementById('scZoomW'); if (!ww) return;
+  const wp = document.getElementById('scZoomPos');
+  let w = +ww.value, c = wp ? (+wp.value) : 15;
+  if (w >= 29.5) { _scZoom = null; }
+  else {
+    let x0 = Math.max(0, c - w / 2), x1 = x0 + w;
+    if (x1 > 30) { x1 = 30; x0 = x1 - w; }
+    _scZoom = { x0: Math.max(0, x0), x1 };
+  }
+  const lbl = document.getElementById('scZoomLabel');
+  if (lbl) lbl.textContent = _scZoom ? ('查看 ' + Math.round(_scZoom.x0*10)/10 + '% – ' + Math.round(_scZoom.x1*10)/10 + '%') : '查看 0% – 30% 全量';
+  if (wp) wp.disabled = !_scZoom;
+  scRefreshChart();
+}
+function scRefreshChart() {
+  const el = document.getElementById('scMainSvg');
+  if (el) el.innerHTML = scSvgBody();
+}
+
 let _scZoom = null;
 let _xDrag = null;
 function scResetZoom() { _scZoom = null; buildFeaturedAndRender(); }
 // 横轴下方可拖动的缩放条（内嵌，无独立模块）
-function buildXBar(L, R, xMax) {
-  const z = _scZoom || { x0: 0, x1: xMax };
-  const l = (z.x0 / xMax) * 100, w = ((z.x1 - z.x0) / xMax) * 100;
-  const maxP = 100 - w;
-  const leftThumb = (l / maxP) * 100, rightThumb = 100;
-  return `<div class="sc-xbar" id="scXBarWrap" style="user-select:none;-webkit-user-select:none;" onpointerdown="scPDown(event)" onpointermove="scPMove(event)" onpointerup="scPUp(event)" onpointercancel="scPUp(event)">
-    <div class="sc-xtack">
-      <div class="sc-xtrack">
-        <div class="sc-xfill" id="scXFill" style="left:${l.toFixed(1)}%;width:${w.toFixed(1)}%;"></div>
-        <div class="sc-xthumb" id="scXL" data-side="l" style="left:${l.toFixed(1)}%;"></div>
-        <div class="sc-xthumb" id="scXR" data-side="r" style="left:${(l + w).toFixed(1)}%;"></div>
-      </div>
-      <div class="sc-xtick"><span>0%</span><span>10%</span><span>20%</span><span>30%</span></div>
-    </div>
-    <div class="lab">◄► 拖两端手柄调整区间 · 拖蓝色区间平移 · 空白处直接拉出选区 · 「⟲ 重置缩放」恢复全部</div>
-  </div>`;
-}
-let _pDrag = null;
-function scPData() {
-  const tr = document.getElementById('scXTrack');
-  if (!tr || !tr.getBoundingClientRect) return null;
-  const r = tr.getBoundingClientRect();
-  if (!r.width) return null;
-  return r;
-}
-function scPPct(ev) { const r = scPData(); if (!r) return null; const p = (ev.clientX - r.left) / r.width * 100; return Math.max(0, Math.min(100, p)); }
-function scPSet(l, w) {
-  const f = document.getElementById('scXFill'), L = document.getElementById('scXL'), R = document.getElementById('scXR');
-  if (f) { f.style.left = l.toFixed(2) + '%'; f.style.width = w.toFixed(2) + '%'; }
-  if (L) L.style.left = 'calc(' + l.toFixed(2) + '%)';
-  if (R) R.style.left = 'calc(' + (l + w).toFixed(2) + '%)';
-}
-function scPDown(ev) {
-  const pct = scPPct(ev); if (pct == null) return;
-  const z = _scZoom || { x0: 0, x1: 30 };
-  const l = (z.x0 / 30) * 100, w = ((z.x1 - z.x0) / 30) * 100;
-  const t = ev.target;
-  let mode = null;
-  if (t && t.classList) {
-    if (t.classList.contains('sc-xthumb')) mode = t.dataset.side === 'l' ? 'l' : 'r';
-    else if (t.classList.contains('sc-xfill')) mode = 'move';
-  }
-  if (!mode) mode = 'new';
-  _pDrag = { mode, baseL: l, baseW: w, startPct: pct };
-  if (ev.currentTarget && ev.currentTarget.setPointerCapture) { try { ev.currentTarget.setPointerCapture(ev.pointerId); } catch (e) {} }
-  scPApply(pct);
-  if (ev.preventDefault) ev.preventDefault();
-}
-function scPMove(ev) {
-  if (!_pDrag) return;
-  const pct = scPPct(ev); if (pct == null) return;
-  scPApply(pct);
-}
-function scPApply(pct) {
-  const d = _pDrag; let l = d.baseL, w = d.baseW;
-  if (d.mode === 'new') { l = Math.min(d.startPct, pct); w = Math.max(2, Math.abs(pct - d.startPct)); }
-  else if (d.mode === 'l') { l = Math.max(0, Math.min(pct, d.baseL + d.baseW - 2)); w = d.baseL + d.baseW - l; }
-  else if (d.mode === 'r') { l = d.baseL; w = Math.max(2, Math.min(100 - l, pct - l)); }
-  else { const dx = pct - d.startPct; l = Math.max(0, Math.min(100 - d.baseW, d.baseL + dx)); w = d.baseW; }
-  scPSet(l, w);
-  d.cur = { l, w };
-}
-function scPUp(ev) {
-  if (!_pDrag) return;
-  const d = _pDrag; const c = d.cur || { l: d.baseL, w: d.baseW }; _pDrag = null;
-  const x0 = 30 * (c.l / 100), x1 = 30 * ((c.l + c.w) / 100);
-  if (d.mode === 'new' && c.w < 1) { _scZoom = null; }
-  else { _scZoom = { x0: Math.max(0, x0), x1: Math.min(30, x1) }; }
-  if (ev.currentTarget && ev.currentTarget.releasePointerCapture) { try { ev.currentTarget.releasePointerCapture(ev.pointerId); } catch (e) {} }
-  setTimeout(buildFeaturedAndRender, 0);
-}
 function initChartTip() { if (!document.getElementById('chartTip')) { const d = document.createElement('div'); d.id = 'chartTip'; document.body.appendChild(d); } }
 
 const PAGE_BUILDERS = {
