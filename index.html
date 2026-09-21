@@ -2848,13 +2848,13 @@ function buildXBar(L, R, xMax) {
     ticks.push(`<line x1="${x.toFixed(1)}" y1="18" x2="${x.toFixed(1)}" y2="22" stroke="#4a5a74"/><text x="${x.toFixed(1)}" y="40" text-anchor="middle" font-size="9" fill="#6b7a92">${t}%</text>`);
   }
   return `<div class="sc-xbar">
-    <svg id="scXBar" viewBox="0 0 960 52" width="100%" height="auto" style="cursor:crosshair;display:block;">
+    <svg id="scXBar" viewBox="0 0 960 52" width="100%" height="auto" style="cursor:crosshair;display:block;-webkit-user-select:none;user-select:none;" onmousedown="scXDown(event)" onmousemove="scXMove(event)" onmouseup="scXUp(event)">
       <rect x="${L}" y="14" width="${bw}" height="10" rx="5" fill="rgba(59,130,246,.10)" stroke="rgba(59,130,246,.25)"/>
       <rect id="scXSel" x="${px0.toFixed(1)}" y="12" width="${Math.max(px1-px0,6).toFixed(1)}" height="14" rx="7" fill="rgba(59,130,246,.35)" stroke="#3b82f6" stroke-width="1"/>
       ${ticks.join('')}
       <text x="24" y="30" font-size="9" fill="#6b7a92">◄► 拖动选择范围</text>
     </svg>
-    <div class="lab">拖动下方滑条即可放大 X 轴查看小份额气泡；双击空处或「⟲ 重置缩放」恢复全部</div>
+    <div class="lab">横轴缩放条：拖动空白处拉出选区放大 · 拖动蓝色选区平移 · 单击 / 「⟲ 重置缩放」恢复全部</div>
   </div>`;
 }
 function scXNom(ev) {
@@ -2871,6 +2871,8 @@ function scXDown(ev) {
   const selL = L + (R - L) * z.x0 / xMax, selR = L + (R - L) * z.x1 / xMax;
   _xDrag = (cx >= selL - 3 && cx <= selR + 3) ? { mode: 'move', start: cx, base: selL, width: selR - selL } : { mode: 'new', start: cx, x0: cx, x1: cx };
   scXDraw(cx);
+  window.addEventListener('mousemove', scXMove);
+  window.addEventListener('mouseup', scXUp);
   if (ev.preventDefault) ev.preventDefault();
 }
 function scXMove(ev) {
@@ -2891,6 +2893,8 @@ function scXMove(ev) {
 function scXUp(ev) {
   if (!_xDrag) return;
   const d = _xDrag; _xDrag = null;
+  window.removeEventListener('mousemove', scXMove);
+  window.removeEventListener('mouseup', scXUp);
   const L = 100, R = 776, xMax = 30;
   const sel = document.getElementById('scXSel');
   const sl = parseInt(sel.getAttribute('x'), 10), sr = sl + parseInt(sel.getAttribute('width'), 10);
