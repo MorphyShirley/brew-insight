@@ -2744,7 +2744,8 @@ function closeCityModal() {
 }
 function openMethodModal() {
   const base = BRAND_MARKET_BASE;
-  const majors = Object.keys(BRAND_METRICS).slice().sort((a, b) => BRAND_SOURCES[b] ? (BRAND_SOURCES[b].share || 0) - (BRAND_SOURCES[a].share || 0) : -1);
+  const shareOf = b => (BRAND_SOURCES[b] && BRAND_SOURCES[b].share) || 0;
+  const majors = Object.keys(BRAND_METRICS).slice().sort((a, b) => shareOf(b) - shareOf(a));
   const rows = majors.slice(0, 12).map(b => {
     const s = brandSrc(b);
     const mark = TYPE_MARK[s.type] || '▲';
