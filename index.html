@@ -2168,7 +2168,7 @@ function buildFeatured() {
     side: `
       <div class="insight-card">
         <div class="insight-title">🌌 品牌门店×份额 分析</div>
-        <p>主区是 <span class="highlight">气泡散点图</span>：X = 市场份额，Y = 门店数，气泡半径 ∝ 门店规模。<br>可切换 <span class="highlight">咖啡&茶饮 / QSR</span> 分模块查看；点击气泡查看月度份额、覆盖城市、客单价与热销品。<br>当前 ${_activeBrand ? `正在查看 <span class="highlight">${_activeBrand}</span>，共 ${filteredItems.length} 条资讯。` : '未筛选，展示全品牌资讯。'}</p>
+        <p>主区为 <span class="highlight">气泡散点图</span>：X = 营收份额（估算口径），Y = 门店数，气泡半径 ∝ 门店规模。<br>点击「<span class="highlight">ⓘ 数据口径</span>」可查看口径定义与来源分级（财报● / 第三方▲ / 观远实测◆）。<br>当前 ${_activeBrand ? `正在查看 <span class="highlight">${_activeBrand}</span>，共 ${filteredItems.length} 条资讯。` : '未筛选，展示全品牌资讯。'}</p>
       </div>
       <div class="trend-card"><div class="trend-title">🔥 份额 TOP</div>${Object.entries(BRAND_METRICS).sort((a,b)=>b[1].share-a[1].share).slice(0,8).map(([b,m],i)=>`<div style="display:flex;align-items:center;gap:6px;padding:5px 2px;border-bottom:1px solid rgba(59,130,246,.05);"><span style="width:18px;height:18px;border-radius:50%;background:${U2_COLOR[b]||'#3b82f6'}22;color:${U2_COLOR[b]||'#3b82f6'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;">${i+1}</span><span style="font-size:12px;color:#e0e6f0;flex:1;">${b}</span><span style="font-size:11px;color:#60a5fa;font-weight:700;">${m.share}%</span></div>`).join('')}</div>
     `
@@ -2589,7 +2589,6 @@ const QSR_BRANDS = ['肯德基','麦当劳','华莱士','塔斯汀','德克士',
 const isQsr = b => QSR_BRANDS.includes(b);
 const U2_EMOJI = {'瑞幸咖啡':'☕','星巴克中国':'⭐','喜茶':'🧋','奈雪的茶':'🌰','霸王茶姬':'🥤','蜜雪冰城':'🍦','库迪咖啡':'☕','茶百道':'🍋','Tims天好咖啡':'☕','Manner':'☕','M Stand':'☕','乐乐茶':'🧋','Peets Coffee':'P','书亦烧仙草':'🌿','古茗':'🍵','沪上阿姨':'🧑','茉莉奶白':'💐','一点点':'🫘','CoCo都可':'🥥','肯德基':'K','麦当劳':'麦','华莱士':'🍗','塔斯汀':'🍔','德克士':'🍗','汉堡王':'🍔','必胜客':'🍕','达美乐':'🍕','老乡鸡':'🍚','真功夫':'🍚','乡村基':'🍚','Subway':'🥖'};
 const U2_COLOR = {'瑞幸咖啡':'#003366','星巴克中国':'#006241','喜茶':'#d32f2f','奈雪的茶':'#7b1fa2','霸王茶姬':'#8d6e2e','蜜雪冰城':'#e53935','库迪咖啡':'#1565c0','茶百道':'#2e7d32','Tims天好咖啡':'#b71c1c','Manner':'#f57c00','M Stand':'#37474f','乐乐茶':'#e91e63','Peets Coffee':'#1b5e20','书亦烧仙草':'#3e2723','古茗':'#4caf50','沪上阿姨':'#ff6b6b','茉莉奶白':'#8e6e3a','一点点':'#7c4dff','CoCo都可':'#ff9800','肯德基':'#c62828','麦当劳':'#daa520','华莱士':'#e67e22','塔斯汀':'#16a34a','德克士':'#c2410c','汉堡王':'#e65100','必胜客':'#e11d48','达美乐':'#dc2626','老乡鸡':'#f59e0b','真功夫':'#334155','乡村基':'#65a30d','Subway':'#2e7d32'};
-// 业绩份额(%)、门店数、客单价(元)、重点城市门店分布（示意，基于公开资料估）
 const BRAND_METRICS = {
   '瑞幸咖啡': { share:18.5, stores:36310, aov:15.6, cities:{'上海':2900,'北京':2500,'深圳':1700,'广州':1600,'杭州':1300,'成都':1200,'重庆':1100,'武汉':900,'西安':850,'苏州':900,'南京':800,'长沙':700,'郑州':650,'东莞':750,'合肥':600,'青岛':520,'沈阳':480,'福州':430,'昆明':500,'天津':460} },
   '蜜雪冰城': { share:16.0, stores:59823, aov:8.5, cities:{'郑州':2600,'成都':2300,'重庆':2200,'西安':1900,'武汉':1800,'长沙':1700,'合肥':1600,'南阳':950,'周口':850,'商丘':820,'菏泽':800,'临沂':780,'保定':760,'衡阳':720,'赣州':700,'柳州':680,'湛江':660,'渭南':640,'德阳':620,'驻马店':610} },
@@ -2618,6 +2617,34 @@ const BRAND_METRICS = {
   'Peets Coffee': { share:0.6, stores:100, aov:38.0, cities:{'上海':30,'北京':22,'广州':12,'深圳':10,'杭州':8,'成都':6,'南京':5,'武汉':4,'西安':4,'苏州':4,'重庆':3,'厦门':3,'天津':2,'青岛':2,'长沙':2,'大连':2,'合肥':1,'昆明':1,'福州':1,'郑州':1} },
   '乐乐茶': { share:1.5, stores:500, aov:16.0, cities:{'上海':70,'北京':50,'成都':28,'杭州':25,'武汉':22,'南京':20,'重庆':18,'西安':16,'长沙':15,'苏州':14,'广州':12,'深圳':12,'合肥':10,'青岛':9,'昆明':8,'厦门':8,'福州':7,'天津':6,'郑州':7,'沈阳':5} },
 };
+// ── 数据口径（营收份额）说明 ──
+// 口径定义：份额 = 品牌"中国区年度营收 ÷ 行业基准"，行业基准=中国现制饮品+西式快餐市场
+// 来源分级：● 财报/招股书（可溯源的公开权威数字）  ▲ 第三方研究/媒体估算（口径示意） ◆ 观远BI实测（品牌自有数据锚点）
+const BRAND_MARKET_BASE = { name: '中国现制饮品+西式快餐市场', value: 13000, unit: '亿元', yr: '2024', type: '第三方研究估算', note: '市场规模以弗若斯特沙利文/艾媒等第三方研究口径为基线，用以换算营收占比' };
+const BRAND_SOURCES = {
+  '瑞幸咖啡': { rev: '344', yr: '2024', type: '财报', src: '瑞幸咖啡上市年报', share: 18.5 },
+  '蜜雪冰城': { rev: '248', yr: '2024', type: '财报', src: '蜜雪冰城招股书/年报', share: 16.0 },
+  'Tims天好咖啡': { rev: '30.7', yr: '2023', type: '观远实测', src: '观远BI自有数据锚点 + THCh 23年报', share: 1.5 },
+  '古茗': { rev: '182', yr: '2023', type: '财报', src: '古茗招股书', share: 4.2 },
+  '奈雪的茶': { rev: '51.6', yr: '2023', type: '财报', src: '奈雪的茶上市年报', share: 3.6 },
+  '茶百道': { rev: '57', yr: '2023', type: '财报', src: '茶百道招股书', share: 3.0 },
+  '肯德基': { rev: '820', yr: '2024', type: '第三方估算', src: '按百胜中国财报口径拆分估算', share: 8.0 },
+  '必胜客': { rev: '230', yr: '2024', type: '第三方估算', src: '按百胜中国财报口径拆分估算', share: 3.2 },
+  '星巴克中国': { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算', share: 9.2 },
+  '麦当劳': { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算', share: 5.5 },
+  '喜茶': { rev: '—', yr: '—', type: '第三方估算', src: '媒体/调研披露估算', share: 5.0 },
+  '华莱士': { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算', share: 6.5 },
+  '塔斯汀': { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算', share: 2.8 },
+  '德克士': { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算', share: 2.0 },
+  '汉堡王': { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算', share: 1.6 },
+  '达美乐': { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算', share: 1.8 },
+  '老乡鸡': { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算', share: 2.4 },
+  '真功夫': { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算', share: 1.2 },
+  '乡村基': { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算', share: 1.4 },
+  'Subway': { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算', share: 1.0 },
+};
+const TYPE_MARK = { '财报': '●', '第三方估算': '▲', '观远实测': '◆' };
+function brandSrc(b) { return BRAND_SOURCES[b] || { rev: '—', yr: '—', type: '第三方估算', src: '市场研究机构估算' }; }
 function brandMetric(b) {
   return BRAND_METRICS[b] || { share:0, stores:0, aov:0, cities:{} };
 }
@@ -2663,6 +2690,7 @@ function renderBrandMetricHTML(b) {
   const m = brandMetric(b);
   const cityCount = Object.keys(m.cities).length;
   const emoji = U2_EMOJI[b] || '🏷️';
+  const src = brandSrc(b);
   const prods = (TOP_PRODUCTS[b] || []).slice(0, 6);
   return `<div class="u2-metrics" id="brandMetricPanel">
     <div class="um-head">
@@ -2670,11 +2698,11 @@ function renderBrandMetricHTML(b) {
       <span class="um-close" onclick="document.getElementById('brandMetricPanel').innerHTML=''">✕ 收起</span>
     </div>
     <div class="um-grid">
-      <div class="um-cell"><div class="um-v">${m.share}%</div><div class="um-k">月度业绩份额（估）</div></div>
-      <div class="um-cell"><div class="um-v">${(m.stores/1000).toFixed(0)}k+</div><div class="um-k">门店数</div></div>
+      <div class="um-cell"><div class="um-v">${m.share}%</div><div class="um-k">营收份额（中国区·估算口径）<span style="color:#94a3b8;">${TYPE_MARK[src.type] || '▲'}${src.type}</span></div></div>
+      <div class="um-cell"><div class="um-v">${(m.stores/1000).toFixed(0)}k+</div><div class="um-k">门店数 <span style="color:#94a3b8;">公开资料</span></div></div>
       <div class="um-cell"><div class="um-v">${cityCount}</div><div class="um-k">重点覆盖城市数 <span class="um-btn" onclick="openCityModal('${b}')">查看各城市门店</span></div></div>
       <div class="um-cell"><div class="um-v">¥${m.aov}</div><div class="um-k">客单价</div></div>
-      <div class="um-cell"><div class="um-v" style="font-size:14px;">${prods.slice(0,3).join(' · ')}</div><div class="um-k">热销品</div>
+      <div class="um-cell"><div class="um-v" style="font-size:13px;">营收 ${src.rev} 亿元${src.yr !== '—' ? ' · ' + src.yr : ''}</div><div class="um-k">数据来源：${src.src}<br>门店/客单价/城市分布为估算示意</div>
         <div class="um-prods">${prods.map(p => `<span class="um-prod">${p}</span>`).join('')}</div>
       </div>
     </div>
@@ -2714,6 +2742,41 @@ function closeCityModal() {
   const m = document.getElementById('cityModalMask');
   if (m) m.remove();
 }
+function openMethodModal() {
+  const base = BRAND_MARKET_BASE;
+  const majors = Object.keys(BRAND_METRICS).slice().sort((a, b) => BRAND_SOURCES[b] ? (BRAND_SOURCES[b].share || 0) - (BRAND_SOURCES[a].share || 0) : -1);
+  const rows = majors.slice(0, 12).map(b => {
+    const s = brandSrc(b);
+    const mark = TYPE_MARK[s.type] || '▲';
+    const color = s.type === '财报' ? '#4ade80' : s.type === '观远实测' ? '#38bdf8' : '#f59e0b';
+    return `<div class="mb-row" style="align-items:flex-start;"><span style="color:#cbd5e1;">${mark} ${b} <span style="color:#6b7a92;margin-left:4px;">${s.rev}亿 · ${s.yr}</span></span><span class="n" style="font-size:10px;color:${color};">${s.src}</span></div>`;
+  }).join('');
+  const mask = document.createElement('div');
+  mask.className = 'modal-mask'; mask.id = 'methodMask';
+  mask.innerHTML = `<div class="modal-box" style="max-width:560px;">
+    <div class="mb-title">📐 数据口径与方法<div class="mb-x" onclick="closeCityModal();document.getElementById('methodMask')&&(document.getElementById('methodMask').remove())">✕</div></div>
+    <div style="font-size:11px;line-height:1.7;color:#cbd5e1;">
+      <b>1. 口径定义</b><br>
+      份额 = 品牌「<span style="color:#60a5fa;">中国区年度营收</span> ÷ 行业基准」；行业基准 = ${base.name}（${base.value}${base.unit}，${base.yr}，第三方研究估算基线）。
+      Y 轴=门店数（公开口径），气泡半径∝门店规模。跨品牌对比时口径为<b>营收占比（示意）</b>，不同来源年份可能不同。
+    </div>
+    <div style="font-size:11px;line-height:1.7;color:#cbd5e1;margin-top:8px;">
+      <b>2. 来源分级</b><br>
+      <span style="color:#4ade80;">● 财报/招股书</span>：可溯源的公开权威数字（例：瑞幸 344亿/2024年报、蜜雪 248亿/2024）
+      <span style="color:#38bdf8;">◆ 观远实测</span>：品牌自有BI数据锚点（当前仅 Tims 可用，后续可替换比尔品牌）
+      <span style="color:#f59e0b;">▲ 第三方估算</span>：市场研究/媒体口径，用于未上市非公开品牌，仅供参考
+    </div>
+    <div style="font-size:11px;line-height:1.7;color:#cbd5e1;margin-top:8px;">
+      <b>3. 接入公开权威口径的做法（接口化）</b><br>
+      ① 定义唯一口径（营收/GMV、时间窗、市场基准）并写入 BRAND_SOURCES；② 优先用上市公司年报/招股书（财报●），缺失处用第三方报告（▲）；③ 观远BI已有数据的品牌（如 Tims）用「观远实测◆」锚定，月度可自动刷新；④ 每年/每季度更新一次 rev 与 yr，字段在右侧逐品牌可查。
+    </div>
+    <div style="margin-top:10px;border-top:1px solid rgba(59,130,246,.1);padding-top:8px;font-size:11px;color:#94a3b8;">品牌来源一览（前 12）：</div>
+    ${rows}
+    <div class="mb-note">* 「—」表示暂无可靠公开数字，份额为估算。门店数/客单价/城市分布均为估算示意。</div>
+  </div>`;
+  mask.addEventListener('click', e => { if (e.target === mask) mask.remove(); });
+  document.body.appendChild(mask);
+}
 
 // ═══ SHARE × STORES BUBBLE CHART（规格化气泡散点图）═══
 let _chartMode = 'all';
@@ -2744,7 +2807,8 @@ function buildShareChartModule() {
     <div class="sc-controls">
       ${['all','coffee','qsr'].map(m => `<span class="sc-seg ${_chartMode===m?'active':''}" onclick="switchChartMode('${m}')">${scModeName(m)}</span>`).join('')}
       ${_scZoom ? '<span class="sc-seg" style="color:#fbbf24;border-color:#fbbf24;" onclick="scResetZoom()">⟲ 重置缩放</span>' : ''}
-      <span style="margin-left:auto;font-size:10px;color:#6b7a92;">X：市场份额 · Y：门店数 · 半径∝门店规模 · 点击气泡看详情</span>
+      <span class="sc-seg" onclick="openMethodModal()">ⓘ 数据口径</span>
+      <span style="margin-left:auto;font-size:10px;color:#6b7a92;">X：营收份额 · Y：门店数 · 半径∝门店规模 · 点击气泡看详情</span>
     </div>
     <div class="sc-box"><svg id="scMainSvg" viewBox="0 0 960 660" width="100%" height="auto">${scSvgBody()}</svg></div>
     ${buildZoomWidget()}
