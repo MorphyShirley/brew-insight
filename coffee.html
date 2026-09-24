@@ -2170,7 +2170,7 @@ function buildFeatured() {
         <div class="insight-title">🌌 品牌门店×份额 分析</div>
         <p>主区为 <span class="highlight">气泡散点图</span>：X = 营收份额（估算口径），Y = 门店数，气泡半径 ∝ 门店规模。<br>点击「<span class="highlight">ⓘ 数据口径</span>」可查看口径定义与来源分级（财报● / 第三方▲ / 观远实测◆）。<br>当前 ${_activeBrand ? `正在查看 <span class="highlight">${_activeBrand}</span>，共 ${filteredItems.length} 条资讯。` : '未筛选，展示全品牌资讯。'}</p>
       </div>
-      <div class="trend-card"><div class="trend-title">🔥 份额 TOP</div>${Object.entries(BRAND_METRICS).sort((a,b)=>b[1].share-a[1].share).slice(0,8).map(([b,m],i)=>`<div style="display:flex;align-items:center;gap:6px;padding:5px 2px;border-bottom:1px solid rgba(59,130,246,.05);"><span style="width:18px;height:18px;border-radius:50%;background:${U2_COLOR[b]||'#3b82f6'}22;color:${U2_COLOR[b]||'#3b82f6'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;">${i+1}</span><span style="font-size:12px;color:#e0e6f0;flex:1;">${b}</span><span style="font-size:11px;color:#60a5fa;font-weight:700;">${m.share}%</span></div>`).join('')}</div>
+      ${shareTopList()}
     `
   };
 }
@@ -2939,6 +2939,29 @@ let _xDrag = null;
 function scResetZoom() { _scZoom = null; buildFeaturedAndRender(); }
 // 横轴下方可拖动的缩放条（内嵌，无独立模块）
 function initChartTip() { if (!document.getElementById('chartTip')) { const d = document.createElement('div'); d.id = 'chartTip'; document.body.appendChild(d); } }
+
+let _shareTopPage = 0;
+function shareTopList() {
+  const all = Object.entries(BRAND_METRICS).sort((a, b) => b[1].share - a[1].share);
+  const size = 8;
+  const pages = Math.max(1, Math.ceil(all.length / size));
+  if (_shareTopPage > pages - 1) _shareTopPage = 0;
+  const start = _shareTopPage * size;
+  const rows = all.slice(start, start + size);
+  return `<div class="trend-card">
+    <div class="trend-title">🔥 份额 TOP <span style="font-size:10px;font-weight:400;color:#6b7a92;">全部 ${all.length} 品牌 · 点击行看详情</span></div>
+    ${rows.map(([b, m], i) => `<div style="display:flex;align-items:center;gap:6px;padding:5px 2px;border-bottom:1px solid rgba(59,130,246,.05);cursor:pointer;" onclick="showBrandMetric('${b}')" title="查看 ${b} 详情">
+      <span style="width:18px;height:18px;border-radius:50%;background:${U2_COLOR[b]||'#3b82f6'}22;color:${U2_COLOR[b]||'#3b82f6'};display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;flex-shrink:0;">${start + i + 1}</span>
+      <span style="font-size:12px;color:#e0e6f0;flex:1;">${b}</span>
+      <span style="font-size:11px;color:#60a5fa;font-weight:700;">${m.share}%</span>
+    </div>`).join('')}
+    <div style="display:flex;align-items:center;justify-content:space-between;padding-top:6px;font-size:10px;color:#6b7a92;">
+      ${_shareTopPage > 0 ? '<span style="cursor:pointer;color:#60a5fa;" onclick="_shareTopPage--;buildFeaturedAndRender()">‹ 上一页</span>' : '<span style="opacity:.35">‹ 上一页</span>'}
+      <span>${_shareTopPage + 1} / ${pages}</span>
+      ${_shareTopPage < pages - 1 ? '<span style="cursor:pointer;color:#60a5fa;" onclick="_shareTopPage++;buildFeaturedAndRender()">下一页 ›</span>' : '<span style="opacity:.35">下一页 ›</span>'}
+    </div>
+  </div>`;
+}
 
 const PAGE_BUILDERS = {
   featured: buildFeatured,
