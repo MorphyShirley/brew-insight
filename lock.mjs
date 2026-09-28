@@ -42,6 +42,8 @@ js = js.replace(/if \(!AUTH\.enabled \|\| sessionStorage\.getItem\('brew_auth'\)
 js = js.trimEnd() + '\nappMain();\n';
 
 const payload = JSON.stringify({ body: appHTML, js });
+// 收集源码全部样式（含 App 布局/主题），合入登录壳保证解锁后正常渲染
+const styles = (src.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).join('\n');
 const salt = webcrypto.getRandomValues(new Uint8Array(16));
 const iv = webcrypto.getRandomValues(new Uint8Array(12));
 const keyBits = await deriveKey(PASSWORD, salt);
@@ -62,18 +64,8 @@ const shell = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>饮力情报局</title>
 <style>
-  html,body{margin:0;background:#0a0f18;height:100%;}
-  #loginMask{position:fixed;inset:0;z-index:2000;background:radial-gradient(1200px 600px at 50% -10%,#16233c,#0a0f18 60%);display:flex;align-items:center;justify-content:center;}
-  .lg-box{width:min(92vw,360px);background:#0e1526;border:1px solid rgba(59,130,246,.25);border-radius:14px;padding:28px 26px 22px;box-shadow:0 20px 60px rgba(0,0,0,.5);}
-  .lg-box .lg-logo{font-size:26px;text-align:center;}
-  .lg-box .lg-title{font-size:16px;font-weight:800;color:#e0e6f0;text-align:center;margin:8px 0 2px;}
-  .lg-box .lg-sub{font-size:11px;color:#6b7a92;text-align:center;margin-bottom:18px;}
-  .lg-box input{width:100%;box-sizing:border-box;background:#0a1220;border:1px solid rgba(59,130,246,.18);color:#e0e6f0;border-radius:8px;padding:10px 12px;font-size:13px;margin-bottom:12px;outline:none;}
-  .lg-box input:focus{border-color:#3b82f6;}
-  .lg-box .lg-btn{width:100%;background:linear-gradient(135deg,#3b82f6,#2563eb);color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:700;cursor:pointer;}
-  .lg-box .lg-btn:hover{filter:brightness(1.08);}
-  .lg-box .lg-err{color:#f87171;font-size:11px;margin-top:8px;min-height:14px;}
-  .lg-box .lg-hint{font-size:10px;color:#4a5568;text-align:center;margin-top:12px;}
+${styles}
+#loginMask{display:flex !important;}
 </style>
 </head>
 <body>
