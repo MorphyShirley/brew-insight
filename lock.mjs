@@ -63,10 +63,8 @@ const shell = `<!DOCTYPE html>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>饮力情报局</title>
-<style>
 ${styles}
-#loginMask{display:flex;z-index:2000;}
-</style>
+<style>#loginMask{display:flex;z-index:2000;}</style>
 </head>
 <body>
 <div id="loginMask">
