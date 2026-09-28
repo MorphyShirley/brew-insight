@@ -1041,8 +1041,35 @@
     ::-webkit-scrollbar-thumb { background: rgba(59,130,246,.15); border-radius: 3px; }
     ::-webkit-scrollbar-thumb:hover { background: rgba(59,130,246,.25); }
   </style>
+  <style>
+    /* ── 登录门禁 ── */
+    #loginMask { position: fixed; inset: 0; z-index: 2000; background: radial-gradient(1200px 600px at 50% -10%, #16233c, #0a0f18 60%); display: none; align-items: center; justify-content: center; }
+    .lg-box { width: min(92vw, 360px); background: #0e1526; border: 1px solid rgba(59,130,246,.25); border-radius: 14px; padding: 28px 26px 22px; box-shadow: 0 20px 60px rgba(0,0,0,.5); }
+    .lg-box .lg-logo { font-size: 26px; text-align: center; }
+    .lg-box .lg-title { font-size: 16px; font-weight: 800; color: #e0e6f0; text-align: center; margin: 8px 0 2px; }
+    .lg-box .lg-sub { font-size: 11px; color: #6b7a92; text-align: center; margin-bottom: 18px; }
+    .lg-box input { width: 100%; box-sizing: border-box; background: #0a1220; border: 1px solid rgba(59,130,246,.18); color: #e0e6f0; border-radius: 8px; padding: 10px 12px; font-size: 13px; margin-bottom: 12px; outline: none; }
+    .lg-box input:focus { border-color: #3b82f6; }
+    .lg-box .lg-btn { width: 100%; background: linear-gradient(135deg,#3b82f6,#2563eb); color: #fff; border: none; border-radius: 8px; padding: 11px; font-size: 14px; font-weight: 700; cursor: pointer; }
+    .lg-box .lg-btn:hover { filter: brightness(1.08); }
+    .lg-box .lg-err { color: #f87171; font-size: 11px; margin-top: 8px; min-height: 14px; }
+    .lg-box .lg-hint { font-size: 10px; color: #4a5568; text-align: center; margin-top: 12px; }
+  </style>
 </head>
 <body>
+
+<div id="loginMask">
+  <form class="lg-box" onsubmit="onLogin(event)" autocomplete="off">
+    <div class="lg-logo">☕</div>
+    <div class="lg-title">饮力情报局</div>
+    <div class="lg-sub">请输入账号密码登录查看</div>
+    <input id="lgUser" type="text" placeholder="账号" autocomplete="username" required>
+    <input id="lgPass" type="password" placeholder="密码" autocomplete="current-password" required>
+    <button class="lg-btn" type="submit">登 录</button>
+    <div class="lg-err" id="lgErr"></div>
+    <div class="lg-hint">内部情报站 · 凭据不落盘，离线校验</div>
+  </form>
+</div>
 
 <div class="app">
 
@@ -1078,6 +1105,7 @@
           <div style="font-size:11px;color:#6b7a92;">品牌分析师</div>
         </div>
       </div>
+      <div style="text-align:center;font-size:11px;color:#64748b;cursor:pointer;margin-top:8px;" onclick="logout()">退出登录</div>
     </div>
   </aside>
 
@@ -1164,6 +1192,33 @@
 </div>
 
 <script>
+// ═══ AUTH ═══
+const AUTH = { enabled: true,
+  userHash: '5a2dc66616e9f5c666362e6374c245853a8bbe084a378700085b91e007bc1488',
+  passHash: '5f291e764b3dfde97ed9009c686ef0ef5857b38dfaccbba475012efee5203539' };
+async function sha256(s) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+function showLogin() { const m = document.getElementById('loginMask'); if (m) m.style.display = 'flex'; }
+function hideLogin() { const m = document.getElementById('loginMask'); if (m) m.style.display = 'none'; }
+async function onLogin(ev) {
+  ev.preventDefault();
+  const u = (document.getElementById('lgUser').value || '').trim();
+  const p = document.getElementById('lgPass').value || '';
+  const err = document.getElementById('lgErr');
+  const uh = await sha256(u), ph = await sha256(p);
+  if (uh === AUTH.userHash && ph === AUTH.passHash) {
+    sessionStorage.setItem('brew_auth', '1');
+    hideLogin();
+    boot();
+  } else {
+    err.textContent = '账号或密码错误，请重试';
+    document.getElementById('lgPass').value = '';
+  }
+}
+function logout() { sessionStorage.removeItem('brew_auth'); location.reload(); }
+function boot() { switchPage('featured'); initChartTip(); }
 // ═══ PRODUCT ANALYSIS DATA ═══
 const PRODUCT_ANALYSIS = {
   '柠打·九窨茉王（喜茶）': {
@@ -3799,8 +3854,8 @@ const searchItems = [];
 Object.entries(PRODUCT_ANALYSIS).forEach(([k,v]) => searchItems.push({type:'product',label:k, brand:v.brand, date:v.date, key:k}));
 CARDS.forEach(c => searchItems.push({type:'news',label:c.title, brand:c.brand, time:c.time, key:c.id, tags:c.tags}));
 
-switchPage('featured');
-initChartTip();
+if (!AUTH.enabled || sessionStorage.getItem('brew_auth') === '1') { boot(); }
+else { showLogin(); }
 
 // Resize handler for scatter chart
 let resizeTimer;
