@@ -65,7 +65,7 @@ const shell = `<!DOCTYPE html>
 <title>饮力情报局</title>
 <style>
 ${styles}
-#loginMask{display:flex !important;}
+#loginMask{display:flex;z-index:2000;}
 </style>
 </head>
 <body>
