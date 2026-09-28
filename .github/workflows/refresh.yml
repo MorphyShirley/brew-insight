@@ -11,9 +11,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: 同步 index.html
+      - name: 同步 index.html（加密构建）
         run: |
-          cp coffee.html index.html
+          node lock.mjs
           git config user.name "brew-insight-bot"
           git config user.email "bot@brew-insight.com"
           git add index.html

@@ -20,11 +20,11 @@ jobs:
         run: |
           pip install lunardate
           python cal_fetch.py
-      - name: 同步部署
+      - name: 同步部署（加密构建）
         run: |
           git config user.name "brew-insight-bot"
           git config user.email "bot@brew-insight.com"
-          cp coffee.html index.html
+          node lock.mjs
           git add coffee.html index.html
           git diff --cached --quiet || {
             git commit -m "📅 营销节点自动刷新 $(date +'%Y-%m-%d')"

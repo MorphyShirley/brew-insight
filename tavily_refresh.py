@@ -419,7 +419,11 @@ def main():
             subprocess.run([sys.executable, os.path.join(repo, 'cal_fetch.py')], cwd=repo, check=True)
         except Exception as e:
             print(f"ℹ️  营销节点未更新（不影响部署）: {str(e)[:80]}")
-        shutil.copyfile(html_path, os.path.join(repo, 'index.html'))
+        try:
+            subprocess.run(['node', os.path.join(repo, 'lock.mjs')], cwd=repo, check=True)
+        except Exception as e:
+            print(f"ℹ️  内容加密生成失败，回退直接复制: {str(e)[:80]}")
+            shutil.copyfile(html_path, os.path.join(repo, 'index.html'))
         now = datetime.now().strftime('%Y-%m-%d %H:%M')
         subprocess.run(['git', 'add', 'coffee.html', 'index.html'], cwd=repo, check=True)
         changed = subprocess.run(['git', 'diff', '--cached', '--quiet'], cwd=repo).returncode != 0
