@@ -99,45 +99,45 @@ async function deriveKey(pass){
   const km=await crypto.subtle.importKey('raw', ENC.encode(pass), 'PBKDF2', false, ['deriveBits']);
   return crypto.subtle.deriveBits({name:'PBKDF2', hash:'SHA-256', salt:b64ToU8(LOCK.s), iterations:150000}, km, 256);
 }
-async function unlock(pass){
-  const keyBits=await deriveKey(pass);
-  const key=await crypto.subtle.importKey('raw', keyBits, {name:'AES-GCM'}, false, ['decrypt']);
-  const pt=await crypto.subtle.decrypt({name:'AES-GCM', iv:b64ToU8(LOCK.iv)}, key, b64ToU8(LOCK.ct));
-  return JSON.parse(DEC.decode(pt));
-}
 async function onLogin(ev){
   ev.preventDefault();
   const u=(document.getElementById('lgUser').value||'').trim();
   const p=document.getElementById('lgPass').value||'';
   const err=document.getElementById('lgErr');
   err.textContent='解密中…';
+  if (!window.isSecureContext){ err.textContent='当前非安全环境(非HTTPS)，WebCrypto不可用，请用 https 访问'; return; }
   if ((await sha256(u))!==LOCK.user || (await sha256(p))!==LOCK.pass){ err.textContent='账号或密码错误，请重试'; return; }
-  try {
-    const keyBits=await deriveKey(p);
-    sessionStorage.setItem('brew_key', bufToB64(keyBits));
-    await injectData(keyBits);
-    sessionStorage.setItem('brew_auth','1');
-    document.getElementById('loginMask').style.display='none';
-    err.textContent='';
-  } catch(e){ err.textContent='密码正确但解密失败，请刷新重试'; }
+  let keyBits;
+  try { keyBits=await deriveKey(p); }
+  catch(e){ err.textContent='密钥派生失败：'+e.message; return; }
+  let data;
+  try { data=await decryptData(keyBits); }
+  catch(e){ err.textContent='解密失败：'+e.message; return; }
+  try { injectData(data); }
+  catch(e){ console.error(e); err.textContent='内容渲染失败，请刷新重试：'+e.message; return; }
+  try { sessionStorage.setItem('brew_key', bufToB64(keyBits)); sessionStorage.setItem('brew_auth','1'); } catch(e){}
+  document.getElementById('loginMask').style.display='none';
+  err.textContent='';
 }
 function bufToB64(u8){ let s=''; for(const c of u8) s+=String.fromCharCode(c); return btoa(s); }
-async function injectData(keyBits){
+async function decryptData(keyBits){
   const key=await crypto.subtle.importKey('raw', keyBits, {name:'AES-GCM'}, false, ['decrypt']);
   const pt=await crypto.subtle.decrypt({name:'AES-GCM', iv:b64ToU8(LOCK.iv)}, key, b64ToU8(LOCK.ct));
-  const data=JSON.parse(DEC.decode(pt));
+  return JSON.parse(DEC.decode(pt));
+}
+function injectData(data){
   document.getElementById('appRoot').innerHTML=data.body;
   const s=document.createElement('script'); s.textContent=data.js; document.body.appendChild(s);
   appMain();
 }
 function appMain(){ try{ switchPage('featured'); initChartTip(); }catch(e){ console.error(e); } }
-function logout(){ sessionStorage.removeItem('brew_auth'); sessionStorage.removeItem('brew_key'); location.reload(); }
+function logout(){ try{ sessionStorage.removeItem('brew_auth'); sessionStorage.removeItem('brew_key'); }catch(e){} location.reload(); }
 // 本会话已解锁过（存有派生密钥，非密码明文），刷新后自动解密
 (async function(){
   const k=sessionStorage.getItem('brew_key');
   if (k) {
-    try{ await injectData(b64ToU8(k)); document.getElementById('loginMask').style.display='none'; }
-    catch(e){ sessionStorage.removeItem('brew_key'); sessionStorage.removeItem('brew_auth'); }
+    try{ injectData(await decryptData(b64ToU8(k))); document.getElementById('loginMask').style.display='none'; }
+    catch(e){ try{ sessionStorage.removeItem('brew_key'); sessionStorage.removeItem('brew_auth'); }catch(e){} }
   }
 })();
 </script>
