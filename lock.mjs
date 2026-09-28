@@ -108,8 +108,8 @@ async function onLogin(ev){
   try { injectData(data); }
   catch(e){ console.error(e); err.textContent='内容渲染失败，请刷新重试：'+e.message; return; }
   try { sessionStorage.setItem('brew_key', bufToB64(keyBits)); sessionStorage.setItem('brew_auth','1'); } catch(e){}
-  document.getElementById('loginMask').style.display='none';
   err.textContent='';
+  dismissMask();
 }
 function bufToB64(u8){ let s=''; for(const c of u8) s+=String.fromCharCode(c); return btoa(s); }
 async function decryptData(keyBits){
@@ -122,13 +122,22 @@ function injectData(data){
   const s=document.createElement('script'); s.textContent=data.js; document.body.appendChild(s);
   appMain();
 }
-function appMain(){ try{ switchPage('featured'); initChartTip(); }catch(e){ console.error(e); } }
+function dismissMask(){
+  const m=document.getElementById('loginMask');
+  if (!m) return;
+  m.style.setProperty('display','none','important');
+  m.hidden=true;
+  try { m.remove(); } catch(e){}
+}
+function appMain(){ try{ switchPage('featured'); initChartTip(); }catch(e){ showBadge('appMain: '+e.message); } }
 function logout(){ try{ sessionStorage.removeItem('brew_auth'); sessionStorage.removeItem('brew_key'); }catch(e){} location.reload(); }
+function showBadge(msg){ let b=document.getElementById('errBadge'); if(!b){ b=document.createElement('div'); b.id='errBadge'; b.style.cssText='position:fixed;left:10px;bottom:10px;z-index:9999;background:#7f1d1d;color:#fecaca;font-size:12px;padding:8px 12px;border-radius:8px;max-width:60vw;white-space:pre-wrap;'; document.body.appendChild(b);} b.textContent='⚠ '+msg; }
+window.addEventListener('error', function(e){ showBadge(e.message + ' @ ' + (e.filename||'').split('/').pop() + ':' + (e.lineno||'')); });
 // 本会话已解锁过（存有派生密钥，非密码明文），刷新后自动解密
 (async function(){
   const k=sessionStorage.getItem('brew_key');
   if (k) {
-    try{ injectData(await decryptData(b64ToU8(k))); document.getElementById('loginMask').style.display='none'; }
+    try{ injectData(await decryptData(b64ToU8(k))); dismissMask(); }
     catch(e){ try{ sessionStorage.removeItem('brew_key'); sessionStorage.removeItem('brew_auth'); }catch(e){} }
   }
 })();
