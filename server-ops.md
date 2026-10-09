@@ -2,6 +2,20 @@
 
 > IP: `118.196.3.71` · 登录：仅密钥 · 密钥文件：`~/.ssh/deploy_brew_ed25519`
 
+## 〇、自动化全景（哪些在自动跑）
+| 自动化 | 频率 | 载体 | 说明 |
+|---|---|---|---|
+| 资讯刷新（23 品牌） | 每 2 日 10:17 | GitHub Actions `news.yml` | 抓取→过滤去重→加密→部署；依赖 Secret `TAVILY_API_KEY` |
+| 营销节点刷新 | 每周一 11:17 | Actions `calendar.yml` | 拉 AdGuider 节点并固化 |
+| 页面加密构建 | 随上述自动 | `lock.mjs` | 源码→AES-GCM 密文 index.html |
+| Pages 自动部署 | push 即发 | GitHub Pages | 线上主站（HTTPS）|
+| 服务器每日备份 | 每天 02:30 | 服务器 crontab | 存 `/var/backups/brew-insight/`，留最近 14 份 |
+| 服务器站点同步 | **手动** `./deploy_server.sh` | 本机 | 可选后续自动化 |
+
+- Actions 页面：https://github.com/MorphyShirley/brew-insight/actions
+- 手动触发：Actions → 选工作流 → Run workflow
+- 备份日志：服务器 `/var/log/brew-backup.log`
+
 ## 一、登录（用你自己的电脑）
 ```bash
 # 直接登录
