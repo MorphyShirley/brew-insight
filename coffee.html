@@ -2443,6 +2443,8 @@ function buildFlash() {
 
 // ═══ MONTHLY CALENDAR ═══
 let _calBack = 0;
+let _calAutoDone = false;
+let _calHinted = false;
 // 咖啡品牌适配节点：类型词 + 高价值营销节日 + 饮品/茶/节日词
 const COFFEE_HOLIDAYS = ['情人节', '七夕', '中秋节', '端午', '春节', '元旦', '除夕',
   '圣诞节', '平安夜', '万圣节', '双十一', '双11', '双十二', '双12', '618',
@@ -2471,6 +2473,20 @@ function calColor(label) { return CAL_COLORS[label] || '#94a3b8'; }
 function changeCal(d) { _calBack = Math.max(0, Math.min(6, _calBack + d)); buildFeaturedAndRender(); }
 function buildMonthCalendar() {
   const now = new Date();
+  // 默认跳到最近有动态的月份（当前月仍无资讯时不显示空日历）
+  if (!_calAutoDone) {
+    const curM = now.getMonth() + 1;
+    let lm = '00';
+    for (const c of dedupCards([...CARDS])) {
+      const tm = (c.time || '').split('/')[0];
+      if (tm > lm) lm = tm;
+    }
+    if (lm && parseInt(lm, 10) < curM) {
+      _calBack = Math.max(0, curM - parseInt(lm, 10));
+      _calHinted = true;
+    }
+    _calAutoDone = true;
+  }
   const m0 = now.getMonth() - _calBack;
   const year = m0 < 0 ? now.getFullYear() - 1 : now.getFullYear();
   const mon = ((m0 % 12) + 12) % 12 + 1; // 1..12
@@ -2510,7 +2526,7 @@ function buildMonthCalendar() {
     <div class="mc-head">
       <div class="mc-nav">
         <button onclick="changeCal(1)" ${_calBack >= 6 ? 'disabled style="opacity:.35"' : ''}>‹</button>
-        <div class="mc-title">📅 月度热点日历<span class="mc-sub">${year}年${mon}月 · ${cardBrandCount(mm)} 个品牌爆点</span></div>
+        <div class="mc-title">📅 月度热点日历<span class="mc-sub">${year}年${mon}月${_calHinted ? ' · 最近有动态月份' : ''} · ${cardBrandCount(mm)} 个品牌爆点</span></div>
         <button onclick="changeCal(-1)" ${_calBack <= 0 ? 'disabled style="opacity:.35"' : ''}>›</button>
       </div>
       <div class="mc-legend">
