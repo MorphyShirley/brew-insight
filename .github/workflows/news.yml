@@ -18,7 +18,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
+      - name: 环境诊断
+        run: |
+          echo "== Secret 是否注入 =="
+          if [ -n "$TAVILY_API_KEY" ]; then echo "TAVILY_API_KEY: 已注入 (长度 ${#TAVILY_API_KEY})"; else echo "TAVILY_API_KEY: 缺失！"; fi
+          echo "== 工具版本 =="
+          python --version; node --version
+          echo "== 依赖 =="
+          pip install lunardate
       - name: 抓取资讯并自动部署（含营销节点+加密构建+提交推送）
         run: |
-          pip install lunardate
+          git config user.name "brew-insight-bot"
+          git config user.email "bot@brew-insight.com"
           python tavily_refresh.py --deploy
