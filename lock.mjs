@@ -89,7 +89,7 @@ function b64ToU8(s){ const bin=atob(s); const u=new Uint8Array(bin.length); for(
 async function sha256(s){ const buf=await crypto.subtle.digest('SHA-256', ENC.encode(s)); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
 async function deriveKey(pass){ 
   const km=await crypto.subtle.importKey('raw', ENC.encode(pass), 'PBKDF2', false, ['deriveBits']);
-  return crypto.subtle.deriveBits({name:'PBKDF2', hash:'SHA-256', salt:b64ToU8(LOCK.s), iterations:150000}, km, 256);
+  return new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2', hash:'SHA-256', salt:b64ToU8(LOCK.s), iterations:150000}, km, 256));
 }
 async function onLogin(ev){
   ev.preventDefault();
