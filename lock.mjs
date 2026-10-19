@@ -66,9 +66,17 @@ const shell = `<!DOCTYPE html>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>饮力情报局</title>
 ${styles}
-<style>#loginMask{display:flex;z-index:2000;}</style>
+<style>
+#loginMask{display:none;z-index:2000;}
+#bootSplash{position:fixed;inset:0;z-index:1900;display:flex;align-items:center;justify-content:center;background:#0a0f18;color:#6b7a92;font:13px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;transition:opacity .22s ease;}
+#bootSplash .sp{width:22px;height:22px;border:3px solid rgba(96,165,250,.22);border-top-color:#60a5fa;border-radius:50%;animation:sp .8s linear infinite;margin-right:10px;}
+@keyframes sp{to{transform:rotate(360deg)}}
+#appRoot{opacity:0;transition:opacity .28s ease;}
+#appRoot.ready{opacity:1;}
+</style>
 </head>
 <body>
+<div id="bootSplash"><span class="sp"></span>正在解密…</div>
 <div id="loginMask">
   <form class="lg-box" onsubmit="onLogin(event)" autocomplete="off">
     <div class="lg-logo">☕</div>
@@ -121,7 +129,11 @@ function injectData(data){
   document.getElementById('appRoot').innerHTML=data.body;
   const s=document.createElement('script'); s.textContent=data.js; document.body.appendChild(s);
   appMain();
+  const r=document.getElementById('appRoot'); if (r) r.classList.add('ready');
+  hideSplash();
 }
+function hideSplash(){ const s=document.getElementById('bootSplash'); if(!s) return; s.style.opacity='0'; setTimeout(()=>{ try{ s.remove(); }catch(e){} }, 240); }
+function showLoginMask(){ const m=document.getElementById('loginMask'); if(m) m.style.display='flex'; hideSplash(); }
 function dismissMask(){
   const m=document.getElementById('loginMask');
   if (!m) return;
@@ -133,12 +145,14 @@ function appMain(){ try{ switchPage('featured'); initChartTip(); }catch(e){ show
 function logout(){ try{ sessionStorage.removeItem('brew_auth'); sessionStorage.removeItem('brew_key'); }catch(e){} location.reload(); }
 function showBadge(msg){ let b=document.getElementById('errBadge'); if(!b){ b=document.createElement('div'); b.id='errBadge'; b.style.cssText='position:fixed;left:10px;bottom:10px;z-index:9999;background:#7f1d1d;color:#fecaca;font-size:12px;padding:8px 12px;border-radius:8px;max-width:60vw;white-space:pre-wrap;'; document.body.appendChild(b);} b.textContent='⚠ '+msg; }
 window.addEventListener('error', function(e){ showBadge(e.message + ' @ ' + (e.filename||'').split('/').pop() + ':' + (e.lineno||'')); });
-// 本会话已解锁过（存有派生密钥，非密码明文），刷新后自动解密
+// 有会话密钥 → 静默解密直接进内容；无 → 显示登录
 (async function(){
-  const k=sessionStorage.getItem('brew_key');
+  let k=null; try{ k=sessionStorage.getItem('brew_key'); }catch(e){}
   if (k) {
     try{ injectData(await decryptData(b64ToU8(k))); dismissMask(); }
-    catch(e){ try{ sessionStorage.removeItem('brew_key'); sessionStorage.removeItem('brew_auth'); }catch(e){} }
+    catch(e){ try{ sessionStorage.removeItem('brew_key'); sessionStorage.removeItem('brew_auth'); }catch(e){} showLoginMask(); }
+  } else {
+    showLoginMask();
   }
 })();
 </script>
