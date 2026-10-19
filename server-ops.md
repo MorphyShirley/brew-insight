@@ -43,6 +43,21 @@ cd ~/coffee-site
 ./deploy_server.sh
 ```
 
+## 三之二、填充「现有菜单」数据
+1. 编辑 `~/coffee-site/menu_data.json`，往各品牌 `items` 里加产品：
+   ```json
+   { "name":"生椰拿铁", "cat":"咖啡·拿铁", "price":16, "cup":"大杯", "temp":"冷/热", "tags":["常驻"], "note":"" }
+   ```
+2. 校验并注入 → 加密 → 上线：
+   ```bash
+   cd ~/coffee-site
+   python3 menu_build.py     # 校验 + 注入 coffee.html（打印各品牌 SKU 数）
+   node lock.mjs             # 生成加密版 index.html
+   git add -A && git commit -m "☰ 更新菜单数据" && git push
+   ./deploy_server.sh        # 如需同步云服务器
+   ```
+   （或直接把数据丢给我，我来跑）
+
 ## 四、备份站点文件（如手动）
 ```bash
 scp -i ~/.ssh/deploy_brew_ed25519 \

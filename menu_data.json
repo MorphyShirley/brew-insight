@@ -1,0 +1,21 @@
+{
+  "config": {
+    "brands": ["瑞幸咖啡", "星巴克中国", "库迪咖啡", "Manner", "M Stand", "Peets Coffee", "Tims天好咖啡", "肯悦咖啡"]
+  },
+  "brands": {
+    "瑞幸咖啡": {
+      "updated": "",
+      "source": "",
+      "items": [
+        { "name": "生椰拿铁", "cat": "咖啡·拿铁", "price": 16, "cup": "大杯", "temp": "冷/热", "tags": ["常驻"], "note": "" }
+      ]
+    },
+    "星巴克中国": { "updated": "", "source": "", "items": [] },
+    "库迪咖啡": { "updated": "", "source": "", "items": [] },
+    "Manner": { "updated": "", "source": "", "items": [] },
+    "M Stand": { "updated": "", "source": "", "items": [] },
+    "Peets Coffee": { "updated": "", "source": "", "items": [] },
+    "Tims天好咖啡": { "updated": "", "source": "", "items": [] },
+    "肯悦咖啡": { "updated": "", "source": "", "items": [] }
+  }
+}
