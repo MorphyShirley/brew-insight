@@ -44,7 +44,9 @@ js = js.trimEnd() + '\nappMain();\n';
 const payload = JSON.stringify({ body: appHTML, js });
 // 收集源码全部样式（含 App 布局/主题），合入登录壳保证解锁后正常渲染
 const styles = (src.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).join('\n');
-const salt = webcrypto.getRandomValues(new Uint8Array(16));
+// 固定盐：保证同一密码派生出的密钥跨版本稳定（刷新/重新部署后无需重复登录）。
+// IV 仍每次随机，AES-GCM 安全性不受影响。
+const salt = enc.encode('brewinsight2026!');
 const iv = webcrypto.getRandomValues(new Uint8Array(12));
 const keyBits = await deriveKey(PASSWORD, salt);
 const ct = await aesEncrypt(keyBits, iv, payload);
