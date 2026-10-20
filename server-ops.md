@@ -58,6 +58,16 @@ cd ~/coffee-site
    ```
    （或直接把数据丢给我，我来跑）
 
+## 三之三、刷新「现有菜单」数据（从菜单情报库）
+```bash
+cd ~/coffee-site
+python3 menu_import_skill.py   # 读取 ~/.workbuddy/skills/brand-menu-intel → menu_data.json
+python3 menu_build.py          # 注入 coffee.html
+node lock.mjs                  # 加密构建
+git add -A && git commit -m "☰ 更新菜单" && git push
+./deploy_server.sh             # 同步服务器
+```
+
 ## 四、备份站点文件（如手动）
 ```bash
 scp -i ~/.ssh/deploy_brew_ed25519 \
