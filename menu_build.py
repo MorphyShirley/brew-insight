@@ -21,7 +21,7 @@ import sys
 HTML = 'coffee.html'
 JSONF = 'menu_data.json'
 REQ = {'name'}
-ALLOWED = {'name', 'cat', 'price', 'cup', 'temp', 'tags', 'note'}
+ALLOWED = {'name', 'cat', 'price', 'cup', 'temp', 'tags', 'note', 'orig', 'disc', 'sales', 'mini', 'type'}
 
 
 def load():
@@ -51,8 +51,10 @@ def validate(data):
             extra = set(it) - ALLOWED
             if extra:
                 errs.append(f'{b}[{i}] 含未知字段 {sorted(extra)}')
-            if it.get('price') not in (None, '') and not isinstance(it['price'], (int, float)):
-                errs.append(f'{b}[{i}].price 应为数字')
+            for numk in ('price', 'orig', 'disc', 'sales', 'mini'):
+                v = it.get(numk)
+                if v not in (None, '') and not isinstance(v, (int, float)):
+                    errs.append(f'{b}[{i}].{numk} 应为数字')
             total += 1
     return errs, total
 
