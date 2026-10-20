@@ -3557,13 +3557,13 @@ function menuInsightSection() {
 
   return `
     <div class="minsight">
-      <div class="mic">
+      <div class="mic mspan2">
         <div class="mit">📊 价格带分布 <span class="misub">点击柱/图例可筛选${_menuBand >= 0 ? ' · 已筛 ' + bands[_menuBand].lab + '（点击取消）' : ''}</span></div>
         <div class="mband">${bands.map((x, i) => x.n ? `<i class="${_menuBand >= 0 && _menuBand !== i ? 'dim' : ''}" style="width:${(x.n/bandTotal*100).toFixed(1)}%;background:${x.color}" onclick="switchMenuBand(${i})" onmouseenter="menuBandTip(event,${i})" onmousemove="menuTipMove(event)" onmouseleave="menuTipHide()"></i>` : '').join('')}</div>
         <div class="mlegend">${bands.map((x, i) => `<span class="${_menuBand === i ? 'on' : ''}" onclick="switchMenuBand(${i})" onmouseenter="menuBandTip(event,${i})" onmousemove="menuTipMove(event)" onmouseleave="menuTipHide()"><i style="background:${x.color}"></i>${x.lab} <b>${x.n}</b></span>`).join('')}</div>
       </div>
 
-      <div class="mic">
+      <div class="mic mspan2">
         <div class="mit">🎯 价格 × 月售 <span class="misub">悬停看详情 · 点击定位产品</span></div>
         ${menuScatterSVG(items, color)}
       </div>
