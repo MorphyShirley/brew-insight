@@ -17,8 +17,10 @@ BRAND_MAP = {
     'Tims': 'Tims天好咖啡', '星巴克': '星巴克中国', '瑞幸': '瑞幸咖啡',
     'Manner': 'Manner', 'MStand': 'M Stand', '库迪': '库迪咖啡',
     'Peets': 'Peets Coffee', '肯悦': '肯悦咖啡',
+    '麦当劳': '麦当劳', '肯德基': '肯德基', '汉堡王': '汉堡王', '赛百味': '赛百味', 'Popeyes': 'Popeyes',
 }
-ORDER = ['瑞幸咖啡', '星巴克中国', '库迪咖啡', 'Manner', 'M Stand', 'Peets Coffee', 'Tims天好咖啡', '肯悦咖啡']
+ORDER = ['瑞幸咖啡', '星巴克中国', '库迪咖啡', 'Manner', 'M Stand', 'Peets Coffee', 'Tims天好咖啡', '肯悦咖啡',
+         '麦当劳', '肯德基', '汉堡王', '赛百味', 'Popeyes']
 
 NOISE = re.compile(r'^(月售[\d.]+\+?|近期[\d.]+人?\+?下单|已售[\d.]*|下单|￥[\d.]+)$')
 
@@ -118,7 +120,7 @@ def build():
     data = {'config': {'brands': ORDER}, 'brands': brands}
     json.dump(data, open(OUT, 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     total = sum(len(v['items']) for v in brands.values())
-    print(f'✅ 写入 {OUT} · 8 品牌 · {total} SKU')
+    print(f'✅ 写入 {OUT} · 13 品牌 · {total} SKU')
 
 
 if __name__ == '__main__':

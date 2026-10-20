@@ -83,7 +83,7 @@ def main():
     if not marker.search(html):
         print('❌ 未找到 //@MENU_START/END 标记')
         sys.exit(1)
-    open(HTML, 'w', encoding='utf-8').write(marker.sub(block, html, count=1))
+    open(HTML, 'w', encoding='utf-8').write(marker.sub(lambda m: block, html, count=1))
     print(f'✅ 已写入 {HTML}（接着运行 node lock.mjs 生成加密版）')
 
 

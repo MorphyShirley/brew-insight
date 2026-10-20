@@ -114,7 +114,7 @@ def main():
     if not marker.search(html):
         print('❌ 未找到 //@BI_START/END 标记，请先加入占位')
         sys.exit(1)
-    new_html = marker.sub('//@BI_START\nconst BI_DATA = ' + block_json + ';\n//@BI_END', html, count=1)
+    new_html = marker.sub(lambda m: '//@BI_START\nconst BI_DATA = ' + block_json + ';\n//@BI_END', html, count=1)
     open(HTML, 'w', encoding='utf-8').write(new_html)
     print(f'✅ 已写入 {HTML}')
 
