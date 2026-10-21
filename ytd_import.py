@@ -168,7 +168,7 @@ def build():
         'brands': {
             BRAND: {
                 'meta': {
-                    'label': meta.get('label'), 'channel': meta.get('channel'),
+                    'label': meta.get('label'), 'channel': (meta.get('channel') or '外送').replace('美团', '美团&淘闪'),
                     'source': meta.get('source_file'), 'extracted': meta.get('extracted_at'),
                 },
                 'kpi': {
