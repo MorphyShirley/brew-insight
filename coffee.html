@@ -1255,7 +1255,7 @@
       <a href="#" data-page="brand-overview"><span class="icon">🏢</span>品牌概况</a>
       <a href="#" data-page="marketing-cal"><span class="icon">📅</span>营销节点</a>
       <a href="#" data-page="bi"><span class="icon">📊</span>观远看板</a>
-      <a href="#" data-page="menu"><span class="icon">☰</span>现有菜单</a>
+      <a href="#" data-page="menu"><span class="icon">☰</span>行业菜单</a>
       <a href="#" data-page="own"><span class="icon">🏠</span>本品牌菜单</a>
       <a href="#" data-page="brand" id="brandNavLink" style="display:none;"><span class="icon">🏷️</span><span id="brandNavName">品牌详情</span></a>
       <a href="#" data-page="flash"><span class="icon">⚡</span>快讯订阅</a>
@@ -1900,7 +1900,7 @@ const PAGE_META = {
   'brand-overview': { title: '🏢 品牌概况', sub: '品牌定位·价值·品类' },
   'marketing-cal': { title: '📅 营销节点', sub: '节气·节日·品牌日等营销节点日历' },
   'bi': { title: '📊 观远看板', sub: '业绩大盘 · 产品分类 · TOP20 · 竞争力与趋势' },
-  'menu': { title: '☰ 现有菜单', sub: '13 品牌双渠道菜单 · 品类与价格带' },
+  'menu': { title: '☰ 行业菜单', sub: '13 品牌双渠道菜单 · 品类与价格带' },
   'own': { title: '🏠 本品牌菜单', sub: 'Tims 外送 YTD · 档期节奏 · 生命周期 · 研发与备货建议' },
 };
 
@@ -3697,7 +3697,7 @@ function buildMenuPage() {
     content: `
       <div class="mdash">
         <div class="mdash-top">
-          <span class="mdash-title">☰ 现有菜单 · 品类情报盘</span>
+          <span class="mdash-title">☰ 行业菜单 · 品类情报盘</span>
           <div class="mdash-seg">
             ${brands.map(nm => `<span class="sg ${nm === b ? 'on' : ''}" onclick="switchMenuBrand('${nm}')">${nm.replace('咖啡', '').replace('中国', '').replace('天好', '')}</span>`).join('')}
           </div>
