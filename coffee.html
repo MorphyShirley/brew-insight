@@ -1137,6 +1137,31 @@
     .mrow:hover { background:rgba(59,130,246,.08); }
     .mrow.on .nm { color:#93c5fd; font-weight:700; }
     .mdot { transition:fill-opacity .12s; }
+    /* 本品牌菜单 */
+    .op-wrap { background:linear-gradient(160deg,#0f1a2e 0%,#0b1220 55%,#0e1727 100%); border:1px solid rgba(59,130,246,.12); border-radius:14px; padding:14px 16px 12px; max-width:100%; box-sizing:border-box; }
+    .op-adv { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; }
+    .op-adv .card { background:rgba(10,15,26,.52); border:1px solid rgba(96,165,250,.1); border-radius:12px; padding:12px 14px; min-width:0; }
+    .op-adv .card h4 { margin:0 0 8px; font-size:11px; color:#dbeafe; letter-spacing:.3px; }
+    .op-list { margin:0; padding-left:14px; font-size:10.5px; color:#c6d3e4; line-height:1.9; }
+    .op-list b { color:#93c5fd; }
+    .op-risk { font-size:10px; color:#8b9aa8; line-height:1.8; background:rgba(251,191,36,.06); border:1px solid rgba(251,191,36,.18); border-radius:10px; padding:10px 12px; margin-top:10px; }
+    .op-chart { position:relative; }
+    .op-legend { display:flex; gap:12px; flex-wrap:wrap; font-size:9px; color:#7d8ea6; margin-top:4px; }
+    .op-legend i { display:inline-block; width:8px; height:8px; border-radius:2px; margin-right:4px; }
+    .op-life { display:flex; flex-direction:column; gap:6px; }
+    .op-life .r { display:grid; grid-template-columns:96px minmax(0,1fr) 54px; gap:8px; align-items:center; font-size:10px; }
+    .op-life .bar { height:9px; background:rgba(96,165,250,.1); border-radius:5px; overflow:hidden; }
+    .op-life .bar i { display:block; height:100%; border-radius:5px; background:linear-gradient(90deg,#3b82f6,#93c5fd); }
+    .op-life .v { text-align:right; color:#93c5fd; font-variant-numeric:tabular-nums; }
+    .op-stack { display:flex; height:22px; border-radius:7px; overflow:hidden; margin:5px 0 6px; }
+    .op-stack i { display:block; height:100%; }
+    .op-seq { font-size:9.5px; color:#7d8ea6; margin-bottom:10px; }
+    .op-launch { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; }
+    .op-launch .col { min-width:0; }
+    .op-launch .it { display:flex; align-items:center; gap:6px; font-size:10px; padding:3px 0; border-bottom:1px solid rgba(96,165,250,.05); }
+    .op-launch .it .n { flex:1; color:#c6d3e4; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .op-launch .it .p { color:#93c5fd; font-variant-numeric:tabular-nums; }
+    @media (max-width: 960px) { .op-adv, .op-launch { grid-template-columns:minmax(0,1fr); } }
     .mtip { position:fixed; z-index:3000; display:none; background:rgba(8,13,22,.97); border:1px solid rgba(96,165,250,.35); color:#e8f0fb; font-size:11px; line-height:1.65; padding:8px 11px; border-radius:8px; pointer-events:none; transform:translate(-50%,-100%); white-space:nowrap; box-shadow:0 10px 30px rgba(0,0,0,.45); }
     @media (max-width: 960px) { .minsight { grid-template-columns:minmax(0,1fr); } .minsight .mspan2 { grid-column:auto; } }
 
@@ -1197,6 +1222,7 @@
       <a href="#" data-page="marketing-cal"><span class="icon">📅</span>营销节点</a>
       <a href="#" data-page="bi"><span class="icon">📊</span>观远看板</a>
       <a href="#" data-page="menu"><span class="icon">☰</span>现有菜单</a>
+      <a href="#" data-page="own"><span class="icon">🏠</span>本品牌菜单</a>
       <a href="#" data-page="brand" id="brandNavLink" style="display:none;"><span class="icon">🏷️</span><span id="brandNavName">品牌详情</span></a>
       <a href="#" data-page="flash"><span class="icon">⚡</span>快讯订阅</a>
     </nav>
@@ -1227,6 +1253,7 @@
       <a href="#" data-page="marketing-cal"><span class="mn-icon">📅</span>节点</a>
       <a href="#" data-page="bi"><span class="mn-icon">📊</span>看板</a>
       <a href="#" data-page="menu"><span class="mn-icon">☰</span>菜单</a>
+      <a href="#" data-page="own"><span class="mn-icon">🏠</span>本品牌</a>
       <a href="#" data-page="flash"><span class="mn-icon">⚡</span>快讯</a>
       <a href="#" data-page="follows"><span class="mn-icon">📌</span>关注</a>
     </div>
@@ -1839,7 +1866,8 @@ const PAGE_META = {
   'brand-overview': { title: '🏢 品牌概况', sub: '品牌定位·价值·品类' },
   'marketing-cal': { title: '📅 营销节点', sub: '节气·节日·品牌日等营销节点日历' },
   'bi': { title: '📊 观远看板', sub: '业绩大盘 · 产品分类 · TOP20 · 竞争力与趋势' },
-  'menu': { title: '☰ 现有菜单', sub: '8 大咖啡品牌在售菜单 · 品类与价格带' },
+  'menu': { title: '☰ 现有菜单', sub: '13 品牌双渠道菜单 · 品类与价格带' },
+  'own': { title: '🏠 本品牌菜单', sub: 'Tims 外送 YTD · 档期节奏 · 生命周期 · 研发与备货建议' },
 };
 
 const BRAND_LOGO = {
@@ -3721,6 +3749,173 @@ function buildMenuPage() {
   };
 }
 
+//@YTD_START
+const BRAND_YTD = {"config": {"brands": ["Tims天好咖啡"], "active": "Tims天好咖啡"}, "brands": {"Tims天好咖啡": {"meta": {"label": "2026-01-13 ~ 2026-10-16", "channel": "外送（美团）", "source": "FY26外送菜单YTD总览_20260113-20261016.xlsx", "extracted": "2026-10-21 15:07"}, "kpi": {"periods": 27, "sku": 341, "launch": 217, "baseline": 124, "alive": 153, "aliveRate": 0.4487, "avgLaunch": 12.6, "stores": 867, "cities": 80, "stdShare": 0.8085, "offTotal": 194, "changes": 29}, "periods": [{"p": "01/13", "alive": 124, "launch": 124, "ala": 90, "set": 34, "off": 0, "net": 124}, {"p": "01/20", "alive": 119, "launch": 2, "ala": 0, "set": 2, "off": 7, "net": -5}, {"p": "01/27", "alive": 130, "launch": 11, "ala": 7, "set": 4, "off": 1, "net": 10}, {"p": "03/03", "alive": 117, "launch": 0, "ala": 0, "set": 0, "off": 13, "net": -13}, {"p": "03/24", "alive": 121, "launch": 24, "ala": 9, "set": 15, "off": 20, "net": 4}, {"p": "04/09", "alive": 125, "launch": 17, "ala": 7, "set": 10, "off": 13, "net": 4}, {"p": "04/21", "alive": 121, "launch": 8, "ala": 4, "set": 4, "off": 12, "net": -4}, {"p": "05/07", "alive": 123, "launch": 13, "ala": 6, "set": 7, "off": 11, "net": 2}, {"p": "05/16", "alive": 122, "launch": 1, "ala": 0, "set": 1, "off": 2, "net": -1}, {"p": "05/26", "alive": 126, "launch": 9, "ala": 2, "set": 7, "off": 6, "net": 3}, {"p": "06/02", "alive": 116, "launch": 3, "ala": 0, "set": 3, "off": 13, "net": -10}, {"p": "06/09", "alive": 124, "launch": 10, "ala": 5, "set": 5, "off": 3, "net": 7}, {"p": "06/23", "alive": 128, "launch": 7, "ala": 3, "set": 4, "off": 3, "net": 4}, {"p": "06/30", "alive": 130, "launch": 0, "ala": 0, "set": 0, "off": 1, "net": -1}, {"p": "07/02", "alive": 122, "launch": 0, "ala": 0, "set": 0, "off": 8, "net": -8}, {"p": "07/14", "alive": 133, "launch": 17, "ala": 9, "set": 8, "off": 6, "net": 11}, {"p": "07/21", "alive": 129, "launch": 5, "ala": 0, "set": 5, "off": 9, "net": -4}, {"p": "07/28", "alive": 122, "launch": 2, "ala": 0, "set": 2, "off": 9, "net": -7}, {"p": "08/04", "alive": 130, "launch": 14, "ala": 8, "set": 6, "off": 6, "net": 8}, {"p": "08/13", "alive": 126, "launch": 1, "ala": 0, "set": 1, "off": 5, "net": -4}, {"p": "08/18", "alive": 128, "launch": 3, "ala": 1, "set": 2, "off": 1, "net": 2}, {"p": "08/25", "alive": 135, "launch": 7, "ala": 2, "set": 5, "off": 0, "net": 7}, {"p": "09/04", "alive": 136, "launch": 7, "ala": 0, "set": 7, "off": 6, "net": 1}, {"p": "09/17", "alive": 149, "launch": 24, "ala": 14, "set": 10, "off": 11, "net": 13}, {"p": "09/22", "alive": 151, "launch": 3, "ala": 0, "set": 3, "off": 1, "net": 2}, {"p": "10/09", "alive": 158, "launch": 21, "ala": 11, "set": 10, "off": 14, "net": 7}, {"p": "10/16", "alive": 153, "launch": 8, "ala": 0, "set": 8, "off": 13, "net": -5}], "structure": {"total": {"ala": 178, "set": 163, "share": 0.478}, "front": {"range": ["01/13", "05/16"], "ala": 123, "set": 77, "share": 0.385}, "back": {"range": ["08/04", "10/16"], "ala": 36, "set": 52, "share": 0.5909}}, "life": {"dist": [{"lab": "全程在售(27)", "n": 61}, {"lab": "长销(18-26)", "n": 22}, {"lab": "中期(9-17)", "n": 56}, {"lab": "短期(3-8)", "n": 130}, {"lab": "闪现(1-2)", "n": 72}], "sku": 341, "alive": 153, "dead": 188, "rate": 0.4487, "byCat": [{"cat": "咖啡", "sku": 60, "alive": 33, "rate": 0.55}, {"cat": "非咖饮品", "sku": 37, "alive": 23, "rate": 0.6216}, {"cat": "烘焙小食", "sku": 78, "alive": 46, "rate": 0.5897}, {"cat": "组合套餐", "sku": 163, "alive": 48, "rate": 0.2945}, {"cat": "加料", "sku": 3, "alive": 3, "rate": 1.0}]}, "price": {"cats": [{"cat": "咖啡", "sku": 60, "single": 58, "d5avg": 27.76, "d5med": 28, "d5range": "17–33", "d2avg": 29.43, "diff": 1.67, "pkg": 1.5}, {"cat": "非咖饮品", "sku": 37, "single": 34, "d5avg": 23.15, "d5med": 23.5, "d5range": "16–31", "d2avg": 25, "diff": 1.85, "pkg": 1.5}, {"cat": "烘焙小食", "sku": 78, "single": 78, "d5avg": 21.68, "d5med": 20.5, "d5range": "6–35", "d2avg": 22.99, "diff": 1.31, "pkg": 1.45}, {"cat": "组合套餐", "sku": 163, "single": 34, "d5avg": 45.53, "d5med": 50, "d5range": "24–60", "d2avg": 48.15, "diff": 2.62, "pkg": 2.74}, {"cat": "加料", "sku": 3, "single": 3, "d5avg": 4, "d5med": 4, "d5range": "4–4", "d2avg": 4, "diff": 0, "pkg": 0}], "high": [{"商品名称": "“淮安”辣白菜牛肉贝果堡", "D5价": 35, "D2价": 37, "类目": "烘焙小食"}, {"商品名称": "酸辣牛肉嫩蛋贝果堡", "D5价": 35, "D2价": 37, "类目": "烘焙小食"}, {"商品名称": "纽约风慢煮牛肩贝果堡", "D5价": 34, "D2价": 36, "类目": "烘焙小食"}, {"商品名称": "猛犸贝果·黑金芝士", "D5价": 34, "D2价": 36, "类目": "烘焙小食"}, {"商品名称": "大虾牛油果贝果堡", "D5价": 34, "D2价": 36, "类目": "烘焙小食"}, {"商品名称": "红提妮娜皇后葡萄加倍浓醇拿铁", "D5价": 33, "D2价": 35, "类目": "咖啡"}, {"商品名称": "慢炖猪肉流心蛋贝果堡", "D5价": 32, "D2价": 34, "类目": "烘焙小食"}, {"商品名称": "芝士云顶拿铁", "D5价": 31, "D2价": 33, "类目": "咖啡"}], "low": [{"商品名称": "彩蔬欧姆蛋", "D5价": 6, "D2价": 6, "类目": "烘焙小食"}, {"商品名称": "蒙特利尔风味小肉丸", "D5价": 6, "D2价": 6, "类目": "烘焙小食"}, {"商品名称": "香糯薯饼", "D5价": 6, "D2价": 6, "类目": "烘焙小食"}, {"商品名称": "烟熏风味烤肠", "D5价": 8, "D2价": 8, "类目": "烘焙小食"}, {"商品名称": "缤纷鲜蔬", "D5价": 9, "D2价": 9, "类目": "烘焙小食"}, {"商品名称": "泰式甜辣嫩香鸡块", "D5价": 11, "D2价": 11, "类目": "烘焙小食"}, {"商品名称": "高纤可露丽随心选", "D5价": 11, "D2价": "11–13", "类目": "烘焙小食"}, {"商品名称": "圆圆可颂", "D5价": 14, "D2价": 14, "类目": "烘焙小食"}], "changes": [{"商品名称": "芝士嫩蛋鸡肉卷", "类目": "烘焙小食", "杯型": "单品", "价格变动": "24→19", "类型": "单一价"}, {"商品名称": "芝士鸡肉可颂", "类目": "烘焙小食", "杯型": "单品", "价格变动": "23→20", "类型": "单一价"}, {"商品名称": "【应援成都蓉城】蓉城必胜能量套餐", "类目": "组合套餐", "杯型": "中杯", "价格变动": "35–51→35–53", "类型": "区间调整"}, {"商品名称": "【早8不愁】元气贝果套餐", "类目": "组合套餐", "杯型": "中杯", "价格变动": "35–46→34–46", "类型": "区间调整"}, {"商品名称": "【闭眼入】打工人可颂套餐", "类目": "组合套餐", "杯型": "中杯", "价格变动": "33–34→34", "类型": "区间调整"}, {"商品名称": "一口甜心下午茶套餐", "类目": "组合套餐", "杯型": "中杯", "价格变动": "32–47→32–42", "类型": "区间调整"}, {"商品名称": "何浩楠元气在握套餐", "类目": "组合套餐", "杯型": "中杯", "价格变动": "36–53→80–92", "类型": "区间调整"}, {"商品名称": "元气盐可颂套餐", "类目": "组合套餐", "杯型": "中杯", "价格变动": "33–34→34", "类型": "区间调整"}, {"商品名称": "元气馕香贝果套餐", "类目": "组合套餐", "杯型": "中杯", "价格变动": "36–49→36–48", "类型": "区间调整"}, {"商品名称": "多汁鸡肉贝果堡午餐盒3件套", "类目": "组合套餐", "杯型": "中杯", "价格变动": "50–65→50–68", "类型": "区间调整"}, {"商品名称": "多汁鸡肉贝果堡随心配套餐", "类目": "组合套餐", "杯型": "中杯", "价格变动": "44–64→44–67", "类型": "区间调整"}, {"商品名称": "微笑贝果随心配套餐", "类目": "组合套餐", "杯型": "中杯", "价格变动": "38–51→38–48", "类型": "区间调整"}]}, "stores": {"total": 867, "citiesCount": 80, "stdShare": 0.8085, "top5Share": 0.474, "types": [{"name": "标准店-D5", "n": 667, "share": 0.7693}, {"name": "中石化店-D5", "n": 106, "share": 0.1223}, {"name": "标准店-D2", "n": 34, "share": 0.0392}, {"name": "GO店-D5", "n": 27, "share": 0.0311}, {"name": "Express店-D5", "n": 13, "share": 0.015}, {"name": "GO店(去鲜萃)-D5", "n": 8, "share": 0.0092}], "cities": [{"name": "上海", "n": 193}, {"name": "北京", "n": 96}, {"name": "杭州", "n": 44}, {"name": "深圳", "n": 41}, {"name": "南京", "n": 37}, {"name": "苏州", "n": 37}, {"name": "广州", "n": 33}, {"name": "武汉", "n": 30}, {"name": "成都", "n": 25}, {"name": "西安", "n": 22}, {"name": "天津", "n": 19}, {"name": "宁波", "n": 18}], "modes": [{"name": "直营店", "n": 475, "share": 0.5479}, {"name": "加盟自运营", "n": 187, "share": 0.2157}, {"name": "KA加盟店", "n": 127, "share": 0.1465}, {"name": "城市加盟店", "n": 51, "share": 0.0588}, {"name": "未标注", "n": 14, "share": 0.0161}, {"name": "联营自运营", "n": 9, "share": 0.0104}, {"name": "合资", "n": 2, "share": 0.0023}, {"name": "加盟代运营", "n": 2, "share": 0.0023}, {"name": "注：本次菜单价格表对应「标准店」系列（标准店-D5 667 家 + 标准店-D2 34 家，合计 701 家，占 81%），GO 店 / Express 店 / 中石化店 / 交通枢纽店价盘未纳入本次菜单整合，仅作渠道结构参考。", "n": null, "share": null}]}, "launchRecent": [{"period": "10/16", "n": 9, "items": [{"name": "人气超值有料3件套", "type": "套餐", "cat": "组合套餐", "status": "在售", "price": "50–51"}, {"name": "元气好有料新品力荐套餐", "type": "套餐", "cat": "组合套餐", "status": "在售", "price": "27–28"}, {"name": "元气营养蛋香套餐", "type": "套餐", "cat": "组合套餐", "status": "在售", "price": "35–39"}, {"name": "大堡口福有料3件套", "type": "套餐", "cat": "组合套餐", "status": "在售", "price": 47}, {"name": "手握可颂人气套餐", "type": "套餐", "cat": "组合套餐", "status": "在售", "price": 45}, {"name": "新品拿铁4选1", "type": "套餐", "cat": "组合套餐", "status": "在售", "price": "27–28"}, {"name": "肉食主义贝果堡套餐", "type": "套餐", "cat": "组合套餐", "status": "在售", "price": "46–47"}, {"name": "高蛋白牛肉贝果堡套餐", "type": "套餐", "cat": "组合套餐", "status": "在售", "price": "48–49"}, {"name": "赵小童谷物能量套餐", "type": "套餐", "cat": "组合套餐", "status": "在售", "price": "80–93"}]}, {"period": "10/09", "n": 26, "items": [{"name": "五黑风味元气燕麦拿铁", "type": "ALA", "cat": "咖啡", "status": "在售", "price": 28}, {"name": "五黑风味元气燕麦拿铁", "type": "ALA", "cat": "咖啡", "status": "在售", "price": 31}, {"name": "紫芋风味元气燕麦拿铁", "type": "ALA", "cat": "咖啡", "status": "在售", "price": 28}, {"name": "紫芋风味元气燕麦拿铁", "type": "ALA", "cat": "咖啡", "status": "在售", "price": 31}, {"name": "高纤燕麦拿铁", "type": "ALA", "cat": "咖啡", "status": "在售", "price": 27}, {"name": "高纤燕麦拿铁", "type": "ALA", "cat": "咖啡", "status": "在售", "price": 30}, {"name": "抹茶元气燕麦拿铁", "type": "ALA", "cat": "非咖饮品", "status": "在售", "price": 28}, {"name": "抹茶元气燕麦拿铁", "type": "ALA", "cat": "非咖饮品", "status": "在售", "price": 31}, {"name": "高纤燕麦奶", "type": "ALA", "cat": "非咖饮品", "status": "在售", "price": 18}, {"name": "高纤燕麦奶", "type": "ALA", "cat": "非咖饮品", "status": "在售", "price": 21}]}], "advice": {"rnd": ["上新节奏：双周档期制、平均每档新上 12.6 个，建议保持「双周小档 + 月度大档」，大档集中 20+ SKU（参考 03/24、09/17）", "结构漂移：套餐占新上比重由前段 38% 升至后段 59%，建议继续用「咖啡+贝果/暖食」套餐拉客单，但保留约 40% ALA 满足尝鲜与复购", "生命周期：短期(3–8档) 130 款、闪现(1–2档) 72 款，合计占 59%；建议建立「爆款池」(活过9档) 并给潜力款二次档期", "价盘机会：咖啡 D5 中位 28 元、区间 17–33；烘焙小食 6–35，建议补 20–25 元咖啡带与 12–18 元小食组合", "品类侧重：非咖饮品在售率 62% 最高、咖啡 55%、烘焙 59%——烘焙汰换最快，聚焦 3–5 个核心贝果/可颂打成功率"], "supply": ["档期备货：按 27 个档期提前 2 周备料；大档（03/24、09/17）提前 3 周锁定原料与包装", "常备库存：全程在售 61 款 + 长销 22 款 = 83 款设为常备；新品首批按常规量 ≤30% 试产", "汰换预警：下架累计 194 次；对连续 2 档零动销 SKU 停补货，短期/闪现款做小批量、快清库", "价格版本：D2 比 D5 平均高 1.9 元（5–8%），打包费 1.3–2.7 元；成本核算按 D5、渠道结算按 D2，避免毛利误判", "门店差异：标准店 81%，其余 GO/Express/中石化/交通枢纽；GO 店少鲜萃、Express 精简 SKU，需分店型备货", "城市集中：Top5 城市占 47%，优先保障上海/北京/杭州/深圳/南京的冷链与小食周转"], "risk": ["YTD 价格为线上原价（D5/D2），非到手价，不可与横向快照的到手价直接比较", "163 个套餐中 129 个为区间价（组合上下限），不可当作单一价格比较", "仅覆盖标准店价盘（80.8%），全国性定价结论需注明口径", "上新存活率存在生存偏差：越早的档期经历的下架窗口越多"], "strategy": ["P0 私域价差：小程序折扣 7.71 折、有折扣 SKU 仅 29%，浅于外送 6.22 折；建议核心 20 个 SKU（拿铁/鲜萃/贝果）上线会员专享价，到手再降 2–3 元，覆盖率提至 50%+", "P0 外送常驻爆款：鲜萃黑咖月售 1000/800（到手 13.5 元）验证价格带，建议把 13.5 元鲜萃/拿铁做成常驻价或长期秒杀位，稳定外送流量", "P1 套餐标准化：套餐占比 27% 居咖啡阵营前列，但组合散落；建议固化「咖啡+贝果/小食」15/20/25 元三档常驻套餐，进外送首屏与会员专区", "P1 中端双锚：外送单品到手均价 16.9 元，两头受挤；建议 12–15 元守量、20 元+ 用贝果与季节限定拉客单", "P2 周边/联名空白：周边 SKU 为 0，竞品已用联名盲盒/礼盒做溢价；建议先小程序限定发售测款，跑通后进外送满赠"]}}}};
+//@YTD_END
+let _ownBrand = '', _ownPeriods = [];
+function switchOwnBrand(b) { _ownBrand = b; activatePage('own'); }
+function ownCurrent() {
+  const cfg = (typeof BRAND_YTD !== 'undefined' && BRAND_YTD.config) || {};
+  const brands = cfg.brands || [];
+  const b = brands.includes(_ownBrand) ? _ownBrand : (cfg.active || brands[0] || '');
+  return { brands, b, blk: (BRAND_YTD.brands || {})[b] };
+}
+function ownPeriodTip(ev, i) {
+  const r = _ownPeriods[i]; if (!r) return;
+  menuTipShow(ev, `<b style="color:#93c5fd">${r.p} 档期</b><br>在售 ${r.alive} · 新上 ${r.launch}（ALA ${r.ala} / 套餐 ${r.set}）<br>下架 ${r.off} · 净变化 ${r.net > 0 ? '+' : ''}${r.net}`);
+}
+function ownPeriodSVG(rows) {
+  _ownPeriods = rows;
+  const W = 1000, H = 250, L = 40, R = 52, T = 14, B = 34;
+  const n = rows.length;
+  const maxFlow = Math.max(10, ...rows.map(r => Math.max(r.launch, r.off)));
+  const alive = rows.map(r => r.alive);
+  const amin = Math.min(...alive), amax = Math.max(...alive);
+  const slot = (W - L - R) / n;
+  const mid = T + (H - T - B) * 0.52;
+  const yUp = v => mid - (v / maxFlow) * (mid - T) * 0.92;
+  const yDown = v => mid + (v / maxFlow) * (H - B - mid) * 0.92;
+  const yAlive = v => H - B - (H - T - B) * ((v - amin) / (amax - amin || 1));
+  const g = [];
+  for (let i = 0; i <= 3; i++) {
+    const y = T + (H - T - B) * i / 3;
+    g.push(`<line x1="${L}" y1="${y.toFixed(1)}" x2="${W-R}" y2="${y.toFixed(1)}" stroke="rgba(96,165,250,.08)" stroke-dasharray="3 4"/>`);
+    g.push(`<text x="${L-6}" y="${(y+3).toFixed(1)}" text-anchor="end" font-size="9" fill="#5b6b82">${Math.round(amax - (amax-amin)*i/3)}</text>`);
+  }
+  g.push(`<line x1="${L}" y1="${mid.toFixed(1)}" x2="${W-R}" y2="${mid.toFixed(1)}" stroke="rgba(148,163,184,.35)"/>`);
+  g.push(`<text x="${W-R+4}" y="${T+8}" font-size="9" fill="#7d8ea6">在售SKU</text>`);
+  rows.forEach((r, i) => {
+    const x = L + slot * i + slot * 0.18;
+    const w = slot * 0.64;
+    if (r.launch) g.push(`<rect x="${x.toFixed(1)}" y="${yUp(r.launch).toFixed(1)}" width="${w.toFixed(1)}" height="${(mid-yUp(r.launch)).toFixed(1)}" rx="2" fill="#4ade80" fill-opacity=".55"/>`);
+    if (r.off) g.push(`<rect x="${x.toFixed(1)}" y="${mid.toFixed(1)}" width="${w.toFixed(1)}" height="${(yDown(r.off)-mid).toFixed(1)}" rx="2" fill="#f87171" fill-opacity=".5"/>`);
+    if (i % 3 === 0 || i === n - 1) g.push(`<text x="${(L + slot*i + slot/2).toFixed(1)}" y="${H-14}" text-anchor="middle" font-size="8.5" fill="#5b6b82">${r.p}</text>`);
+    g.push(`<rect x="${(L + slot*i).toFixed(1)}" y="${T}" width="${slot.toFixed(1)}" height="${H-T-B}" fill="transparent" onmouseenter="ownPeriodTip(event,${i})" onmousemove="menuTipMove(event)" onmouseleave="menuTipHide()" style="cursor:pointer;"/>`);
+  });
+  const pts = rows.map((r, i) => `${(L + slot*i + slot/2).toFixed(1)},${yAlive(r.alive).toFixed(1)}`).join(' ');
+  g.push(`<polyline points="${pts}" fill="none" stroke="#60a5fa" stroke-width="1.6" stroke-linejoin="round"/>`);
+  rows.forEach((r, i) => g.push(`<circle cx="${(L + slot*i + slot/2).toFixed(1)}" cy="${yAlive(r.alive).toFixed(1)}" r="2.2" fill="#93c5fd" pointer-events="none"/>`));
+  return `<div class="op-chart"><svg viewBox="0 0 ${W} ${H}" width="100%" height="auto" style="display:block;">${g.join('')}</svg>
+    <div class="op-legend"><span><i style="background:#4ade80"></i>新上</span><span><i style="background:#f87171"></i>下架</span><span><i style="background:#60a5fa;border-radius:50%"></i>在售 SKU（右轴）</span></div></div>`;
+}
+function buildOwnBrandPage() {
+  const { brands, b, blk } = ownCurrent();
+  if (!blk) return { content: '<div class="hot-hero"><h2>本品牌数据未就绪，请运行 ytd_import.py</h2></div>', side: '' };
+  const k = blk.kpi, st = blk.structure, life = blk.life, pr = blk.price, sh = blk.stores;
+  const lifeMax = Math.max(1, ...life.dist.map(x => x.n));
+  const cityMax = Math.max(1, ...sh.cities.map(x => x.n));
+  const fmt = (v, d = 0) => (v == null || isNaN(v)) ? '—' : (+v).toFixed(d);
+
+  return {
+    content: `
+      <div class="op-wrap">
+        <div class="mdash-top">
+          <span class="mdash-title">🏠 本品牌菜单 · 档期与产品力</span>
+          <div class="mdash-seg">${brands.map(nm => `<span class="sg ${nm === b ? 'on' : ''}" onclick="switchOwnBrand('${nm}')">${nm.replace('咖啡','').replace('天好','')}</span>`).join('')}</div>
+          <span class="mdash-meta">${blk.meta.label} · ${blk.meta.channel} · 源：${blk.meta.source}</span>
+        </div>
+
+        <div class="mstats">
+          ${[
+            ['档期', k.periods], ['去重SKU', k.sku], ['档期新增', k.launch],
+            ['最新在售', k.alive + '（' + (k.aliveRate * 100).toFixed(0) + '%）'],
+            ['平均新上/档', fmt(k.avgLaunch, 1)], ['门店', k.stores + ' / ' + k.cities + '城'],
+            ['标准店', (k.stdShare * 100).toFixed(0) + '%'],
+          ].map(([lab, v]) => `<div class="mstat"><div class="v">${v}</div><div class="k">${lab}</div></div>`).join('')}
+        </div>
+
+        <div class="mic" style="margin-bottom:12px">
+          <div class="mit">📅 档期节奏 <span class="misub">每档新上/下架 + 在售 SKU 走势 · 悬停看明细</span></div>
+          ${ownPeriodSVG(blk.periods)}
+        </div>
+
+        <div class="minsight" style="margin-top:0">
+          <div class="mic">
+            <div class="mit">🧬 上新结构漂移 <span class="misub">ALA vs 套餐</span></div>
+            <div class="op-seq">前段 ${st.front.range[0]}–${st.front.range[1]} · 套餐占比 <b style="color:#fbbf24">${(st.front.share*100).toFixed(0)}%</b></div>
+            <div class="op-stack"><i style="width:${(1-st.front.share)*100}%;background:#60a5fa"></i><i style="width:${st.front.share*100}%;background:#c084fc"></i></div>
+            <div class="op-seq" style="margin-top:10px">后段 ${st.back.range[0]}–${st.back.range[1]} · 套餐占比 <b style="color:#fbbf24">${(st.back.share*100).toFixed(0)}%</b></div>
+            <div class="op-stack"><i style="width:${(1-st.back.share)*100}%;background:#60a5fa"></i><i style="width:${st.back.share*100}%;background:#c084fc"></i></div>
+            <div class="op-legend"><span><i style="background:#60a5fa"></i>ALA 单品</span><span><i style="background:#c084fc"></i>套餐</span></div>
+            <div style="font-size:10px;color:#7d8ea6;margin-top:8px;line-height:1.7;">套餐占比由 ${(st.front.share*100).toFixed(0)}% 升至 ${(st.back.share*100).toFixed(0)}%，全期 ${(st.total.share*100).toFixed(0)}%</div>
+          </div>
+
+          <div class="mic">
+            <div class="mit">⏳ 生命周期分布 <span class="misub">存活档期数 · 在售率 ${(life.rate*100).toFixed(0)}%</span></div>
+            <div class="op-life">
+              ${life.dist.map(x => `<div class="r"><span style="color:#7d8ea6">${x.lab}</span><span class="bar"><i style="width:${(x.n/lifeMax*100).toFixed(0)}%"></i></span><span class="v">${x.n}</span></div>`).join('')}
+            </div>
+            <div style="font-size:9.5px;color:#5b6b82;margin-top:8px;">下市 ${life.dead} / ${life.sku}；各品类在售率：${life.byCat.map(c => c.cat + ' ' + (c.rate*100).toFixed(0) + '%').join(' · ')}</div>
+          </div>
+        </div>
+
+        <div class="mic" style="margin-top:12px">
+          <div class="mit">💰 类目价盘 <span class="misub">线上原价 D5 / D2（非到手价）</span></div>
+          <div class="mtable-wrap" style="max-height:none">
+            <table class="mtable">
+              <thead><tr><th>类目</th><th class="r">SKU</th><th class="r">单一价SKU</th><th class="r">D5均价</th><th class="r">D5中位</th><th class="r">D5区间</th><th class="r">D2均价</th><th class="r">D2−D5</th><th class="r">打包费</th></tr></thead>
+              <tbody>${pr.cats.map(c => `<tr><td class="pname">${c.cat}</td><td class="r">${c.sku}</td><td class="r">${c.single}</td><td class="r" style="color:#93c5fd">${fmt(c.d5avg, 1)}</td><td class="r">${fmt(c.d5med, 1)}</td><td class="r">${c.d5range}</td><td class="r">${fmt(c.d2avg, 1)}</td><td class="r" style="color:#fbbf24">+${fmt(c.diff, 1)}</td><td class="r">${fmt(c.pkg, 1)}</td></tr>`).join('')}</tbody>
+            </table>
+          </div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:10px" class="op-adv">
+            <div><div class="mgrp">高端 Top（D5）</div>${pr.high.map(x => `<div class="it" style="display:flex;gap:8px;font-size:10px;padding:2px 0;border-bottom:1px solid rgba(96,165,250,.05)"><span style="flex:1;color:#c6d3e4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x['商品名称']}</span><span style="color:#93c5fd">¥${x['D5价']}</span></div>`).join('')}</div>
+            <div><div class="mgrp">低端 Top（D5）</div>${pr.low.map(x => `<div class="it" style="display:flex;gap:8px;font-size:10px;padding:2px 0;border-bottom:1px solid rgba(96,165,250,.05)"><span style="flex:1;color:#c6d3e4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${x['商品名称']}</span><span style="color:#93c5fd">¥${x['D5价']}</span></div>`).join('')}</div>
+          </div>
+        </div>
+
+        <div class="op-adv" style="margin-top:12px">
+          <div class="card">
+            <h4>🏙️ 门店结构</h4>
+            <div style="font-size:9.5px;color:#7d8ea6;margin-bottom:6px">在营 ${sh.total} 家 · ${sh.citiesCount} 城 · 标准店 ${(sh.stdShare*100).toFixed(0)}% · Top5 集中度 ${(sh.top5Share*100).toFixed(0)}%</div>
+            ${sh.cities.map(c => `<div class="r" style="display:grid;grid-template-columns:60px minmax(0,1fr) 40px;gap:8px;align-items:center;font-size:10px;margin-bottom:3px"><span style="color:#c6d3e4">${c.name}</span><span class="bar" style="height:8px;background:rgba(96,165,250,.1);border-radius:4px;overflow:hidden;display:block"><i style="display:block;height:100%;width:${(c.n/cityMax*100).toFixed(0)}%;background:linear-gradient(90deg,#3b82f6,#93c5fd)"></i></span><span style="text-align:right;color:#93c5fd">${c.n}</span></div>`).join('')}
+            <div class="mgrp" style="margin-top:8px">店型 / 经营方式</div>
+            <div style="display:flex;flex-wrap:wrap;gap:5px">${sh.types.map(t => `<span class="mpill">${t.name} ${t.n}</span>`).join('')}${sh.modes.map(m => `<span class="mpill">${m.name} ${m.n}</span>`).join('')}</div>
+          </div>
+
+          <div class="card">
+            <h4>🔁 价格变动（${k.changes} 个 SKU）</h4>
+            ${pr.changes.map(c => `<div style="display:flex;gap:8px;font-size:10px;padding:2.5px 0;border-bottom:1px solid rgba(96,165,250,.05)"><span style="flex:1;color:#c6d3e4;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c['商品名称']}</span><span style="color:#fbbf24;font-variant-numeric:tabular-nums">${c['价格变动']}</span><span style="color:#5b6b82;width:44px;text-align:right">${c['类型']}</span></div>`).join('')}
+          </div>
+        </div>
+
+        <div class="mic" style="margin-top:12px">
+          <div class="mit">🆕 最近档期上新 <span class="misub">${blk.launchRecent.map(x => x.period + '（' + x.n + '）').join(' / ')}</span></div>
+          <div class="op-launch">
+            ${blk.launchRecent.map(g => `<div class="col"><div class="mgrp">${g.period}</div>${g.items.map(it => `<div class="it"><span class="n">${it.name}</span><span class="mpill">${it.type}</span><span class="p">¥${it.price}</span></div>`).join('')}</div>`).join('')}
+          </div>
+        </div>
+
+        <div class="op-adv" style="margin-top:12px">
+          <div class="card"><h4>🧪 研发参考（R&D）</h4><ul class="op-list">${blk.advice.rnd.map(x => `<li>${x}</li>`).join('')}</ul></div>
+          <div class="card"><h4>📦 备货依据（Supply）</h4><ul class="op-list">${blk.advice.supply.map(x => `<li>${x}</li>`).join('')}</ul></div>
+        </div>
+        <div class="card" style="background:rgba(10,15,26,.52);border:1px solid rgba(96,165,250,.1);border-radius:12px;padding:12px 14px;margin-top:12px;">
+          <h4 style="margin:0 0 8px;font-size:11px;color:#dbeafe;">🎯 市场对标策略（P0 / P1）</h4>
+          <ul class="op-list">${(blk.advice.strategy || []).map(x => `<li>${x}</li>`).join('')}</ul>
+        </div>
+        <div class="op-risk"><b style="color:#fbbf24">口径与风险提示</b><br>${blk.advice.risk.join('<br>')}</div>
+
+        <div style="font-size:9px;color:#4a5568;margin-top:10px;line-height:1.7">
+          数据源：${blk.meta.source}（${blk.meta.label}，${blk.meta.channel}）· 抽取于 ${blk.meta.extracted}。价格为线上原价（D5/D2），非到手价；仅覆盖标准店价盘（${(sh.stdShare*100).toFixed(0)}%）。
+        </div>
+      </div>
+    `,
+    side: `
+      ${sideInsight('🏠 本品牌菜单', '按品牌分层：当前为 Tims 外送菜单 YTD（27 档期）。<br>可换品牌时，在 BRAND_YTD.config.brands 中新增即可。')}
+      <div class="trend-card">
+        <div class="trend-title">📌 关键结论</div>
+        <div style="font-size:11px;color:#c6d3e4;line-height:1.9;">
+          · 双周档期制，平均每档新上 <b style="color:#93c5fd">${fmt(k.avgLaunch,1)}</b> 个<br>
+          · 套餐占比升至 <b style="color:#fbbf24">${(st.back.share*100).toFixed(0)}%</b><br>
+          · 最新在售率 <b style="color:#93c5fd">${(k.aliveRate*100).toFixed(0)}%</b><br>
+          · 短期+闪现款占 <b style="color:#fbbf24">${((life.dist.find(x=>x.lab.includes('短期'))?.n||0)+(life.dist.find(x=>x.lab.includes('闪现'))?.n||0))/life.sku*100|0}%</b><br>
+          · 标准店占比 <b style="color:#93c5fd">${(sh.stdShare*100).toFixed(0)}%</b>
+        </div>
+      </div>
+    `,
+  };
+}
+
 const PAGE_BUILDERS = {
   featured: buildFeatured,
   all: buildAll,
@@ -3736,6 +3931,7 @@ const PAGE_BUILDERS = {
   'marketing-cal': buildMarketingCal,
   'bi': buildBiPage,
   'menu': buildMenuPage,
+  'own': buildOwnBrandPage,
   'brand-deep': buildBrandDeep,
 };
 
