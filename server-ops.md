@@ -68,6 +68,18 @@ git add -A && git commit -m "☰ 更新菜单" && git push
 ./deploy_server.sh             # 同步服务器
 ```
 
+## 三之四、邀请链接（按人授权）
+```bash
+cd ~/coffee-site
+node invite.mjs new --label "张三" --days 7   # 生成邀请（自动重建 index.html）
+node invite.mjs list                          # 查看全部邀请与链接
+node invite.mjs revoke <id>                   # 撤销某邀请（自动重建）
+```
+- 只有拿到邀请链接（`?k=id.token`）的人能解密查看；过期自动失效
+- `invites.json` 含 token，仅本地（已 gitignore）；`invites.lock.json` 已入库，CI 复用以避免自动刷新时丢失邀请
+- 生成/撤销后请：`git add -A && git commit -m "邀请更新" && git push`，服务器再跑 `./deploy_server.sh`
+- 管理员仍可用账号密码登录（不受邀请影响）
+
 ## 四、备份站点文件（如手动）
 ```bash
 scp -i ~/.ssh/deploy_brew_ed25519 \

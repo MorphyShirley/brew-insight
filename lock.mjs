@@ -58,6 +58,25 @@ const LOCK = {
 };
 const lockJson = JSON.stringify(LOCK);
 
+// ── 邀请链接：用邀请 token 派生的密钥封装内容密钥（CK）──
+function readJsonSafe(f) { try { return JSON.parse(readFileSync(f, 'utf8')); } catch (e) { return null; } }
+const inviteSrc = readJsonSafe('invites.json');   // 本地文件（含 token，不入库）
+let invites = [];
+if (Array.isArray(inviteSrc)) {
+  const ckU8 = new Uint8Array(keyBits);
+  for (const it of inviteSrc) {
+    const tokKey = await deriveKey(it.token, b64ToU8(it.salt));
+    const ivI = webcrypto.getRandomValues(new Uint8Array(12));
+    const kI = await subtle.importKey('raw', tokKey, { name: 'AES-GCM' }, false, ['encrypt']);
+    const wrapped = new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv: ivI }, kI, ckU8));
+    invites.push({ id: it.id, label: it.label || '', exp: it.exp || 0, salt: it.salt, iv: b64(ivI), ct: b64(wrapped) });
+  }
+  writeFileSync('invites.lock.json', JSON.stringify(invites, null, 1));
+} else {
+  invites = readJsonSafe('invites.lock.json') || [];   // CI 无 token → 复用已封装条目
+}
+const invitesJson = JSON.stringify(invites);
+
 // ── 生成加密版 index.html（登录壳）──
 const shell = `<!DOCTYPE html>
 <html lang="zh-CN">
@@ -86,18 +105,30 @@ ${styles}
     <input id="lgPass" type="password" placeholder="密码" autocomplete="current-password" required>
     <button class="lg-btn" type="submit">解 锁</button>
     <div class="lg-err" id="lgErr"></div>
-    <div class="lg-hint">内容已加密存储 · 解密仅在本机内存进行，源码中无明文数据</div>
+    <div class="lg-hint">仅限受邀用户访问 · 如无邀请链接请联系管理员<br>管理员可用账号密码登录</div>
   </form>
 </div>
 <div id="appRoot"></div>
 <script>
 const LOCK = ${lockJson};
+const INVITES = ${invitesJson};
 const ENC = new TextEncoder(), DEC = new TextDecoder();
 function b64ToU8(s){ const bin=atob(s); const u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i); return u; }
 async function sha256(s){ const buf=await crypto.subtle.digest('SHA-256', ENC.encode(s)); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
 async function deriveKey(pass){ 
   const km=await crypto.subtle.importKey('raw', ENC.encode(pass), 'PBKDF2', false, ['deriveBits']);
   return new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2', hash:'SHA-256', salt:b64ToU8(LOCK.s), iterations:150000}, km, 256));
+}
+async function keyFromToken(token, saltB64) {
+  const salt = b64ToU8(saltB64);
+  const km = await crypto.subtle.importKey('raw', ENC.encode(token), 'PBKDF2', false, ['deriveBits']);
+  return crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: 150000 }, km, 256);
+}
+async function unwrapInvite(entry, token) {
+  const kb = await keyFromToken(token, entry.salt);
+  const key = await crypto.subtle.importKey('raw', kb, { name: 'AES-GCM' }, false, ['decrypt']);
+  const ck = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64ToU8(entry.iv) }, key, b64ToU8(entry.ct));
+  return new Uint8Array(ck);
 }
 async function onLogin(ev){
   ev.preventDefault();
@@ -145,12 +176,29 @@ function appMain(){ try{ switchPage('featured'); initChartTip(); }catch(e){ show
 function logout(){ try{ sessionStorage.removeItem('brew_auth'); sessionStorage.removeItem('brew_key'); }catch(e){} location.reload(); }
 function showBadge(msg){ let b=document.getElementById('errBadge'); if(!b){ b=document.createElement('div'); b.id='errBadge'; b.style.cssText='position:fixed;left:10px;bottom:10px;z-index:9999;background:#7f1d1d;color:#fecaca;font-size:12px;padding:8px 12px;border-radius:8px;max-width:60vw;white-space:pre-wrap;'; document.body.appendChild(b);} b.textContent='⚠ '+msg; }
 window.addEventListener('error', function(e){ showBadge(e.message + ' @ ' + (e.filename||'').split('/').pop() + ':' + (e.lineno||'')); });
-// 有会话密钥 → 静默解密直接进内容；无 → 显示登录
+function showMaskMsg(msg) { showLoginMask(); const e = document.getElementById('lgErr'); if (e) e.textContent = msg; }
+// 启动：会话密钥 → 邀请链接 → 登录
 (async function(){
-  let k=null; try{ k=sessionStorage.getItem('brew_key'); }catch(e){}
-  if (k) {
-    try{ injectData(await decryptData(b64ToU8(k))); dismissMask(); }
-    catch(e){ try{ sessionStorage.removeItem('brew_key'); sessionStorage.removeItem('brew_auth'); }catch(e){} showLoginMask(); }
+  let ck = null;
+  try { const k = sessionStorage.getItem('brew_key'); if (k) ck = b64ToU8(k); } catch(e){}
+  if (!ck) {
+    const q = new URLSearchParams(location.search).get('k');
+    if (q && q.indexOf('.') > 0) {
+      const id = q.slice(0, q.indexOf('.'));
+      const token = q.slice(q.indexOf('.') + 1);
+      const entry = (typeof INVITES !== 'undefined' ? INVITES : []).find(function(x){ return x.id === id; });
+      if (!entry) { showMaskMsg('邀请链接无效，请联系管理员重新获取'); return; }
+      if (entry.exp && Date.now() > entry.exp) { showMaskMsg('邀请链接已过期，请联系管理员重新获取'); return; }
+      try { ck = await unwrapInvite(entry, token); }
+      catch(e){ showMaskMsg('邀请链接无效或已被撤销'); return; }
+    }
+  }
+  if (ck) {
+    try {
+      injectData(await decryptData(ck));
+      try { sessionStorage.setItem('brew_key', bufToB64(ck)); } catch(e){}
+      dismissMask();
+    } catch(e) { showLoginMask(); }
   } else {
     showLoginMask();
   }

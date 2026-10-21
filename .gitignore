@@ -3,3 +3,6 @@ __pycache__/
 node_modules/
 .env
 .DS_Store
+
+# 邀请 token（仅本地）
+invites.json
