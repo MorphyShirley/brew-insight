@@ -1200,6 +1200,10 @@
     @media (max-width: 960px) { .minsight { grid-template-columns:minmax(0,1fr); } .minsight .mspan2 { grid-column:auto; } }
 
     @media (max-width: 900px) { .mbody { grid-template-columns:1fr; } .mrail { max-height:220px; } }
+    .sb-stale { font-size: 10px; color: #fbbf24; background: rgba(251,191,36,.12); border: 1px solid rgba(251,191,36,.3); border-radius: 100px; padding: 1px 8px; margin-left: 6px; }
+    #backTop { position: fixed; right: 18px; bottom: 22px; z-index: 900; width: 38px; height: 38px; border-radius: 50%; border: 1px solid rgba(96,165,250,.28); background: rgba(13,20,34,.9); color: #93c5fd; font-size: 16px; cursor: pointer; display: none; align-items: center; justify-content: center; box-shadow: 0 6px 18px rgba(0,0,0,.35); backdrop-filter: blur(4px); transition: all .2s; }
+    #backTop.show { display: flex; }
+    #backTop:hover { background: rgba(59,130,246,.22); color: #dbeafe; transform: translateY(-2px); }
 </style>
   <style>
     /* ── 登录门禁 ── */
@@ -4469,7 +4473,18 @@ function renderRadarChart(canvasId, brand1, brand2) {
 // ═══ STATUS BAR ═══
 function statusBar() {
   const now = new Date();
-  return `<div class="status-bar"><span class="sb-dot green"></span>数据更新至 ${now.toISOString().slice(0,10)} · 共 ${CARDS.length} 条资讯<span class="sb-action" onclick="location.reload()">⟳ 刷新</span></div>`;
+  // 最新资讯日期 → 距今天数，滞后时提示（自动刷新异常时能第一时间发现）
+  let latest = null;
+  for (const c of dedupCards([...CARDS])) {
+    const [mm, dd] = (c.time || '').split('/').map(Number);
+    if (mm && dd) { const d = new Date(now.getFullYear(), mm - 1, dd); if (!latest || d > latest) latest = d; }
+  }
+  let stale = null;
+  if (latest) { stale = Math.floor((now - latest) / 86400000); if (stale < -180) stale += 365; }
+  const staleTag = (stale != null && stale > 3)
+    ? `<span class="sb-stale" title="自动刷新可能未生效，请检查 Tavily Key">⚠️ 资讯滞后 ${stale} 天</span>` : '';
+  const latestStr = latest ? `${String(latest.getMonth()+1).padStart(2,'0')}/${String(latest.getDate()).padStart(2,'0')}` : '—';
+  return `<div class="status-bar"><span class="sb-dot green"></span>数据更新至 ${latestStr} · 共 ${CARDS.length} 条资讯${staleTag}<span class="sb-action" onclick="location.reload()">⟳ 刷新</span></div>`;
 }
 
 // ═══ BRAND TREND CHART (12-month) ═══
@@ -5024,6 +5039,7 @@ function refreshSearchSource() {
   Object.entries(PRODUCT_ANALYSIS).forEach(([k,v]) => searchItems.push({type:'product',label:k, brand:v.brand, date:v.date, key:k}));
   CARDS.forEach(c => searchItems.push({type:'news',label:c.title, brand:c.brand, time:c.time, key:c.id, tags:c.tags}));
 }
+window.addEventListener('scroll', function(){ const b = document.getElementById('backTop'); if (b) b.classList.toggle('show', window.scrollY > 420); }, { passive: true });
 </script>
 
 </body>
