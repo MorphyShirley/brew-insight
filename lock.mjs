@@ -5,6 +5,7 @@
 //
 // 用法: node lock.mjs [password]          默认密码 morphyshirley999
 import { readFileSync, writeFileSync } from 'node:fs';
+import { gzipSync } from 'node:zlib';
 import { webcrypto } from 'node:crypto';
 const subtle = webcrypto.subtle;
 
@@ -22,7 +23,8 @@ async function deriveKey(pass, salt) {
 }
 async function aesEncrypt(keyBits, iv, data) {
   const k = await subtle.importKey('raw', keyBits, { name: 'AES-GCM' }, false, ['encrypt']);
-  const ct = await subtle.encrypt({ name: 'AES-GCM', iv }, k, enc.encode(data));
+  const bytes = typeof data === 'string' ? enc.encode(data) : data;
+  const ct = await subtle.encrypt({ name: 'AES-GCM', iv }, k, bytes);
   return new Uint8Array(ct);
 }
 
@@ -49,10 +51,12 @@ const styles = (src.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).join('\n');
 const salt = enc.encode('brewinsight2026!');
 const iv = webcrypto.getRandomValues(new Uint8Array(12));
 const keyBits = await deriveKey(PASSWORD, salt);
-const ct = await aesEncrypt(keyBits, iv, payload);
+// gzip 压缩明文后再加密（浏览器端 DecompressionStream 解压），显著减小页面体积
+const gz = gzipSync(Buffer.from(payload, 'utf8'), { level: 9 });
+const ct = await aesEncrypt(keyBits, iv, gz);
 
 const LOCK = {
-  s: b64(salt), iv: b64(iv), ct: b64(ct),
+  s: b64(salt), iv: b64(iv), ct: b64(ct), zip: 1,
   user: '5a2dc66616e9f5c666362e6374c245853a8bbe084a378700085b91e007bc1488',
   pass: '5f291e764b3dfde97ed9009c686ef0ef5857b38dfaccbba475012efee5203539',
 };
@@ -83,6 +87,11 @@ const shell = `<!DOCTYPE html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="咖啡与茶饮行业情报站：品牌动态、菜单情报、营销节点、档期与产品力分析">
+<meta name="theme-color" content="#0a0f18">
+<meta property="og:title" content="饮力情报局 · 行业情报站">
+<meta property="og:description" content="品牌动态 · 菜单情报 · 营销节点 · 档期分析">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
 <title>饮力情报局</title>
 ${styles}
 <style>
@@ -109,6 +118,7 @@ ${styles}
   </form>
 </div>
 <div id="appRoot"></div>
+<button id="backTop" title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
 <script>
 const LOCK = ${lockJson};
 const INVITES = ${invitesJson};
@@ -151,9 +161,16 @@ async function onLogin(ev){
   dismissMask();
 }
 function bufToB64(u8){ let s=''; for(const c of u8) s+=String.fromCharCode(c); return btoa(s); }
+async function gunzip(u8){
+  if (typeof DecompressionStream === 'undefined') throw new Error('浏览器版本过低，请使用新版 Chrome / Edge / Safari');
+  const stream = new Blob([u8]).stream().pipeThrough(new DecompressionStream('gzip'));
+  const buf = await new Response(stream).arrayBuffer();
+  return new Uint8Array(buf);
+}
 async function decryptData(keyBits){
   const key=await crypto.subtle.importKey('raw', keyBits, {name:'AES-GCM'}, false, ['decrypt']);
   const pt=await crypto.subtle.decrypt({name:'AES-GCM', iv:b64ToU8(LOCK.iv)}, key, b64ToU8(LOCK.ct));
+  if (LOCK.zip === 1) return JSON.parse(DEC.decode(await gunzip(new Uint8Array(pt))));
   return JSON.parse(DEC.decode(pt));
 }
 function injectData(data){

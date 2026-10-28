@@ -127,7 +127,8 @@ def is_trad_heavy(text):
 NOISE_TITLE = ['抽奖', '抽2万', '0.01元', '薅羊毛', '未中奖', '兑换码', '免费下载', '官方正版',
                '蹭空调', '蹭wifi', '惬意', '日常饮食记录', '小红书背景图', '手记', '探店',
                '三轮摩托', '摩托车', 'vip', 'VIP', '博主', '吃瓜', '求转发', '应用宝',
-               'Uber Eats', 'app下载', '日常vlog', '第一视角', '沉浸式体验']
+               'Uber Eats', 'app下载', '日常vlog', '第一视角', '沉浸式体验',
+    '百度地图', '加盟项目', '加盟指南', '选型指南', '加盟推荐', '品牌推荐', '攻略', '汇总', '门店地址', '营业时间', '团购',]
 TW_HK_DOMAINS = ('travel.yam.com', 'niusnews.com', 'womenshealthmag.com', 'cmnews.com.tw',
                  'ufood.com.hk', 'orangenews.hk', 'ulapp.hk', 'thestormmedia.com', 'hk01.com')
 SOCIAL_DOMAINS = ('facebook.com', 'instagram.com', 'm.facebook.com')
@@ -379,20 +380,28 @@ def main():
     print(f"📋 现有卡片: {len(existing_titles)} 条, 最大 id={max_id}")
 
     all_news = []
+    failed = 0
     for brand, info in BRANDS.items():
         print(f"\n🔍 搜索 {brand}...")
         try:
             results = tavily_search(api_key, info['kw'])
         except Exception as e:
+            failed += 1
             print(f"  ⚠️  {brand} 失败: {type(e).__name__}: {str(e)[:80]}")
             continue
         if not results:
+            failed += 1
             print(f"  ⚠️  无结果")
             continue
         for r in results:
             r['brand'] = brand
         all_news.extend(results)
         print(f"  ✅ {len(results)} 条")
+
+    # 失败率过高（多半是 Key 失效/额度用尽）→ 显式失败，避免 CI 静默成功
+    if failed >= max(3, len(BRANDS) // 2) or (failed == len(BRANDS)):
+        print(f"\n❌ {failed}/{len(BRANDS)} 个品牌搜索失败，疑似 TAILY_API_KEY 失效或额度用尽，退出")
+        sys.exit(2)
 
     new_cards = build_new_cards(all_news, existing_titles, existing_urls, max_id + 1)
     print(f"\n✨ 待新增卡片: {len(new_cards)} 条")

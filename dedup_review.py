@@ -32,7 +32,7 @@ NOISE_TITLE = [
     '好喝', '蹭空调', '蹭wifi', '惬意', '日常饮食记录', '小红书背景图', '背景图',
     '手记', '打卡', '探店', '三轮摩托', '摩托车', 'vip', 'VIP', '博主', '吃瓜',
     '应用宝', 'Uber Eats', 'app下载', '日常vlog', '第一视角', '沉浸式体验',
-]
+    '百度地图', '加盟项目', '加盟指南', '选型指南', '加盟推荐', '品牌推荐', '攻略', '汇总', '门店地址', '营业时间', '团购',]
 NOISE_DESC = ['换号拉满', '去换号', '评论区抽', '私信领', '送杯']
 SRC_RANK = ['36kr.com', 'm.36kr.com', 'jiemian.com', 'cbndata.com', 'news.cn',
             'zqrb.cn', 'jjckb.xinhuanet.com', 'foodinc.com.cn', 'm.canyin88.com',
