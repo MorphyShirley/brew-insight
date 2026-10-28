@@ -10,7 +10,7 @@
 
 2. **在 GitHub 仓库设置中添加 Secrets**：
    - `Settings` → `Secrets and variables` → `Actions`
-   - 添加 `SURGE_TOKEN` = `fa6ed0b4299c4cf7abd02657cf9a855a`
+   - 添加 `SURGE_TOKEN`（值请从 Surge 后台获取，勿写入仓库）
 
 3. **启用 GitHub Pages**（可选，用于直接访问）：
    - `Settings` → `Pages`

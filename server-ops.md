@@ -1,6 +1,6 @@
 # ☕ 云服务器操作小抄（火山引擎 · Ubuntu 24.04）
 
-> IP: `118.196.3.71` · 登录：仅密钥 · 密钥文件：`~/.ssh/deploy_brew_ed25519`
+> IP: `<你的服务器IP>` · 登录：仅密钥 · 密钥文件：`~/.ssh/<deploy-key>`
 
 ## 〇、自动化全景（哪些在自动跑）
 | 自动化 | 频率 | 载体 | 说明 |
@@ -19,7 +19,7 @@
 ## 一、登录（用你自己的电脑）
 ```bash
 # 直接登录
-ssh -i ~/.ssh/deploy_brew_ed25519 root@118.196.3.71
+ssh -i ~/.ssh/<deploy-key> root@<服务器IP>
 
 # 一键巡检（推荐入口）
 cd ~/coffee-site && ./server_status.sh
@@ -82,8 +82,8 @@ node invite.mjs revoke <id>                   # 撤销某邀请（自动重建�
 
 ## 四、备份站点文件（如手动）
 ```bash
-scp -i ~/.ssh/deploy_brew_ed25519 \
-  root@118.196.3.71:/var/www/brew-insight/index.html \
+scp -i ~/.ssh/<deploy-key> \
+  root@<服务器IP>:/var/www/brew-insight/index.html \
   ~/Desktop/index_backup.html
 ```
 
@@ -97,6 +97,6 @@ https://morphyshirley.github.io/brew-insight/
 2. 重新生成密钥是不行的（原私钥已授权）；要么用新公钥写入 `~/.ssh/authorized_keys`，要么临时开回密码登录
 
 ## 七、待办（域名备案通过后）
-1. DNS：域名 A 记录 → `118.196.3.71`
+1. DNS：域名 A 记录 → `<服务器IP>`
 2. certbot 签发 Let's Encrypt 证书 + 自动续期
 3. Nginx 强制 HTTPS + 443 放行

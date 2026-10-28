@@ -2195,6 +2195,25 @@ function dedupCards(list, thr) {
   });
 }
 
+// ── 安全：外部资讯文本去 HTML / URL 白名单 ──
+function cleanText(s) {
+  return String(s == null ? '' : s)
+    .replace(/<script[\s\S]*?<\/script>/gi, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/[<>]/g, '');
+}
+function safeUrl(u) {
+  const s = String(u || '').trim();
+  return /^https?:\/\//i.test(s) ? s.replace(/"/g, '%22').replace(/'/g, '%27') : '#';
+}
+function sanitizeCards() {
+  for (const c of CARDS) {
+    c.title = cleanText(c.title);
+    c.desc = cleanText(c.desc);
+    c.url = safeUrl(c.url);
+  }
+}
+
 function renderCard(c) {
   const b = BRANDS[c.brand] || ['?','#666',''];
   const tagHtml = c.tags.map(t => `<span class="tag ${tagClass(t)}">${t}</span>`).join('');
@@ -4874,6 +4893,8 @@ document.querySelectorAll('.mobile-nav a[data-page]').forEach(a => {
 const now = new Date();
 const weekdays = ['周日','周一','周二','周三','周四','周五','周六'];
 document.querySelector('.date-display').textContent = `📅 数据更新至 ${new Date().toISOString().slice(0,10)}`;
+
+sanitizeCards();
 
 // ═══ SEARCH INIT (must be before switchPage) ═══
 const searchItems = [];
