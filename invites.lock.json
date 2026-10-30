@@ -1,1 +1,10 @@
-[]
+[
+ {
+  "id": "d265e1",
+  "label": "朋友",
+  "exp": 1793941110291,
+  "salt": "PvXjB7GAixuV12rHXZ+DkA==",
+  "iv": "ZP88ch/vm55yuGU/",
+  "ct": "hjL4bI7Upb6CdBUaQPTBnXZGx668iGC4Ef13dRYu3cv7yG5f6DO06/AvvKAMBRxj"
+ }
+]
