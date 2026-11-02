@@ -8,7 +8,7 @@ import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gzipSync } from 'node:zlib';
-import { webcrypto } from 'node:crypto';
+import { webcrypto, createHash } from 'node:crypto';
 const subtle = webcrypto.subtle;
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -30,6 +30,8 @@ if (!PASSWORD) {
   console.error('❌ 缺少 OWNER_PASSWORD（环境变量或 .env 中配置）');
   process.exit(1);
 }
+const ACCOUNT = process.env.OWNER_ACCOUNT || '2991600311@qq.com';
+const sha256hex = s => createHash('sha256').update(s, 'utf8').digest('hex');
 const enc = new TextEncoder();
 const dec = new TextDecoder();
 
@@ -77,8 +79,8 @@ const ct = await aesEncrypt(keyBits, iv, gz);
 
 const LOCK = {
   s: b64(salt), iv: b64(iv), ct: b64(ct), zip: 1,
-  user: '5a2dc66616e9f5c666362e6374c245853a8bbe084a378700085b91e007bc1488',
-  pass: '5f291e764b3dfde97ed9009c686ef0ef5857b38dfaccbba475012efee5203539',
+  user: sha256hex(ACCOUNT),
+  pass: sha256hex(PASSWORD),
 };
 const lockJson = JSON.stringify(LOCK);
 
