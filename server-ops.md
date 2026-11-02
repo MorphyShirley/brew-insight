@@ -1,0 +1,102 @@
+# ☕ 云服务器操作小抄（火山引擎 · Ubuntu 24.04）
+
+> IP: `<你的服务器IP>` · 登录：仅密钥 · 密钥文件：`~/.ssh/<deploy-key>`
+
+## 〇、自动化全景（哪些在自动跑）
+| 自动化 | 频率 | 载体 | 说明 |
+|---|---|---|---|
+| 资讯刷新（23 品牌） | 每 2 日 10:17 | GitHub Actions `news.yml` | 抓取→过滤去重→加密→部署；依赖 Secret `TAVILY_API_KEY` |
+| 营销节点刷新 | 每周一 11:17 | Actions `calendar.yml` | 拉 AdGuider 节点并固化 |
+| 页面加密构建 | 随上述自动 | `lock.mjs` | 源码→AES-GCM 密文 index.html |
+| Pages 自动部署 | push 即发 | GitHub Pages | 线上主站（HTTPS）|
+| 服务器每日备份 | 每天 02:30 | 服务器 crontab | 存 `/var/backups/brew-insight/`，留最近 14 份 |
+| 服务器站点同步 | **手动** `./deploy_server.sh` | 本机 | 可选后续自动化 |
+
+- Actions 页面：https://github.com/MorphyShirley/brew-insight/actions
+- 手动触发：Actions → 选工作流 → Run workflow
+- 备份日志：服务器 `/var/log/brew-backup.log`
+
+## 一、登录（用你自己的电脑）
+```bash
+# 直接登录
+ssh -i ~/.ssh/<deploy-key> root@<服务器IP>
+
+# 一键巡检（推荐入口）
+cd ~/coffee-site && ./server_status.sh
+```
+
+## 二、常用运维命令（登进服务器后）
+```bash
+systemctl status nginx          # 看 nginx 状态
+systemctl restart nginx         # 重启 nginx
+journalctl -u nginx -n 50       # 看 nginx 最近日志
+ls -la /var/www/brew-insight/   # 站点目录
+free -h && df -h /              # 内存/磁盘
+ss -tlnp                        # 端口监听
+```
+
+## 三、更新站点内容（在你的电脑上）
+```bash
+cd ~/coffee-site
+./deploy_server.sh build        # 重新加密构建 + 上传 + reload（正常用这个）
+# 或只上传不重新构建：
+./deploy_server.sh
+```
+
+## 三之二、填充「现有菜单」数据
+1. 编辑 `~/coffee-site/menu_data.json`，往各品牌 `items` 里加产品：
+   ```json
+   { "name":"生椰拿铁", "cat":"咖啡·拿铁", "price":16, "cup":"大杯", "temp":"冷/热", "tags":["常驻"], "note":"" }
+   ```
+2. 校验并注入 → 加密 → 上线：
+   ```bash
+   cd ~/coffee-site
+   python3 menu_build.py     # 校验 + 注入 coffee.html（打印各品牌 SKU 数）
+   node lock.mjs             # 生成加密版 index.html
+   git add -A && git commit -m "☰ 更新菜单数据" && git push
+   ./deploy_server.sh        # 如需同步云服务器
+   ```
+   （或直接把数据丢给我，我来跑）
+
+## 三之三、刷新「现有菜单」数据（从菜单情报库）
+```bash
+cd ~/coffee-site
+python3 menu_import_skill.py   # 读取 ~/.workbuddy/skills/brand-menu-intel → menu_data.json
+python3 menu_build.py          # 注入 coffee.html
+node lock.mjs                  # 加密构建
+git add -A && git commit -m "☰ 更新菜单" && git push
+./deploy_server.sh             # 同步服务器
+```
+
+## 三之四、邀请链接（按人授权）
+```bash
+cd ~/coffee-site
+node invite.mjs new --label "张三" --days 7   # 生成邀请（自动重建 index.html）
+node invite.mjs list                          # 查看全部邀请与链接
+node invite.mjs revoke <id>                   # 撤销某邀请（自动重建）
+```
+- 只有拿到邀请链接（`?k=id.token`）的人能解密查看；过期自动失效
+- `invites.json` 含 token，仅本地（已 gitignore）；`invites.lock.json` 已入库，CI 复用以避免自动刷新时丢失邀请
+- 生成/撤销后请：`git add -A && git commit -m "邀请更新" && git push`，服务器再跑 `./deploy_server.sh`
+- 管理员仍可用账号密码登录（不受邀请影响）
+
+## 四、备份站点文件（如手动）
+```bash
+scp -i ~/.ssh/<deploy-key> \
+  root@<服务器IP>:/var/www/brew-insight/index.html \
+  ~/Desktop/index_backup.html
+```
+
+## 五、开始用 GitHub Pages（域名审核通过前，日常访问走这里）
+```text
+https://morphyshirley.github.io/brew-insight/
+```
+
+## 六、密钥丢了怎么办
+1. 火山引擎控制台 → 该实例 → 「重置密码」或 VNC 登录
+2. 重新生成密钥是不行的（原私钥已授权）；要么用新公钥写入 `~/.ssh/authorized_keys`，要么临时开回密码登录
+
+## 七、待办（域名备案通过后）
+1. DNS：域名 A 记录 → `<服务器IP>`
+2. certbot 签发 Let's Encrypt 证书 + 自动续期
+3. Nginx 强制 HTTPS + 443 放行

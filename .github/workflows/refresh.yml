@@ -1,0 +1,29 @@
+name: 手动重建并发布
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      OWNER_PASSWORD: ${{ secrets.OWNER_PASSWORD }}
+      SRC_KEY: ${{ secrets.SRC_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: 解密源码
+        run: node src_crypt.mjs open
+      - name: 同步 index.html（加密构建）
+        run: |
+          node lock.mjs
+          node src_crypt.mjs seal
+          git config user.name "brew-insight-bot"
+          git config user.email "bot@brew-insight.com"
+          git add coffee.src.enc index.html
+          git diff --cached --quiet || {
+            git commit -m "📊 同步 index.html $(date +'%Y-%m-%d')"
+            git push
+          }

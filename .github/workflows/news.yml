@@ -1,0 +1,39 @@
+name: 资讯自动刷新
+
+on:
+  schedule:
+    - cron: '17 2 */2 * *'   # 每 2 日 02:17 UTC（北京 10:17）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
+      OWNER_PASSWORD: ${{ secrets.OWNER_PASSWORD }}
+      SRC_KEY: ${{ secrets.SRC_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: 环境诊断
+        run: |
+          echo "== Secret 是否注入 =="
+          if [ -n "$TAVILY_API_KEY" ]; then echo "TAVILY_API_KEY: 已注入 (长度 ${#TAVILY_API_KEY})"; else echo "TAVILY_API_KEY: 缺失！"; fi
+          if [ -n "$OWNER_PASSWORD" ]; then echo "OWNER_PASSWORD: 已注入"; else echo "OWNER_PASSWORD: 缺失！"; fi
+          if [ -n "$SRC_KEY" ]; then echo "SRC_KEY: 已注入"; else echo "SRC_KEY: 缺失！"; fi
+          echo "== 工具版本 =="
+          python --version; node --version
+          echo "== 依赖 =="
+          pip install lunardate
+      - name: 解密源码
+        run: node src_crypt.mjs open
+      - name: 抓取资讯并自动部署（含营销节点+加密构建+提交推送）
+        run: |
+          git config user.name "brew-insight-bot"
+          git config user.email "bot@brew-insight.com"
+          python tavily_refresh.py --deploy

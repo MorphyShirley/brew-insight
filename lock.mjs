@@ -1,0 +1,248 @@
+#!/usr/bin/env node
+// 饮力情报局 · 内容级加密构建
+// 读取 coffee.html（源码），把「应用结构 + 全部数据脚本」用 AES-256-GCM 加密，
+// 产出 index.html（仅含登录壳 + 密文）。源码中不出现明文数据。
+//
+// 用法: node lock.mjs（从 OWNER_PASSWORD 环境变量或 .env 读取密码）
+import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { dirname, join } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { gzipSync } from 'node:zlib';
+import { webcrypto } from 'node:crypto';
+const subtle = webcrypto.subtle;
+
+const ROOT = dirname(fileURLToPath(import.meta.url));
+function readEnvFile() {
+  const p = join(ROOT, '.env');
+  if (!existsSync(p)) return {};
+  const out = {};
+  for (const line of readFileSync(p, 'utf8').split('\n')) {
+    const s = line.trim();
+    if (!s || s.startsWith('#')) continue;
+    const i = s.indexOf('=');
+    if (i < 0) continue;
+    out[s.slice(0, i).trim()] = s.slice(i + 1).trim();
+  }
+  return out;
+}
+const PASSWORD = process.env.OWNER_PASSWORD || readEnvFile().OWNER_PASSWORD;
+if (!PASSWORD) {
+  console.error('❌ 缺少 OWNER_PASSWORD（环境变量或 .env 中配置）');
+  process.exit(1);
+}
+const enc = new TextEncoder();
+const dec = new TextDecoder();
+
+function b64(bytes) { return Buffer.from(bytes).toString('base64'); }
+function b64ToU8(s) { return new Uint8Array(Buffer.from(s, 'base64')); }
+
+// 与浏览器端完全一致的 KDF 参数
+async function deriveKey(pass, salt) {
+  const km = await subtle.importKey('raw', enc.encode(pass), 'PBKDF2', false, ['deriveBits']);
+  return subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: 150000 }, km, 256);
+}
+async function aesEncrypt(keyBits, iv, data) {
+  const k = await subtle.importKey('raw', keyBits, { name: 'AES-GCM' }, false, ['encrypt']);
+  const bytes = typeof data === 'string' ? enc.encode(data) : data;
+  const ct = await subtle.encrypt({ name: 'AES-GCM', iv }, k, bytes);
+  return new Uint8Array(ct);
+}
+
+// ── 源文件解析 ──
+const src = readFileSync('coffee.html', 'utf8');
+const iApp = src.indexOf('<div class="app">');
+if (iApp < 0) { console.error('未找到 <div class="app">'); process.exit(1); }
+const iScript = src.indexOf('<script>', iApp);
+const iScriptEnd = src.indexOf('</script>', iScript);
+if (iScript < 0 || iScriptEnd < 0) { console.error('未找到主脚本'); process.exit(1); }
+const appHTML = src.slice(iApp, iScript).replace(/\s+$/, '');
+let js = src.slice(iScript + '<script>'.length, iScriptEnd);
+
+// 从脚本中剔除鉴权块（由登录壳负责），并把结尾启动改成交给 shell 的 appMain()
+js = js.replace(/\/\/ ═══ AUTH ═══[\s\S]*?function boot\(\) \{ switchPage\('featured'\); initChartTip\(\); \}\n?/, '');
+js = js.replace(/if \(!AUTH\.enabled \|\| sessionStorage\.getItem\('brew_auth'\) === '1'\) \{ boot\(\); \}\nelse \{ showLogin\(\); \}\n?/, '');
+js = js.trimEnd() + '\nappMain();\n';
+
+const payload = JSON.stringify({ body: appHTML, js });
+// 收集源码全部样式（含 App 布局/主题），合入登录壳保证解锁后正常渲染
+const styles = (src.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).join('\n');
+// 固定盐：保证同一密码派生出的密钥跨版本稳定（刷新/重新部署后无需重复登录）。
+// IV 仍每次随机，AES-GCM 安全性不受影响。
+const salt = enc.encode('brewinsight2026!');
+const iv = webcrypto.getRandomValues(new Uint8Array(12));
+const keyBits = await deriveKey(PASSWORD, salt);
+// gzip 压缩明文后再加密（浏览器端 DecompressionStream 解压），显著减小页面体积
+const gz = gzipSync(Buffer.from(payload, 'utf8'), { level: 9 });
+const ct = await aesEncrypt(keyBits, iv, gz);
+
+const LOCK = {
+  s: b64(salt), iv: b64(iv), ct: b64(ct), zip: 1,
+  user: '5a2dc66616e9f5c666362e6374c245853a8bbe084a378700085b91e007bc1488',
+  pass: '5f291e764b3dfde97ed9009c686ef0ef5857b38dfaccbba475012efee5203539',
+};
+const lockJson = JSON.stringify(LOCK);
+
+// ── 邀请链接：用邀请 token 派生的密钥封装内容密钥（CK）──
+function readJsonSafe(f) { try { return JSON.parse(readFileSync(f, 'utf8')); } catch (e) { return null; } }
+const inviteSrc = readJsonSafe('invites.json');   // 本地文件（含 token，不入库）
+let invites = [];
+if (Array.isArray(inviteSrc)) {
+  const ckU8 = new Uint8Array(keyBits);
+  for (const it of inviteSrc) {
+    const tokKey = await deriveKey(it.token, b64ToU8(it.salt));
+    const ivI = webcrypto.getRandomValues(new Uint8Array(12));
+    const kI = await subtle.importKey('raw', tokKey, { name: 'AES-GCM' }, false, ['encrypt']);
+    const wrapped = new Uint8Array(await subtle.encrypt({ name: 'AES-GCM', iv: ivI }, kI, ckU8));
+    invites.push({ id: it.id, label: it.label || '', exp: it.exp || 0, salt: it.salt, iv: b64(ivI), ct: b64(wrapped) });
+  }
+  writeFileSync('invites.lock.json', JSON.stringify(invites, null, 1));
+} else {
+  invites = readJsonSafe('invites.lock.json') || [];   // CI 无 token → 复用已封装条目
+}
+const invitesJson = JSON.stringify(invites);
+
+// ── 生成加密版 index.html（登录壳）──
+const shell = `<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="咖啡与茶饮行业情报站：品牌动态、菜单情报、营销节点、档期与产品力分析">
+<meta name="theme-color" content="#0a0f18">
+<meta property="og:title" content="饮力情报局 · 行业情报站">
+<meta property="og:description" content="品牌动态 · 菜单情报 · 营销节点 · 档期分析">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>☕</text></svg>">
+<title>饮力情报局</title>
+${styles}
+<style>
+#loginMask{display:none;z-index:2000;}
+#bootSplash{position:fixed;inset:0;z-index:1900;display:flex;align-items:center;justify-content:center;background:#0a0f18;color:#6b7a92;font:13px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",sans-serif;transition:opacity .22s ease;}
+#bootSplash .sp{width:22px;height:22px;border:3px solid rgba(96,165,250,.22);border-top-color:#60a5fa;border-radius:50%;animation:sp .8s linear infinite;margin-right:10px;}
+@keyframes sp{to{transform:rotate(360deg)}}
+#appRoot{opacity:0;transition:opacity .28s ease;}
+#appRoot.ready{opacity:1;}
+</style>
+</head>
+<body>
+<div id="bootSplash"><span class="sp"></span>正在解密…</div>
+<div id="loginMask">
+  <form class="lg-box" onsubmit="onLogin(event)" autocomplete="off">
+    <div class="lg-logo">☕</div>
+    <div class="lg-title">饮力情报局</div>
+    <div class="lg-sub">请输入账号密码解密内容</div>
+    <input id="lgUser" type="text" placeholder="账号" autocomplete="username" required>
+    <input id="lgPass" type="password" placeholder="密码" autocomplete="current-password" required>
+    <button class="lg-btn" type="submit">解 锁</button>
+    <div class="lg-err" id="lgErr"></div>
+    <div class="lg-hint">仅限受邀用户访问 · 如无邀请链接请联系管理员<br>管理员可用账号密码登录</div>
+  </form>
+</div>
+<div id="appRoot"></div>
+<button id="backTop" title="回到顶部" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+<script>
+const LOCK = ${lockJson};
+const INVITES = ${invitesJson};
+const ENC = new TextEncoder(), DEC = new TextDecoder();
+function b64ToU8(s){ const bin=atob(s); const u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i); return u; }
+async function sha256(s){ const buf=await crypto.subtle.digest('SHA-256', ENC.encode(s)); return Array.from(new Uint8Array(buf)).map(b=>b.toString(16).padStart(2,'0')).join(''); }
+async function deriveKey(pass){ 
+  const km=await crypto.subtle.importKey('raw', ENC.encode(pass), 'PBKDF2', false, ['deriveBits']);
+  return new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2', hash:'SHA-256', salt:b64ToU8(LOCK.s), iterations:150000}, km, 256));
+}
+async function keyFromToken(token, saltB64) {
+  const salt = b64ToU8(saltB64);
+  const km = await crypto.subtle.importKey('raw', ENC.encode(token), 'PBKDF2', false, ['deriveBits']);
+  return crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt, iterations: 150000 }, km, 256);
+}
+async function unwrapInvite(entry, token) {
+  const kb = await keyFromToken(token, entry.salt);
+  const key = await crypto.subtle.importKey('raw', kb, { name: 'AES-GCM' }, false, ['decrypt']);
+  const ck = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64ToU8(entry.iv) }, key, b64ToU8(entry.ct));
+  return new Uint8Array(ck);
+}
+async function onLogin(ev){
+  ev.preventDefault();
+  const u=(document.getElementById('lgUser').value||'').trim();
+  const p=document.getElementById('lgPass').value||'';
+  const err=document.getElementById('lgErr');
+  err.textContent='解密中…';
+  if (!window.isSecureContext){ err.textContent='当前非安全环境(非HTTPS)，WebCrypto不可用，请用 https 访问'; return; }
+  if ((await sha256(u))!==LOCK.user || (await sha256(p))!==LOCK.pass){ err.textContent='账号或密码错误，请重试'; return; }
+  let keyBits;
+  try { keyBits=await deriveKey(p); }
+  catch(e){ err.textContent='密钥派生失败：'+e.message; return; }
+  let data;
+  try { data=await decryptData(keyBits); }
+  catch(e){ err.textContent='解密失败：'+e.message; return; }
+  try { injectData(data); }
+  catch(e){ console.error(e); err.textContent='内容渲染失败，请刷新重试：'+e.message; return; }
+  try { sessionStorage.setItem('brew_key', bufToB64(keyBits)); sessionStorage.setItem('brew_auth','1'); } catch(e){}
+  err.textContent='';
+  dismissMask();
+}
+function bufToB64(u8){ let s=''; for(const c of u8) s+=String.fromCharCode(c); return btoa(s); }
+async function gunzip(u8){
+  if (typeof DecompressionStream === 'undefined') throw new Error('浏览器版本过低，请使用新版 Chrome / Edge / Safari');
+  const stream = new Blob([u8]).stream().pipeThrough(new DecompressionStream('gzip'));
+  const buf = await new Response(stream).arrayBuffer();
+  return new Uint8Array(buf);
+}
+async function decryptData(keyBits){
+  const key=await crypto.subtle.importKey('raw', keyBits, {name:'AES-GCM'}, false, ['decrypt']);
+  const pt=await crypto.subtle.decrypt({name:'AES-GCM', iv:b64ToU8(LOCK.iv)}, key, b64ToU8(LOCK.ct));
+  if (LOCK.zip === 1) return JSON.parse(DEC.decode(await gunzip(new Uint8Array(pt))));
+  return JSON.parse(DEC.decode(pt));
+}
+function injectData(data){
+  document.getElementById('appRoot').innerHTML=data.body;
+  const s=document.createElement('script'); s.textContent=data.js; document.body.appendChild(s);
+  appMain();
+  const r=document.getElementById('appRoot'); if (r) r.classList.add('ready');
+  hideSplash();
+}
+function hideSplash(){ const s=document.getElementById('bootSplash'); if(!s) return; s.style.opacity='0'; setTimeout(()=>{ try{ s.remove(); }catch(e){} }, 240); }
+function showLoginMask(){ const m=document.getElementById('loginMask'); if(m) m.style.display='flex'; hideSplash(); }
+function dismissMask(){
+  const m=document.getElementById('loginMask');
+  if (!m) return;
+  m.style.setProperty('display','none','important');
+  m.hidden=true;
+  try { m.remove(); } catch(e){}
+}
+function appMain(){ try{ switchPage('featured'); initChartTip(); }catch(e){ showBadge('appMain: '+e.message); } }
+function logout(){ try{ sessionStorage.removeItem('brew_auth'); sessionStorage.removeItem('brew_key'); }catch(e){} location.reload(); }
+function showBadge(msg){ let b=document.getElementById('errBadge'); if(!b){ b=document.createElement('div'); b.id='errBadge'; b.style.cssText='position:fixed;left:10px;bottom:10px;z-index:9999;background:#7f1d1d;color:#fecaca;font-size:12px;padding:8px 12px;border-radius:8px;max-width:60vw;white-space:pre-wrap;'; document.body.appendChild(b);} b.textContent='⚠ '+msg; }
+window.addEventListener('error', function(e){ showBadge(e.message + ' @ ' + (e.filename||'').split('/').pop() + ':' + (e.lineno||'')); });
+function showMaskMsg(msg) { showLoginMask(); const e = document.getElementById('lgErr'); if (e) e.textContent = msg; }
+// 启动：会话密钥 → 邀请链接 → 登录
+(async function(){
+  let ck = null;
+  try { const k = sessionStorage.getItem('brew_key'); if (k) ck = b64ToU8(k); } catch(e){}
+  if (!ck) {
+    const q = new URLSearchParams(location.search).get('k');
+    if (q && q.indexOf('.') > 0) {
+      const id = q.slice(0, q.indexOf('.'));
+      const token = q.slice(q.indexOf('.') + 1);
+      const entry = (typeof INVITES !== 'undefined' ? INVITES : []).find(function(x){ return x.id === id; });
+      if (!entry) { showMaskMsg('邀请链接无效，请联系管理员重新获取'); return; }
+      if (entry.exp && Date.now() > entry.exp) { showMaskMsg('邀请链接已过期，请联系管理员重新获取'); return; }
+      try { ck = await unwrapInvite(entry, token); }
+      catch(e){ showMaskMsg('邀请链接无效或已被撤销'); return; }
+    }
+  }
+  if (ck) {
+    try {
+      injectData(await decryptData(ck));
+      try { sessionStorage.setItem('brew_key', bufToB64(ck)); } catch(e){}
+      dismissMask();
+    } catch(e) { showLoginMask(); }
+  } else {
+    showLoginMask();
+  }
+})();
+</script>
+</body>
+</html>
+`;
+writeFileSync('index.html', shell);
+console.log(`✅ 已生成加密版 index.html（${(shell.length/1024).toFixed(0)} KB，明文内容未出现在源码）`);

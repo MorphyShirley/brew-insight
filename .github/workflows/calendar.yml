@@ -1,0 +1,38 @@
+name: 营销节点自动刷新
+
+on:
+  schedule:
+    - cron: '17 3 * * 1'   # 每周一 03:17 UTC（北京 11:17）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    env:
+      OWNER_PASSWORD: ${{ secrets.OWNER_PASSWORD }}
+      SRC_KEY: ${{ secrets.SRC_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: 解密源码
+        run: node src_crypt.mjs open
+      - name: 拉取营销节点并固化
+        run: |
+          pip install lunardate
+          python cal_fetch.py
+      - name: 同步部署（加密构建）
+        run: |
+          git config user.name "brew-insight-bot"
+          git config user.email "bot@brew-insight.com"
+          node lock.mjs
+          node src_crypt.mjs seal
+          git add coffee.src.enc index.html
+          git diff --cached --quiet || {
+            git commit -m "📅 营销节点自动刷新 $(date +'%Y-%m-%d')"
+            git push
+          }
