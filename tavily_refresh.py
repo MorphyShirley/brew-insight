@@ -32,9 +32,9 @@ BRANDS = {
     '霸王茶姬': {'kw': '霸王茶姬 新品'},
     '蜜雪冰城': {'kw': '蜜雪冰城 新品'},
     '库迪咖啡': {'kw': '库迪咖啡 新品'},
-    '茶百道': {'kw': '茶百道 新品'},
-    '爷爷不泡茶': {'kw': '爷爷不泡茶 新品'},
-    'CoCo都可': {'kw': 'CoCo都可 新品'},
+    '茶百道': {'kw': '茶百道 新品', 'kws': ['茶百道 新品', '茶百道 联名 门店 2026', '茶百道 财报 门店 2026']},
+    '爷爷不泡茶': {'kw': '爷爷不泡茶 新品', 'kws': ['爷爷不泡茶 新品', '爷爷不泡茶 门店 扩张']},
+    'CoCo都可': {'kw': 'CoCo都可 新品', 'kws': ['CoCo都可 新品', 'CoCo都可 中国 门店 2026', '都可茶饮 大陆 新品']},
     'Tims天好咖啡': {'kw': 'Tims 咖啡 新品'},
     'Manner': {'kw': 'Manner 咖啡 新品'},
     'M Stand': {'kw': 'M Stand 咖啡 新品'},
@@ -130,7 +130,8 @@ NOISE_TITLE = ['抽奖', '抽2万', '0.01元', '薅羊毛', '未中奖', '兑换
                '蹭空调', '蹭wifi', '惬意', '日常饮食记录', '小红书背景图', '手记', '探店',
                '三轮摩托', '摩托车', 'vip', 'VIP', '博主', '吃瓜', '求转发', '应用宝',
                'Uber Eats', 'app下载', '日常vlog', '第一视角', '沉浸式体验',
-    '百度地图', '加盟项目', '加盟指南', '选型指南', '加盟推荐', '品牌推荐', '攻略', '汇总', '门店地址', '营业时间', '团购',]
+    '百度地图', '加盟项目', '加盟指南', '选型指南', '加盟推荐', '品牌推荐', '攻略', '汇总', '门店地址', '营业时间', '团购',
+    '一次看', '總整理', '手搖優惠', '優惠13間', '最新手搖', '8点1氪', '新品_搜狐',]
 TW_HK_DOMAINS = ('travel.yam.com', 'niusnews.com', 'womenshealthmag.com', 'cmnews.com.tw',
                  'ufood.com.hk', 'orangenews.hk', 'ulapp.hk', 'thestormmedia.com', 'hk01.com')
 SOCIAL_DOMAINS = ('facebook.com', 'instagram.com', 'm.facebook.com')
@@ -385,15 +386,18 @@ def main():
     failed = 0
     for brand, info in BRANDS.items():
         print(f"\n🔍 搜索 {brand}...")
-        try:
-            results = tavily_search(api_key, info['kw'])
-        except Exception as e:
-            failed += 1
-            print(f"  ⚠️  {brand} 失败: {type(e).__name__}: {str(e)[:80]}")
-            continue
+        results = []
+        err = None
+        for kw in info.get('kws') or [info['kw']]:
+            try:
+                part = tavily_search(api_key, kw)
+                results.extend(part or [])
+            except Exception as e:
+                err = e
+                print(f"  ⚠️  关键词「{kw}」失败: {type(e).__name__}: {str(e)[:60]}")
         if not results:
             failed += 1
-            print(f"  ⚠️  无结果")
+            print(f"  ⚠️  {brand} 无结果{'（' + str(err)[:40] + '）' if err else ''}")
             continue
         for r in results:
             r['brand'] = brand
