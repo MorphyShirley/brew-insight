@@ -15,5 +15,8 @@ if [ "${1:-}" = "build" ]; then
 fi
 
 scp -i "$KEY" index.html "$HOST:$SRC"
+for f in data_menu.enc data_ytd.enc; do
+  [ -f "$f" ] && scp -i "$KEY" "$f" "$HOST:/var/www/brew-insight/$f"
+done
 ssh -i "$KEY" "$HOST" 'systemctl reload nginx && echo "✅ nginx reload 完成"'
 echo "🌐 请访问 http://118.196.3.71/（HTTPS 待域名审核通过后配置）"

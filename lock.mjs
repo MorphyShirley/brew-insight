@@ -65,6 +65,35 @@ js = js.replace(/\/\/ ═══ AUTH ═══[\s\S]*?function boot\(\) \{ switc
 js = js.replace(/if \(!AUTH\.enabled \|\| sessionStorage\.getItem\('brew_auth'\) === '1'\) \{ boot\(\); \}\nelse \{ showLogin\(\); \}\n?/, '');
 js = js.trimEnd() + '\nappMain();\n';
 
+// ── 拆出大体量数据（行业菜单 / 品牌 YTD），改为按需加载的独立加密包 ──
+function extractDataBlock(source, startMark, endMark, name) {
+  const i0 = source.indexOf(startMark);
+  if (i0 < 0) return null;
+  const i1 = source.indexOf(endMark, i0);
+  if (i1 < 0) return null;
+  const block = source.slice(i0, i1 + endMark.length);
+  const decl = 'const ' + name + ' = ';
+  const k = block.indexOf(decl);
+  if (k < 0) return null;
+  const rest = block.slice(k + decl.length);
+  const semi = rest.lastIndexOf(';');
+  const jsonText = (semi >= 0 ? rest.slice(0, semi) : rest).trim();
+  return { block, jsonText };
+}
+const chunkData = {};
+const menuBlock = extractDataBlock(js, '//@MENU_START', '//@MENU_END', 'MENU_DATA');
+if (menuBlock) {
+  JSON.parse(menuBlock.jsonText); // 校验
+  js = js.replace(menuBlock.block, () => 'let MENU_DATA = null;');
+  chunkData.menu = menuBlock.jsonText;
+}
+const ytdBlock = extractDataBlock(js, '//@YTD_START', '//@YTD_END', 'BRAND_YTD');
+if (ytdBlock) {
+  JSON.parse(ytdBlock.jsonText);
+  js = js.replace(ytdBlock.block, () => 'let BRAND_YTD = null;');
+  chunkData.ytd = ytdBlock.jsonText;
+}
+
 const payload = JSON.stringify({ body: appHTML, js });
 // 收集源码全部样式（含 App 布局/主题），合入登录壳保证解锁后正常渲染
 const styles = (src.match(/<style[^>]*>[\s\S]*?<\/style>/g) || []).join('\n');
@@ -81,7 +110,18 @@ const LOCK = {
   s: b64(salt), iv: b64(iv), ct: b64(ct), zip: 1,
   user: sha256hex(ACCOUNT),
   pass: sha256hex(PASSWORD),
+  chunks: {},
 };
+const stamp = Date.now().toString(36);
+for (const [name, jsonText] of Object.entries(chunkData)) {
+  const cz = gzipSync(Buffer.from(jsonText, 'utf8'), { level: 9 });
+  const civ = webcrypto.getRandomValues(new Uint8Array(12));
+  const cct = await aesEncrypt(keyBits, civ, cz);
+  const file = `data_${name}.enc`;
+  writeFileSync(file, JSON.stringify({ iv: b64(civ), ct: b64(cct) }));
+  LOCK.chunks[name] = { f: file, v: stamp };
+  console.log(`📦 ${file}: ${Math.round(cct.length / 1024)} KB（明文 ${Math.round(jsonText.length / 1024)} KB）`);
+}
 const lockJson = JSON.stringify(LOCK);
 
 // ── 邀请链接：用邀请 token 派生的密钥封装内容密钥（CK）──

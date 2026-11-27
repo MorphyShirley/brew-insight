@@ -22,7 +22,7 @@ jobs:
           node src_crypt.mjs seal
           git config user.name "brew-insight-bot"
           git config user.email "bot@brew-insight.com"
-          git add coffee.src.enc index.html
+          git add coffee.src.enc index.html data_menu.enc data_ytd.enc
           git diff --cached --quiet || {
             git commit -m "📊 同步 index.html $(date +'%Y-%m-%d')"
             git push

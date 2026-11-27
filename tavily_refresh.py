@@ -435,7 +435,7 @@ def main():
         # 源码加密入库（公开仓库不出现明文 coffee.html）
         subprocess.run(['node', os.path.join(repo, 'src_crypt.mjs'), 'seal'], cwd=repo, check=True)
         now = datetime.now().strftime('%Y-%m-%d %H:%M')
-        subprocess.run(['git', 'add', 'coffee.src.enc', 'index.html', 'invites.lock.json'], cwd=repo, check=True)
+        subprocess.run(['git', 'add', 'coffee.src.enc', 'index.html', 'invites.lock.json', 'data_menu.enc', 'data_ytd.enc'], cwd=repo, check=True)
         changed = subprocess.run(['git', 'diff', '--cached', '--quiet'], cwd=repo).returncode != 0
         if changed:
             msg = f"🤖 自动刷新 {now}" + (f" (+{len(new_cards)})" if new_cards else "（营销节点更新）")
