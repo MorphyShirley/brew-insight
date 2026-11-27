@@ -333,8 +333,10 @@ def check_usage(api_key):
                 print(f"⚠️  Tavily 免费额度已用 {pct:.0f}%")
         else:
             print(f"📊 Tavily 用量: {used} 积分")
+        return used, limit or 0
     except Exception as e:
         print(f"ℹ️  Tavily 用量查询失败（不影响刷新）: {str(e)[:60]}")
+        return None, 0
 
 def main():
     global DAYS_BACK
@@ -362,7 +364,13 @@ def main():
         print('❌ 未设置 TAVILY_API_KEY 环境变量（可用 .env 文件或环境变量提供）')
         sys.exit(1)
 
-    check_usage(api_key)
+    used, limit = check_usage(api_key)
+    if limit:
+        remaining = limit - used
+        need = len(BRANDS)
+        if remaining < need + 2:
+            print(f"⛔ 额度仅剩 {remaining} 次，不足本次 {need} 次检索，跳过本次刷新（下个计费周期恢复）")
+            sys.exit(0)
 
     html_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'coffee.html')
     with open(html_path, 'r', encoding='utf-8') as f:
